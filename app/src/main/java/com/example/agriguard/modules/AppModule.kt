@@ -1,5 +1,6 @@
 package com.example.agriguard.modules
 
+import com.example.agriguard.BuildConfig
 import com.example.agriguard.modules.main.user.model.entity.User
 import dagger.Module
 import dagger.Provides
@@ -7,7 +8,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
-import com.example.agriguard.BuildConfig
 import io.realm.kotlin.mongodb.App
 import io.realm.kotlin.mongodb.Credentials
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
@@ -26,7 +26,7 @@ object AppModule {
             val user = app.login(credentials)
 
             val setOfEntities = setOf(
-                User::class
+                User::class,
             )
 
             val config = SyncConfiguration
@@ -37,7 +37,7 @@ object AppModule {
                 .initialSubscriptions { realm ->
                     add(
                         realm.query<User>("_id <> $0", null),
-                        name = "Users"
+                        name = "User"
                     )
                 }
                 .build()
