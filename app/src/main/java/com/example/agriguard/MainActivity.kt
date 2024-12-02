@@ -38,7 +38,6 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(UserState provides userState) {
                     val startingDestination = getStartDestination(loginViewModel)
                     NavHost(navController = navController, startDestination = startingDestination) {
-//                    NavHost(navController = navController, startDestination = IntroNav) {
                         introGraph(navController)
                         mainGraph(navController)
                     }

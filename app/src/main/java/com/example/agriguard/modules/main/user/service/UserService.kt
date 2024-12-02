@@ -4,17 +4,13 @@ import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.model.entity.User
 import com.example.agriguard.modules.main.user.model.mapper.toDTO
 import com.example.agriguard.modules.main.user.model.mapper.toEntity
-import com.example.agriguard.modules.shared.ext.toObjectId
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import kotlinx.coroutines.runBlocking
 import org.mongodb.kbson.ObjectId
-import java.util.UUID
 import javax.inject.Inject
 
 class UserService  @Inject constructor(private val realm: Realm)  {
-
     fun fetchOne(userId: String): UserDto {
         return realm.query<User>("_id == $0", ObjectId(userId))
             .find()
