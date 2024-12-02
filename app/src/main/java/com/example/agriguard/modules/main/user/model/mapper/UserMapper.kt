@@ -17,7 +17,7 @@ fun User.toDTO(): UserDto {
         lastName = lastName,
         mobileNumber = mobileNumber,
         address = address,
-        userName = userName,
+        username = username,
         dateOfBirth = dateOfBirth.toInstantString(),
         password = password,
         isAdmin = isAdmin,
@@ -41,7 +41,7 @@ fun UserDto.toEntity(): User {
         lastName = userDto.lastName
         mobileNumber = userDto.mobileNumber
         address = userDto.address
-        userName = userDto.userName
+        username = userDto.username
         dateOfBirth = userDto.dateOfBirth.toRealmInstant()
         password = userDto.password
         isAdmin = userDto.isAdmin

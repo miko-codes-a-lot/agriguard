@@ -13,7 +13,7 @@ class User : RealmObject {
     var lastName: String = ""
     var mobileNumber: String? = ""
     var address: String? = ""
-    var userName: String = ""
+    var username: String = ""
     var dateOfBirth: RealmInstant = RealmInstant.now()
     var password: String = ""
     var isAdmin: Boolean = false

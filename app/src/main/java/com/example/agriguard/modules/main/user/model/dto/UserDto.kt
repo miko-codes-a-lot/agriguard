@@ -7,7 +7,7 @@ data class UserDto(
     var lastName: String = "",
     var mobileNumber: String? = null,
     var address: String? = null,
-    var userName: String = "",
+    var username: String = "",
     var dateOfBirth: String = "",
     var password: String = "",
     var isAdmin: Boolean = false,

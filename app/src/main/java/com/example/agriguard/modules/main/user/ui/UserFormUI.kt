@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -40,7 +39,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,18 +52,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.user.model.dto.UserDto
-import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
 import com.example.agriguard.modules.shared.ext.hashPassword
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -96,7 +89,7 @@ fun UserFormUI(
                     "Date Of Birth" -> userDto?.dateOfBirth ?: ""
                     "Address" -> userDto?.address?.trim() ?: ""
                     "Mobile Number" -> userDto?.mobileNumber?.trim() ?: ""
-                    "Username" -> userDto?.userName?.trim() ?: ""
+                    "Username" -> userDto?.username?.trim() ?: ""
                     "Password" -> userDto?.password ?: ""
                     else -> ""
                 }
@@ -764,7 +757,7 @@ fun ButtonSubmitData(
                     address = statesValue["Address"]?.value ?: "",
                     mobileNumber = statesValue["Mobile Number"]?.value ?: "",
                     dateOfBirth = statesValue["Date Of Birth"]?.value ?: "",
-                    userName = statesValue["Username"]?.value ?: "",
+                    username = statesValue["Username"]?.value ?: "",
                     password = statesValue["Password"]?.value ?: targetUserDto?.password ?: "",
                     isAdmin = selectedOption == "Admin",
                     isTechnician = selectedOption == "Technician",

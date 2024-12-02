@@ -1,6 +1,5 @@
 package com.example.agriguard.modules.intro.login
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -110,7 +109,7 @@ fun LogInUI(
                 listOfLabel.associateWith {
                     mutableStateOf(
                         when (it) {
-                            "Username" -> userDto?.userName ?: ""
+                            "Username" -> userDto?.username ?: ""
                             "Password" -> userDto?.password ?: ""
                             else -> ""
                         }
