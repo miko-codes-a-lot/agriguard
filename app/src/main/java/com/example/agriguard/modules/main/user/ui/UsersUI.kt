@@ -4,13 +4,11 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,25 +41,36 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
+import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
 
 @Preview(showSystemUi = true)
 @Composable
 fun UsersListPreview() {
-    UsersList(rememberNavController())
+    UsersUI(
+        rememberNavController(),
+    )
 }
 
 @Composable
-fun UsersList(
-    navController: NavController
+fun UsersUI(
+    navController: NavController,
 ) {
-    val listUsers = listOf(
-        "William Shake Spear","Randy Orton","Justine Santiago","Mike Swift","Carlo Mabini"
-    )
+    val userViewModel: UserViewModel = hiltViewModel()
     var searchQuery by remember { mutableStateOf("") }
+    val users by produceState<List<UserDto>>(emptyList(), userViewModel) {
+        value = userViewModel.fetchUsers()
+    }
+    val filteredFarmers = users.filter {
+        it.firstName.contains(searchQuery, ignoreCase = true) ||
+        it.middleName!!.contains(searchQuery, ignoreCase = true) ||
+        it.lastName.contains(searchQuery, ignoreCase = true)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,7 +81,9 @@ fun UsersList(
                 .fillMaxSize()
                 .background(Color(0xFFFFFFFF)),
             floatingActionButton = {
-                FloatParentFloatingIcon(navController)
+                    FloatParentFloatingIcon(
+                        navController,
+                    )
             }
         ) {padding ->
             Column(
@@ -80,14 +92,12 @@ fun UsersList(
                     .background(Color.White)
                     .padding(padding)
                     .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-//                Spacer(modifier = Modifier.padding( top = 45.dp) )
                 UsersSearchIcon(
                     searchQuery = searchQuery,
                     onSearchQueryChanged = { searchQuery = it },
-                    navController = navController
                 )
                 Spacer(modifier = Modifier.padding(bottom = 3.dp))
                 LazyColumn(
@@ -97,8 +107,8 @@ fun UsersList(
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(listUsers) { user ->
-                        Users(users = user,navController = navController)
+                    items(filteredFarmers) { user ->
+                        UsersSingleLine(userDto = user,navController = navController)
                     }
                 }
             }
@@ -110,7 +120,6 @@ fun UsersList(
 fun UsersSearchIcon(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
-    navController: NavController
 ) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
@@ -127,9 +136,8 @@ fun UsersSearchIcon(
             }
         },
         trailingIcon = {
-//            if (searchQuery.isNotEmpty()) {
-//                IconButton(onClick = { onSearchQueryChanged("") }) {
-                IconButton(onClick = {  }) {
+            if (searchQuery.isNotEmpty()) {
+                IconButton(onClick = { onSearchQueryChanged("") }) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Clear Search",
@@ -137,7 +145,7 @@ fun UsersSearchIcon(
                         modifier = Modifier.size(24.dp)
                     )
                 }
-//            }
+            }
         },
         colors = OutlinedTextFieldDefaults.colors(
             unfocusedBorderColor = Color.Black,
@@ -154,9 +162,8 @@ fun UsersSearchIcon(
 
 
 @Composable
-fun Users(
-    users: String,
-//    userDto: UserDto,
+fun UsersSingleLine(
+    userDto: UserDto,
     navController: NavController
 ) {
     Column(
@@ -169,7 +176,7 @@ fun Users(
                 .fillMaxWidth()
                 .padding(10.dp)
                 .clickable {
-                    navController.navigate(MainNav.FarmersPreview)
+                    navController.navigate(MainNav.EditUser(userId = userDto.id!!))
                 },
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -180,7 +187,7 @@ fun Users(
                 modifier = Modifier.size(26.dp)
             )
             Text(
-                text = users,
+                text = userDto.email ?: "${userDto.firstName} ${userDto.lastName}",
                 fontSize = 18.sp,
                 fontFamily = FontFamily.SansSerif,
                 color = Color.Black,
@@ -200,8 +207,8 @@ fun Users(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FloatParentFloatingIcon(
-    navController: NavController
-) {
+    navController: NavController,
+    ) {
     Column(
         modifier = Modifier
             .background(Color.Transparent),
@@ -209,7 +216,7 @@ fun FloatParentFloatingIcon(
     ) {
 
         FloatingActionButton(
-            onClick = { navController.navigate(MainNav.CreateUser) },
+            onClick = { navController.navigate(MainNav.CreateUser(addressId = null)) },
             containerColor = Color(0xFF136204),
             contentColor = Color(0xFFFFFFFF),
             shape = CircleShape,
