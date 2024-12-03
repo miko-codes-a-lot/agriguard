@@ -32,6 +32,11 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,31 +44,49 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
-
-@Preview(showSystemUi = true)
-@Composable
-fun FarmersPrev() {
-    FarmersListUI(
-        rememberNavController()
-    )
-}
+import com.example.agriguard.modules.main.farmer.enum.FarmerStatus
+import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
+import com.example.agriguard.modules.main.user.model.dto.AddressDto
+import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.example.agriguard.modules.shared.ext.toObjectId
+import kotlinx.coroutines.delay
 
 @Composable
-fun FarmersListUI(navController: NavController) {
-    val listFarmers = listOf(
-        "Mark Smith Perez","Aron Gonzales","Juan Dela Cruz","Pedro Santos","Mike Santos",
-        "Ronnie Lopez","Jhon Paul Perez","Ryan Martinez","Michael Jackson","John Cena",
-        "Mark John Paul","Aron Gonzales","Juan Dela Cruz","Pedro Santos","Mike Santos"
+fun FarmersUI(
+    navController: NavController,
+    currentId: UserDto,
+    addressDto: AddressDto?,
+    status: String,
+) {
+    val farmersViewModel: FarmersViewModel = hiltViewModel()
+    var debouncedQuery by remember { mutableStateOf("") }
+    var searchQuery by remember { mutableStateOf("") }
+    LaunchedEffect(searchQuery) {
+        delay(500L)
+        debouncedQuery = searchQuery
+    }
 
-    )
+    val farmers = when {
+        status == FarmerStatus.FARMER.name -> {
+            farmersViewModel.fetchUsers(currentId.id.toObjectId(), currentId.isAdmin, addressDto?.name)
+        }
+        else -> {
+            farmersViewModel.fetchUsers(currentId.id.toObjectId(), currentId.isAdmin, addressDto?.name)
+        }
+    }
+
+    val filteredFarmers = farmers.filter {
+        it.firstName.contains(debouncedQuery, ignoreCase = true) ||
+        it.middleName?.contains(debouncedQuery, ignoreCase = true) ?: false ||
+        it.lastName.contains(debouncedQuery, ignoreCase = true)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,7 +98,12 @@ fun FarmersListUI(navController: NavController) {
                 .background(Color.White)
                 .fillMaxSize(),
             floatingActionButton = {
-                FloatingIconUserList(navController = navController)
+                if (addressDto != null) {
+                    FloatingIconUserList(
+                        navController = navController,
+                            addressDto
+                    )
+                }
             }
 
         ) { padding ->
@@ -87,7 +115,10 @@ fun FarmersListUI(navController: NavController) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                SearchIcon()
+                SearchIcon(
+                    searchQuery = searchQuery,
+                    onSearchQueryChanged = { searchQuery = it },
+                )
                 Spacer(modifier = Modifier.padding(bottom = 3.dp))
                 LazyColumn(
                     modifier = Modifier
@@ -96,8 +127,8 @@ fun FarmersListUI(navController: NavController) {
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(listFarmers) { farmer ->
-                        Farmers(farmerName = farmer,navController)
+                    items(filteredFarmers) { farmer ->
+                        FarmersListContainer(userDto = farmer,navController)
                     }
                 }
             }
@@ -106,8 +137,59 @@ fun FarmersListUI(navController: NavController) {
 }
 
 @Composable
-fun Farmers(
-    farmerName: String,
+fun SearchIcon(
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit,
+) {
+    OutlinedTextField(
+        modifier = Modifier.fillMaxWidth(),
+        value = searchQuery,
+        onValueChange = { onSearchQueryChanged(it) },
+        leadingIcon = {
+            IconButton(onClick = { } ) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search Icon",
+                    tint = Color.Black,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
+        trailingIcon = {
+            if (searchQuery.isNotEmpty()) {
+                IconButton(onClick = { onSearchQueryChanged("") }) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Clear Search",
+                        tint = Color.Black,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+        },
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedBorderColor = Color.Black,
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            focusedBorderColor = Color.Black,
+            disabledBorderColor = Color.Gray,
+            errorBorderColor = Color.Red,
+            cursorColor = Color.Black
+        ),
+        placeholder = {
+            Text(
+                text = "Search...",
+                color = Color.Black,
+                fontFamily = FontFamily.SansSerif,
+                fontSize = 16.sp
+            )
+        }
+    )
+}
+
+@Composable
+fun FarmersListContainer(
+    userDto: UserDto,
     navController: NavController
 ) {
     Column(
@@ -127,7 +209,7 @@ fun Farmers(
             Spacer(modifier = Modifier.width(10.dp))
             FarmersImageContainer()
             Text(
-                text = farmerName,
+                text = "${userDto.firstName} ${userDto.middleName} ${userDto.lastName}",
                 fontSize = 18.sp,
                 fontFamily = FontFamily.SansSerif,
                 modifier = Modifier
@@ -220,7 +302,8 @@ fun SearchIcon() {
 
 @Composable
 fun FloatingIconUserList(
-    navController: NavController
+    navController: NavController,
+    addressDto: AddressDto,
 ) {
     Column(
         modifier = Modifier
@@ -228,7 +311,7 @@ fun FloatingIconUserList(
         horizontalAlignment = Alignment.End
     ) {
         FloatingActionButton(
-            onClick = { navController.navigate(MainNav.CreateUser) },
+            onClick = { navController.navigate(MainNav.CreateUser(addressDto.id)) },
             containerColor = Color(0xFF136204),
             contentColor = Color(0xFFFFFFFF),
             shape = CircleShape,
