@@ -1,6 +1,8 @@
 package com.example.agriguard.modules.main.user.ui
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +41,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,10 +58,17 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.agriguard.R
+import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
+import com.example.agriguard.modules.main.user.model.dto.AddressDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.example.agriguard.modules.main.user.service.UserService
+import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
 import com.example.agriguard.modules.shared.ext.hashPassword
+import kotlinx.coroutines.launch
+import org.mongodb.kbson.ObjectId
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -69,13 +79,15 @@ fun UserFormUI(
     title: String = "Create Account",
     userDto: UserDto? = null,
     currentUser: UserDto,
-    navController: NavController,
     onSubmit: (UserDto) -> Unit,
+    navController: NavController,
     includePassword: Boolean = true,
+    addressDto: AddressDto?,
+    userService: UserService = hiltViewModel<UserViewModel>().userService
 ) {
     val listOfLabel = mutableListOf(
         "First Name", "Middle Name", "Last Name", "Date Of Birth", "Address",
-        "Mobile Number", "Username"
+        "Mobile Number", "Email"
     )
     if (includePassword) listOfLabel.add("Password")
 
@@ -87,9 +99,9 @@ fun UserFormUI(
                     "Middle Name" -> userDto?.middleName?.trim() ?: ""
                     "Last Name" -> userDto?.lastName?.trim() ?: ""
                     "Date Of Birth" -> userDto?.dateOfBirth ?: ""
-                    "Address" -> userDto?.address?.trim() ?: ""
+                    "Address" -> userDto?.address?.trim() ?: addressDto?.name ?: ""
                     "Mobile Number" -> userDto?.mobileNumber?.trim() ?: ""
-                    "Username" -> userDto?.username?.trim() ?: ""
+                    "Email" -> userDto?.email?.trim() ?: ""
                     "Password" -> userDto?.password ?: ""
                     else -> ""
                 }
@@ -115,10 +127,15 @@ fun UserFormUI(
     val errors = remember {
         listOfLabel.associateWith { mutableStateOf("") }
     }
-
     var isButtonEnabled by remember { mutableStateOf(true) }
     val isEnableSubmit = remember { mutableStateOf(true) }
     var radioError by remember { mutableStateOf(false) }
+
+    val farmersViewModel: FarmersViewModel = hiltViewModel()
+    val addressList by remember { mutableStateOf(farmersViewModel.fetchAddresses()) }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    var selectedProfileImageUri by remember { mutableStateOf<Uri?>(null) }
 
     LazyColumn(
         modifier = Modifier
@@ -137,11 +154,6 @@ fun UserFormUI(
                   fontSize = 24.sp,
                   modifier = Modifier
                       .offset(y = (-6).dp)
-//            Text(
-//                text = "Create Account",
-//                fontFamily = FontFamily.Serif,
-//                fontSize = 24.sp,
-//
             )
         }
 
@@ -153,7 +165,8 @@ fun UserFormUI(
                     selectedOption  = option
                 },
                 includePassword = true,
-                currentUser = currentUser
+                currentUser = currentUser,
+                addressList = addressList
             )
         }
 
@@ -197,7 +210,7 @@ fun UserFormUI(
 //            }
         }
 
-        item{
+                                                                 item{
             Spacer(modifier = Modifier.height(50.dp))
         }
     }
@@ -210,6 +223,7 @@ fun ContainerLabelValue(
     currentUser: UserDto,
     includePassword: Boolean,
     onSelect: (option: String) -> Unit,
+    addressList: List<AddressDto>
 ) {
     val firstNameKey = "First Name"
     val firstName = statesValue[firstNameKey]
@@ -352,25 +366,6 @@ fun ContainerLabelValue(
                     )
                 )
             }
-            val addressList = mapOf(
-                "Magbay" to 1,
-                "Mapaya" to 2,
-                "Mangarin" to 3,
-                "San Agustin" to 4,
-                "La Curva" to 5,
-                "Camburay" to 6,
-                "Mabini" to 7,
-                "Murtha" to 8,
-                "Batasan" to 9,
-                "Monteclaro" to 10,
-                "Nalbuan" to 11,
-                "Bagong Sikat" to 12,
-                "Labangan Poblacion" to 13,
-                "Bayotbot" to 14,
-                "San Isidro" to 15,
-                "Bubog" to 16,
-                "Central" to 17
-            )
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
@@ -380,18 +375,18 @@ fun ContainerLabelValue(
                     .heightIn(max = 200.dp)
                     .offset(y = 8.dp)
             ) {
-                addressList.forEach { (address, _) ->
+                addressList.forEach { address ->
                     DropdownMenuItem(
                         text = {
                             Text(
-                                text = address,
+                                text = address.name,
                                 color = Color.Black,
                                 fontFamily = FontFamily.SansSerif,
                                 fontSize = 16.sp
                             )
                         }, onClick = {
-                            selectItem = address
-                            statesValue["Address"]?.value = address
+                            selectItem = address.name
+                            statesValue["Address"]?.value = address.name
                             expanded = false
                         })
                 }
@@ -412,7 +407,7 @@ fun ContainerLabelValue(
         )
     )
 
-    val userNameKey = "Username"
+    val userNameKey = "Email"
     val userName = statesValue[userNameKey]
     TextFieldContainer(
         textFieldLabel = userNameKey,
@@ -757,7 +752,7 @@ fun ButtonSubmitData(
                     address = statesValue["Address"]?.value ?: "",
                     mobileNumber = statesValue["Mobile Number"]?.value ?: "",
                     dateOfBirth = statesValue["Date Of Birth"]?.value ?: "",
-                    username = statesValue["Username"]?.value ?: "",
+                    email = statesValue["Email"]?.value ?: "",
                     password = statesValue["Password"]?.value ?: targetUserDto?.password ?: "",
                     isAdmin = selectedOption == "Admin",
                     isTechnician = selectedOption == "Technician",
