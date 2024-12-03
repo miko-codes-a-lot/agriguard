@@ -14,9 +14,9 @@ class AuthService @Inject constructor(
 ) {
 
     fun login(loginDto: LoginDto): UserDto? {
-        val query = "userName == $0"
+        val query = "email == $0"
 
-        val user = realm.query<User>(query, loginDto.username)
+        val user = realm.query<User>(query, loginDto.email)
             .find()
             .firstOrNull()
 
