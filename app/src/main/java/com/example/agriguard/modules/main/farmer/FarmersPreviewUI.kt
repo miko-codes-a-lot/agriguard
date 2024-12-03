@@ -24,45 +24,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-
-
-@Preview(showSystemUi = true)
-@Composable
-fun FarmersPrevUI() {
-    FarmersPreviewUI(
-        navController = rememberNavController()
-    )
-}
+import com.example.agriguard.modules.main.user.model.dto.UserDto
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FarmersPreviewUI(
-    navController: NavController
+    navController: NavController,
+    currentUser: UserDto
 ) {
-    val listOfLabel = mutableListOf(
-        "FirstName","MiddleName", "LastName", "Address", "Gender",
-        "Contact Number", "UserName"
-    )
-    val statesValue = remember {
-        listOfLabel.associateWith {
-            mutableStateOf(
-                when (it) {
-                    "FirstName" -> "Mark"
-                    "MiddleName" -> "Smith"
-                    "LastName" -> "Perez"
-                    "Address" -> "101 Manila St"
-                    "Contact Number" -> "09985626428"
-                    "UserName" -> "mark_perez"
-                    "Gender" -> "Male"
-                    else -> ""
-                }
-            )
-        }
+    val statesValue = remember(currentUser) {
+        listOf(
+            "FirstName" to currentUser.firstName,
+            "MiddleName" to (currentUser.middleName ?: ""),
+            "LastName" to currentUser.lastName,
+            "Address" to (currentUser.address ?: ""),
+            "Mobile Number" to (currentUser.mobileNumber ?: ""),
+            "Date Of Birth" to currentUser.dateOfBirth,
+            "Email" to currentUser.email,
+        ).associate { (label, value) -> label to mutableStateOf(value) }
     }
     Scaffold(
 //        floatingActionButton = {
