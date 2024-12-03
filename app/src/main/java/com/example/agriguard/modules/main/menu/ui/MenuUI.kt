@@ -23,9 +23,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.dashboard.ui.DashboardUI
-import com.example.agriguard.modules.main.farmer.AddressUI
+import com.example.agriguard.modules.main.farmer.AddressesUI
 import com.example.agriguard.modules.main.farmer.ComplaintFormUI
-import com.example.agriguard.modules.main.farmer.FarmersListUI
 import com.example.agriguard.modules.main.menu.model.NavItem
 import com.example.agriguard.modules.main.message.MessageListUI
 import com.example.agriguard.modules.main.message.MessageUI
@@ -35,18 +34,21 @@ import com.example.agriguard.modules.main.report.ui.ReportFormValidationUI
 import com.example.agriguard.modules.main.report.ui.ReportListUI
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.example.agriguard.modules.main.user.ui.UsersUI
 
 @Preview(showSystemUi = true)
 @Composable
 fun MenuUIPreview() {
-    MenuUI(navController = rememberNavController(), UserDto(isAdmin = true))
+    MenuUI(
+        navController = rememberNavController(),
+        UserDto(isAdmin = true)
+    )
 }
 
 @Composable
 fun MenuUI(
     navController: NavController,
     currentUser: UserDto
-//    currentUser: UserDto = UserDto(isAdmin = true, isTechnician = false, isFarmers = false)
 ) {
     var routeName by rememberSaveable { mutableStateOf("Dashboard") }
     val navItems = getNavItems(navController, currentUser)
@@ -82,15 +84,15 @@ fun MenuUI(
                 .padding(paddingValues)
         ) {
             when (routeName) {
-                "Dashboard" -> DashboardUI(navController)
+                "Dashboard" -> DashboardUI(navController, currentUser)
                 "ComplainForm" -> ComplaintFormUI(navController)
-                "AddressList" -> AddressUI(navController)
-                "FarmersList" -> FarmersListUI(navController)
+                "AddressList" -> AddressesUI(navController)
                 "MessageList" -> MessageListUI(navController)
                 "Message" -> MessageUI(navController)
                 "FormValidation" -> ReportFormValidationUI(navController)
                 "NotificationList" -> NotificationListUI(navController)
-                "Setting" -> SettingsUI(navController)
+                "Setting" -> SettingsUI(navController, currentUser)
+                "UsersList" -> UsersUI(navController)
                 "RegistrationMenu" -> RegistrationMenu(navController)
                 "ReportList" -> ReportListUI(navController)
             }
@@ -120,6 +122,11 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
             NavItem(
                 icon =  painterResource(id = R.drawable.message),
                 routeName = "Message",
+                navigation = navController,
+            ),
+            NavItem(
+                icon = painterResource(id = R.drawable.insurance),
+                routeName = "RegistrationMenu",
                 navigation = navController,
             ),
             NavItem(
@@ -167,16 +174,16 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
                 routeName = "Dashboard",
                 navigation = navController,
             ),
-//            NavItem(
-//                icon =  painterResource(id = R.drawable.users),
-//                routeName = "UsersList",
-//                navigation = navController,
-//            ),
             NavItem(
-                icon = painterResource(id = R.drawable.insurance),
-                routeName = "RegistrationMenu",
+                icon =  painterResource(id = R.drawable.users),
+                routeName = "UsersList",
                 navigation = navController,
             ),
+//            NavItem(
+//                icon = painterResource(id = R.drawable.insurance),
+//                routeName = "RegistrationMenu",
+//                navigation = navController,
+//            ),
             NavItem(
                 icon = painterResource(id = R.drawable.setting),
                 routeName = "Setting",
