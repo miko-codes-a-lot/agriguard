@@ -13,12 +13,14 @@ class User : RealmObject {
     var lastName: String = ""
     var mobileNumber: String? = ""
     var address: String? = ""
-    var username: String = ""
+    var email: String = ""
     var dateOfBirth: RealmInstant = RealmInstant.now()
     var password: String = ""
     var isAdmin: Boolean = false
     var isTechnician: Boolean = false
     var isFarmers: Boolean = false
+    var userProfile: String? = null
+    var validId: String? = null
     var createdById: ObjectId? = null
     var createdAt: RealmInstant = RealmInstant.now()
     var lastUpdatedById: ObjectId? = null
