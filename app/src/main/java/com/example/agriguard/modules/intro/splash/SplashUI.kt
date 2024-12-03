@@ -17,17 +17,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.intro.IntroNav
-import com.example.agriguard.modules.main.MainNav
 
 @Preview(showSystemUi = true)
 
@@ -54,7 +51,7 @@ fun SplashUI (navController: NavController) {
         Spacer(modifier = Modifier.height(85.dp))
 
         Button(
-            onClick = { navController.navigate(IntroNav.LogIn) },
+            onClick = { navController.navigate(IntroNav.Login) },
             modifier = Modifier
                 .padding(bottom = 50.dp)
                 .height(50.dp)
