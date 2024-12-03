@@ -9,5 +9,5 @@ object IntroNav {
     object Splash
 
     @Serializable
-    object LogIn
+    object Login
 }

@@ -14,7 +14,7 @@ fun NavGraphBuilder.introGraph(navController: NavController) {
         composable<IntroNav.Splash> {
             SplashUI(navController)
         }
-        composable<IntroNav.LogIn> {
+        composable<IntroNav.Login> {
             LogInUI(userDto = UserDto(), navController)
         }
     }
