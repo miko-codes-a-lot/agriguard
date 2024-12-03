@@ -3,22 +3,27 @@ package com.example.agriguard.modules.main
 import kotlinx.serialization.Serializable
 
 @Serializable
-
 object MainNav {
     @Serializable
     object Menu
 
     @Serializable
-    object UsersList
+    data class Farmers(
+        val status: String,
+        var addressId: String? = null
+    )
 
     @Serializable
-    object Address
+    object Users
 
     @Serializable
-    object CreateUser
+    data class EditUser(val userId: String)
 
     @Serializable
-    object FarmersList
+    object Addresses
+
+    @Serializable
+    data class CreateUser(val addressId: String?)
 
     @Serializable
     object FarmersPreview
