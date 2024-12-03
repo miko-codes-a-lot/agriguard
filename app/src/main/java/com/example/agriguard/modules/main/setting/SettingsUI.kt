@@ -17,11 +17,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,23 +36,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.intro.IntroNav
-import com.example.agriguard.modules.main.MainNav
-
-@Preview(showSystemUi = true)
-@Composable
-fun SettingsPreview() {
-    SettingsUI(rememberNavController())
-}
+import com.example.agriguard.modules.intro.login.viewmodel.UserState
+import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.example.agriguard.modules.main.user.service.UserService
+import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsUI(navController: NavController) {
+fun SettingsUI(
+    navController: NavController,
+    currentUser: UserDto,
+    userService: UserService = hiltViewModel<UserViewModel>().userService
+) {
+    val vm = UserState.current
+    val coroutineScope = rememberCoroutineScope()
+    var showButton by remember { mutableStateOf(true) }
+    var profileImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    LaunchedEffect(currentUser.id) {
+        profileImageUri = currentUser.userProfile?.let { Uri.parse(it) }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,49 +72,71 @@ fun SettingsUI(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ){
-            Button(
-                onClick = {
-                    navController.navigate(IntroNav.LogIn) {
-                        popUpTo(IntroNav.LogIn) { inclusive = true }
-                    }
-//                coroutineScope.launch {
-//                    showButton = false
-//                    vm.signOut()
-//                    navController.navigate(IntroNav.Login) {
-//                        popUpTo(navController.graph.startDestinationId) {
-//                            inclusive = true
-//                        }
-//                        launchSingleTop = true
-//                    }
-//                }
-                },
-                modifier = Modifier,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(0xFF136204)
-                )
+        if(showButton){
+            Row(
+                modifier = Modifier
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
             ){
-                Icon(
-                    painter = painterResource(id = R.drawable.exit),
-                    contentDescription = "Logout",
-                    tint = Color.Red,
-                    modifier = Modifier.size(26.dp)
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            showButton = false
+                            vm.signOut()
+                            navController.navigate(IntroNav.Login) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                        }
+                    },
+                    modifier = Modifier,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF136204)
+                    )
+                ) {
+                    if (vm.isBusy) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(26.dp),
+                            color = Color(0xFF136204),
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.exit),
+                            contentDescription = "Logout",
+                            tint = Color.Red,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
+            }
+        }else {
+            Row(
+                modifier = Modifier
+                    .height(50.dp)
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(28.dp),
+                    color = Color(0xFF136204),
                 )
+                Spacer(modifier = Modifier.width(5.dp))
             }
         }
-        Profile(navController = navController)
+        Profile(navController = navController, currentUser = currentUser, userService = userService)
     }
 }
-
 
 @Composable
 fun Profile(
     navController: NavController,
+    currentUser: UserDto,
+    userService: UserService,
 ){
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -115,24 +149,22 @@ fun Profile(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         UserImageUI(
-//      STAND BY CODE
-//            onImageSelected = { newUri ->
-//                selectedProfileImageUri = newUri
-//                coroutineScope.launch {
-//                    val byteArray = getBytesFromUri(context, newUri)
-//                    Log.d("getBytesFromUri", "ByteArray: ${byteArray?.size ?: "null"}")
-//                    if (byteArray != null) {
-//                        userService.saveProfilePicture(currentUser.id!!, byteArray)
-//                    }
-//                }
-//            },
-//            currentUserId = currentUser.id!!,
-//            userService = userService
+            onImageSelected = { newUri ->
+                selectedProfileImageUri = newUri
+                coroutineScope.launch {
+                    val byteArray = getBytesFromUri(context, newUri)
+                    if (byteArray != null) {
+                        userService.saveImage(currentUser.id!!, byteArray)
+                    }
+                }
+            },
+            currentUserId = currentUser.id!!,
+            userService = userService
         )
 
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
 
-        UserDetails(navController)
+        UserDetails(navController, currentUser = currentUser)
 
         Spacer(modifier = Modifier.padding(vertical = 5.dp))
 
@@ -141,18 +173,22 @@ fun Profile(
 }
 
 @Composable
-fun UserDetails(navController: NavController) {
+fun UserDetails(
+    navController: NavController,
+    currentUser: UserDto
+) {
     Row(
-        modifier = Modifier,
+        modifier = Modifier
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Juan Dela Cruz",
+            text = "${currentUser.firstName} ${currentUser.middleName} ${currentUser.lastName}",
             fontSize = 17.sp,
             fontFamily = FontFamily.SansSerif,
             color = Color(0xFF136204),
-            modifier = Modifier.padding(horizontal = 3.dp)
+            modifier = Modifier.padding(start = 10.dp)
         )
         IconButton(
             onClick = {
@@ -164,14 +200,14 @@ fun UserDetails(navController: NavController) {
                 .clip(CircleShape),
             colors = IconButtonDefaults.iconButtonColors(Color(0xFFFFFFFF)),
         ) {
-//            Icon(
-//                painter = painterResource(id = R.drawable.editicon),
-//                contentDescription = "Edit Details",
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(5.dp),
-//                tint = Color(0xFF6650a4)
-//            )
+            Icon(
+                painter = painterResource(id = R.drawable.editicon),
+                contentDescription = "Edit Details",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(5.dp),
+                tint = Color(0xFF136204)
+            )
         }
     }
 }
