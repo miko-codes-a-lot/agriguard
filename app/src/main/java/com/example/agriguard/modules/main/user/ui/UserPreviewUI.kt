@@ -53,7 +53,7 @@ fun UserPreviewUI(
             "Address" to (user.address ?: ""),
             "Mobile Number" to (user.mobileNumber ?: ""),
             "Date Of Birth" to dateFormatContainer(user.dateOfBirth),
-            "Username" to user.username,
+            "Email" to user.email,
             ).associate { (label, value) -> label to mutableStateOf(value) }
     }
 
