@@ -25,11 +25,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.agriguard.modules.main.MainNav
+import com.example.agriguard.modules.main.farmer.enum.FarmerStatus
+import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
+import com.example.agriguard.modules.main.user.model.dto.AddressDto
 
 @Composable
-fun AddressUI(navController: NavController) {
+fun AddressesUI(
+    navController: NavController
+) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -37,7 +43,7 @@ fun AddressUI(navController: NavController) {
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(55.dp))
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -47,7 +53,7 @@ fun AddressUI(navController: NavController) {
             Text(
                 text = "Select Address",
                 fontFamily = FontFamily.SansSerif,
-                fontSize = 24.sp
+                fontSize = 23.sp
             )
             Spacer(modifier = Modifier.height(20.dp))
             HorizontalDivider(
@@ -57,53 +63,56 @@ fun AddressUI(navController: NavController) {
                 color = Color(0xFF136204)
             )
             Spacer(modifier = Modifier.height(10.dp))
-            ListAddress(navController)
+            ListAddress(
+                navController,
+            )
 
         }
     }
 }
 
 @Composable
-fun ListAddress(navController: NavController) {
-    val addresses: HashMap<String, Int> = hashMapOf(
-        "Ambulong" to 1,
-        "Ansilay" to 2,
-        "Bagong Sikat" to 3,
-        "Bangkal" to 4,
-        "Barangay 1 Poblacion" to 5,
-        "Barangay 2 Poblacion" to 6,
-        "Batasan" to 7,
-        "Bayotbot" to 8,
-        "Bubog" to 9,
-        "Buri" to 10,
-        "Camburay" to 11,
-        "Caminawit" to 12,
-        "Catayungan" to 14,
-        "Central" to 15,
-        "La Curva" to 16,
-        "Labangan Iling" to 17,
-        "Mabini" to 18,
-    )
-
+fun ListAddress(
+    navController: NavController,
+) {
+    val farmersViewModel: FarmersViewModel = hiltViewModel()
+    val addresses = farmersViewModel.fetchAddresses()
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .padding(bottom = 45.dp)
+            .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
-        items(addresses.entries.toList()) { entry ->
-            ListButton(address = entry.key, navController = navController)
+        items(addresses) { address ->
+            ListButton(
+                addressDto = address,
+                onClick = {
+                    val farmerStatus = FarmerStatus.FARMER
+
+                    val farmersRoute = MainNav.Farmers(
+                        status = farmerStatus.name,
+                        addressId = address.id,
+                    )
+
+                    navController.navigate(farmersRoute)
+                }
+            )
         }
     }
 }
 
 @Composable
-private fun ListButton(address: String, navController: NavController) {
+private fun ListButton(
+    addressDto: AddressDto,
+    onClick: () -> Unit,
+) {
     ElevatedButton(
-        onClick = {
-            navController.navigate(MainNav.FarmersList)
-        },
+        onClick = onClick,
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor =  Color.White,
-            contentColor = Color(0xFF136204)
+//            containerColor =  Color.White,
+//            contentColor = Color(0xFF136204)
+            containerColor =  Color(0xFF136204),
+            contentColor = Color.White
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -113,10 +122,10 @@ private fun ListButton(address: String, navController: NavController) {
             defaultElevation = 4.dp,
             pressedElevation = 8.dp
         ),
-        border = BorderStroke(2.dp, Color(0xFF136204))
+        border = BorderStroke(2.dp, Color(0xFFFFFFFF))
     ) {
         Text(
-            text = address,
+            text = addressDto.name,
             fontSize = 17.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
