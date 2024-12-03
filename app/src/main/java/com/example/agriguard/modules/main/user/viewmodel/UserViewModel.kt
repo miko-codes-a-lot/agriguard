@@ -8,10 +8,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val userService: UserService
+    val userService: UserService
 ): ViewModel() {
+
+    fun fetchUsers(): List<UserDto> {
+        return this.userService.fetch()
+    }
 
     suspend fun upsertUser(userDto: UserDto, actionOf: UserDto): Result<UserDto> {
         return this.userService.upsert(userDto, actionOf)
     }
+
+    fun fetchUser(userId: String): UserDto {
+        return this.userService.fetchOne(userId)
+    }
+
 }

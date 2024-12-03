@@ -32,4 +32,59 @@ class UserService  @Inject constructor(private val realm: Realm)  {
             Result.failure(error)
         }
     }
+
+    fun fetch(
+        isFarmers: Boolean = false,
+        userId: ObjectId? = null,
+        addressName: String? = null,
+    ): List<UserDto> {
+        val query = StringBuilder()
+            .append("isFarmers == $0")
+        if(userId != null) query.append(" AND createdById == $1")
+        if (addressName != null) query.append(" AND address = $2")
+
+        return realm.query<User>(
+            query.toString(), isFarmers, userId, addressName
+        )
+            .find()
+            .map { user -> user.toDTO() }
+    }
+
+    suspend fun saveValidId(userId: String, imageUri: ByteArray?): Result<UserDto> {
+        return try {
+            realm.write {
+                val user = query<User>("_id == $0", ObjectId(userId)).find().firstOrNull()
+                if (user != null && imageUri != null) {
+                    val validIdImage =
+                        android.util.Base64.encodeToString(imageUri, android.util.Base64.DEFAULT)
+                    user.validId = validIdImage
+                    copyToRealm(user, UpdatePolicy.ALL)
+                    Result.success(user.toDTO())
+                } else {
+                    Result.failure(Exception())
+                }
+            }
+        } catch (error: Exception) {
+            Result.failure(error)
+        }
+    }
+
+    suspend fun saveImage(userId: String, imageUri: ByteArray?): Result<UserDto> {
+        return try {
+            realm.write {
+                val user = query<User>("_id == $0", ObjectId(userId)).find().firstOrNull()
+                if (user != null && imageUri != null) {
+                    val validIdImage =
+                        android.util.Base64.encodeToString(imageUri, android.util.Base64.DEFAULT)
+                    user.userProfile = validIdImage
+                    copyToRealm(user, UpdatePolicy.ALL)
+                    Result.success(user.toDTO())
+                } else {
+                    Result.failure(Exception())
+                }
+            }
+        } catch (error: Exception) {
+            Result.failure(error)
+        }
+    }
 }
