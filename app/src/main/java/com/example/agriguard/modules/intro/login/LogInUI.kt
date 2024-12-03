@@ -103,13 +103,13 @@ fun LogInUI(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val listOfLabel = listOf("Username","Password")
+            val listOfLabel = listOf("Email","Password")
 
             val statesValue = remember {
                 listOfLabel.associateWith {
                     mutableStateOf(
                         when (it) {
-                            "Username" -> userDto?.username ?: ""
+                            "Email" -> userDto?.email ?: ""
                             "Password" -> userDto?.password ?: ""
                             else -> ""
                         }
@@ -168,7 +168,7 @@ fun ButtonLogin(
         ElevatedButton(
             onClick = {
                 val loginDto = LoginDto(
-                    username = statesValue["Username"]?.value ?: "",
+                    email = statesValue["Email"]?.value ?: "",
                     password = statesValue["Password"]?.value ?: "",
                 )
                 val isSuccess = loginViewModel.login(loginDto)
@@ -249,9 +249,9 @@ fun UserLog(
                 fontFamily = FontFamily.SansSerif,
             ),
             leadingIcon = {
-                if (loginLabel.contains("Username")) {
+                if (loginLabel.contains("Email")) {
                     Icon(
-                        painter = painterResource(id = R.drawable.person), contentDescription = "Person",tint = Color(0xFF136204)
+                        painter = painterResource(id = R.drawable.email), contentDescription = "Person",tint = Color(0xFF136204)
                     )
                 } else {
                     Icon(imageVector = Icons.Default.Lock, contentDescription = null, tint = Color(0xFF136204))
@@ -272,8 +272,6 @@ fun UserLog(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
-//                focusedBorderColor = Color(0xFF136204),
-//                unfocusedBorderColor = Color(0xFF136204),
                 cursorColor = Color.Gray
             ),
             visualTransformation = if (isPasswordField && !isPasswordVisible) {

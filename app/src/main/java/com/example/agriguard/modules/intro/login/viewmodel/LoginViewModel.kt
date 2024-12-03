@@ -36,8 +36,6 @@ class LoginViewModel @Inject constructor(
             return true
         }
         return false
-
-//        return true
     }
 
     private fun saveUserSession(userId: String) {
