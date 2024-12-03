@@ -9,14 +9,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.agriguard.modules.main.user.model.dto.AddressDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.example.agriguard.modules.main.user.service.UserService
 import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun UserCreateUI(
     navController: NavController,
-    currentUser: UserDto
+    currentUser: UserDto,
+    addressDto: AddressDto? = null,
+    userService: UserService = hiltViewModel<UserViewModel>().userService
 ) {
     val userViewModel: UserViewModel = hiltViewModel()
     var userDetails by remember { mutableStateOf(UserDto()) }
@@ -40,7 +44,9 @@ fun UserCreateUI(
                     onSubmit(user)
                 }
             },
-            navController = navController
+            navController = navController,
+            addressDto = addressDto,
+            userService = userService
         )
     } else {
         val onSave: suspend (UserDto) -> Unit = { userDto ->
