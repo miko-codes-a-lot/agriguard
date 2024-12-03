@@ -45,7 +45,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -53,11 +52,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
+import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
 import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.example.agriguard.modules.shared.ext.toObjectId
 import com.example.agriguard.modules.shared.ui.PlantsDialog
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
@@ -69,13 +71,15 @@ import com.github.mikephil.charting.data.PieEntry
 @Composable
 fun HomeUIPreview() {
     DashboardUI(
-        rememberNavController()
+        rememberNavController(),
+        currentUser = TODO()
     )
 }
 
 @Composable
 fun DashboardUI(
-    navController: NavController
+    navController: NavController,
+    currentUser: UserDto
 ) {
     var expanded by remember { mutableStateOf(false) }
     val listOfDate = listOf("January","February","March","April","May","June","July","August","September","October","November","December")
@@ -271,42 +275,57 @@ fun DashboardUI(
         }
         PieChart()
 
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize(),
-//            verticalArrangement = Arrangement.Bottom
-//        ) {
-//            Spacer(modifier = Modifier.height(10.dp))
-//            CropsCategory(
-//                navController,
-//                onCropsMonitoringClick = {
-//                    isSampleFormDialogVisible = true
-//                }
-//            )
-//            if (isSampleFormDialogVisible) {
-//                PlantsDialog(onDismiss = { isSampleFormDialogVisible = false }, navController = navController)
-//            }
-//
-//        }
-
-        //For Technician
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center
-        ) {
-            OutlinedButton(
-                onClick = { navController.navigate(MainNav.FarmersList) },
+        if(currentUser.isFarmers){
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Bottom
             ) {
-                Text(
-                    text = "Create an Account for a Farmer",
-                    fontSize = 18.sp,
-                    fontFamily = FontFamily.SansSerif,
-                    color = Color(0xFF136204)
+                Spacer(modifier = Modifier.height(10.dp))
+                CropsCategory(
+                    navController,
+                    onCropsMonitoringClick = {
+                        isSampleFormDialogVisible = true
+                    }
                 )
+                if (isSampleFormDialogVisible) {
+                    PlantsDialog(onDismiss = { isSampleFormDialogVisible = false }, navController = navController)
+                }
+
+            }
+        }
+
+        if(!currentUser.isFarmers) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                OutlinedButton(
+                    onClick = { navController.navigate(MainNav.Addresses) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(70.dp)
+                ) {
+                    if(currentUser.isTechnician){
+                        Text(
+                            text = "Create an account for a farmer",
+                            fontSize = 18.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            color = Color(0xFF136204)
+                        )
+                    }else{
+                        Text(
+                            text = "Create an account for an \n admin or technician",
+                            fontSize = 18.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            color = Color(0xFF136204),
+                            textAlign = TextAlign.Center,
+                            lineHeight = 24.sp,
+                            modifier = Modifier.padding(5.dp)
+                        )
+                    }
+                }
             }
         }
     }
