@@ -56,6 +56,7 @@ fun NotificationListUI(navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.padding(top = 35.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -105,12 +106,16 @@ fun NotificationList() {
         "Crop" to "Feb 10, 2025",
         "Crop" to "Jan 11, 2025",
         "Crop" to "Jan 21, 2025",
-        "Crop" to "Mar 01, 2025"
+        "Crop" to "Mar 01, 2025",
+        "Crop" to "Mar 01, 2025",
+        "Crop" to "Mar 01, 2025",
+        "Crop" to "Mar 01, 2025",
+        "Crop" to "Mar 01, 2025",
     )
 
     LazyColumn(
         modifier = Modifier
-            .height(590.dp)
+            .padding(bottom = 50.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
