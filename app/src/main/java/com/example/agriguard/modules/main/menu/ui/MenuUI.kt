@@ -29,9 +29,9 @@ import com.example.agriguard.modules.main.menu.model.NavItem
 import com.example.agriguard.modules.main.message.MessageListUI
 import com.example.agriguard.modules.main.message.MessageUI
 import com.example.agriguard.modules.main.notification.NotificationListUI
-import com.example.agriguard.modules.main.report.ui.RegistrationMenu
+import com.example.agriguard.modules.main.report.ui.RegistrationMenuUI
 import com.example.agriguard.modules.main.report.ui.ReportFormValidationUI
-import com.example.agriguard.modules.main.report.ui.ReportListUI
+import com.example.agriguard.modules.main.report.ui.ComplaintReportListUI
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.ui.UsersUI
@@ -93,8 +93,8 @@ fun MenuUI(
                 "NotificationList" -> NotificationListUI(navController)
                 "Setting" -> SettingsUI(navController, currentUser)
                 "UsersList" -> UsersUI(navController)
-                "RegistrationMenu" -> RegistrationMenu(navController)
-                "ReportList" -> ReportListUI(navController)
+                "RegistrationMenu" -> RegistrationMenuUI(navController)
+                "ReportList" -> ComplaintReportListUI(navController)
             }
         }
     }
@@ -109,31 +109,26 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
                 routeName = "Dashboard",
                 navigation = navController,
             ),
-            NavItem(
-                icon =  painterResource(id = R.drawable.notification),
-                routeName = "NotificationList",
-                navigation = navController,
-            ),
+//            NavItem(
+//                icon =  painterResource(id = R.drawable.notification),
+//                routeName = "NotificationList",
+//                navigation = navController,
+//            ),
             NavItem(
                 icon =  painterResource(id = R.drawable.add),
                 routeName = "ComplainForm",
                 navigation = navController,
             ),
-            NavItem(
-                icon =  painterResource(id = R.drawable.message),
-                routeName = "Message",
-                navigation = navController,
-            ),
-            NavItem(
-                icon = painterResource(id = R.drawable.insurance),
-                routeName = "RegistrationMenu",
-                navigation = navController,
-            ),
-            NavItem(
-                icon = painterResource(id = R.drawable.report_icon),
-                routeName = "ReportList",
-                navigation = navController,
-            ),
+//            NavItem(
+//                icon =  painterResource(id = R.drawable.message),
+//                routeName = "Message",
+//                navigation = navController,
+//            ),
+//            NavItem(
+//                icon = painterResource(id = R.drawable.insurance),
+//                routeName = "RegistrationMenu",
+//                navigation = navController,
+//            ),
             NavItem(
                 icon = painterResource(id = R.drawable.setting),
                 routeName = "Setting",
