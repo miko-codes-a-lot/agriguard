@@ -32,18 +32,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
-import com.example.agriguard.modules.main.notification.NotificationList
 
 @Preview(showSystemUi = true)
 @Composable
 fun ReportListUIPreview() {
-    ReportListUI(
+    ComplaintReportListUI(
         rememberNavController()
     )
 }
 
 @Composable
-fun ReportListUI(
+fun ComplaintReportListUI(
     navController: NavController
 ) {
     Column(
@@ -53,6 +52,7 @@ fun ReportListUI(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.padding(top = 20.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -72,7 +72,7 @@ fun ReportListUI(
         ) {
             Column {
                 Text(
-                    text = "Submitted Report List",
+                    text = "Complaint Report List",
                     fontSize = 25.sp,
                     color = Color(0xFF136204),
                     fontWeight = FontWeight.W800,
@@ -99,7 +99,7 @@ fun ReportList() {
 
     LazyColumn(
         modifier = Modifier
-            .height(590.dp)
+            .padding(bottom = 50.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
