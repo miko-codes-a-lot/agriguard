@@ -29,9 +29,9 @@ import com.example.agriguard.modules.main.menu.model.NavItem
 import com.example.agriguard.modules.main.message.MessageListUI
 import com.example.agriguard.modules.main.message.MessageUI
 import com.example.agriguard.modules.main.notification.NotificationListUI
-import com.example.agriguard.modules.main.report.ui.RegistrationMenuUI
 import com.example.agriguard.modules.main.report.ui.ReportFormValidationUI
 import com.example.agriguard.modules.main.report.ui.ComplaintReportListUI
+import com.example.agriguard.modules.main.report.ui.RegistrationMenuUI
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.ui.UsersUI
