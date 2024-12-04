@@ -50,13 +50,22 @@ object MainNav {
     object Setting
 
     @Serializable
-    object RiceInsurance
+    object RiceInsuranceForm
 
     @Serializable
-    object InDemnity
+    object RiceInsuranceList
 
     @Serializable
-    object OnionInsurance
+    object InDemnityForm
+
+    @Serializable
+    object InDemnityList
+
+    @Serializable
+    object OnionInsuranceForm
+
+    @Serializable
+    object OnionInsuranceList
 
     @Serializable
     object RiceDisease
@@ -77,5 +86,9 @@ object MainNav {
     object RiceWeed
 
     @Serializable
-    object ReportList
+    object ComplaintReportList
+
+    @Serializable
+    object Registration
+
 }

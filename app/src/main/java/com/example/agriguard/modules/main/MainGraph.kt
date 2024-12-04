@@ -23,10 +23,14 @@ import com.example.agriguard.modules.main.module.RicePetsModule
 import com.example.agriguard.modules.main.module.RiceWeedUI
 import com.example.agriguard.modules.main.notification.NotificationListUI
 import com.example.agriguard.modules.main.report.ui.InDemnityFormUI
+import com.example.agriguard.modules.main.report.ui.InDemnityListUI
 import com.example.agriguard.modules.main.report.ui.OnionInsuranceFormUI
+import com.example.agriguard.modules.main.report.ui.OnionInsuranceListUI
+import com.example.agriguard.modules.main.report.ui.RegistrationMenuUI
 import com.example.agriguard.modules.main.report.ui.ReportFormValidationUI
-import com.example.agriguard.modules.main.report.ui.ReportListUI
+import com.example.agriguard.modules.main.report.ui.ComplaintReportListUI
 import com.example.agriguard.modules.main.report.ui.RiceInsuranceFormUI
+import com.example.agriguard.modules.main.report.ui.RiceInsuranceListUI
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.AddressDto
 import com.example.agriguard.modules.main.user.service.UserService
@@ -145,19 +149,34 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 SettingsUI(navController, currentUser = currentUser, userService = userService)
             }
         }
-        composable<MainNav.RiceInsurance> {
+        composable<MainNav.RiceInsuranceForm> {
             Guard(navController = navController) { currentUser ->
                 RiceInsuranceFormUI()
             }
         }
-        composable<MainNav.InDemnity> {
+        composable<MainNav.RiceInsuranceList> {
+            Guard(navController = navController) { currentUser ->
+                RiceInsuranceListUI()
+            }
+        }
+        composable<MainNav.InDemnityForm> {
             Guard(navController = navController) { currentUser ->
                 InDemnityFormUI()
             }
         }
-        composable<MainNav.OnionInsurance> {
+        composable<MainNav.InDemnityList> {
+            Guard(navController = navController) { currentUser ->
+                InDemnityListUI()
+            }
+        }
+        composable<MainNav.OnionInsuranceForm> {
             Guard(navController = navController) { currentUser ->
                 OnionInsuranceFormUI()
+            }
+        }
+        composable<MainNav.OnionInsuranceList> {
+            Guard(navController = navController) { currentUser ->
+                OnionInsuranceListUI()
             }
         }
         composable<MainNav.RiceDisease> {
@@ -190,9 +209,14 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 RiceWeedUI()
             }
         }
-        composable<MainNav.ReportList> {
+        composable<MainNav.ComplaintReportList> {
             Guard(navController = navController) { currentUser ->
-                ReportListUI(navController)
+                ComplaintReportListUI(navController)
+            }
+        }
+        composable<MainNav.Registration> {
+            Guard(navController = navController) { currentUser ->
+                RegistrationMenuUI(navController)
             }
         }
     }
