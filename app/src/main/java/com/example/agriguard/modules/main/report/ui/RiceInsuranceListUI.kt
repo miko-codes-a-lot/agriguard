@@ -26,25 +26,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
-import com.example.agriguard.modules.main.notification.NotificationList
-
-@Preview(showSystemUi = true)
-@Composable
-fun ReportListUIPreview() {
-    ReportListUI(
-        rememberNavController()
-    )
-}
 
 @Composable
-fun ReportListUI(
-    navController: NavController
+fun RiceInsuranceListUI(
+
 ) {
     Column(
         modifier = Modifier
@@ -53,6 +41,7 @@ fun ReportListUI(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.padding(top = 20.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -72,7 +61,7 @@ fun ReportListUI(
         ) {
             Column {
                 Text(
-                    text = "Submitted Report List",
+                    text = "Rice Insurance List",
                     fontSize = 25.sp,
                     color = Color(0xFF136204),
                     fontWeight = FontWeight.W800,
@@ -86,31 +75,31 @@ fun ReportListUI(
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
-        ReportList()
+        RiceInsuranceList()
     }
 }
 
 @Composable
-fun ReportList() {
-    val notifications = listOf(
+fun RiceInsuranceList() {
+    val indemnityList = listOf(
         "Submitted Files" to "May 25, 2024",
         "Submitted Files" to "Sep 02, 2024",
     )
 
     LazyColumn(
         modifier = Modifier
-            .height(590.dp)
+            .padding(bottom = 50.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        itemsIndexed(items = notifications) { _, (files, date) ->
-            ReportButton(file = files, date = date)
+        itemsIndexed(items = indemnityList) { _, (files, date) ->
+            RiceButton(file = files, date = date)
         }
     }
 }
 
 @Composable
-private fun ReportButton(file: String, date: String) {
+private fun RiceButton(file: String, date: String) {
     ElevatedButton(
         onClick = { /* Navigate Container */ },
         colors = ButtonDefaults.elevatedButtonColors(

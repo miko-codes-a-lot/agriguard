@@ -1,6 +1,5 @@
 package com.example.agriguard.modules.main.report.ui
 
-import android.view.MenuItem
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,13 +39,13 @@ import com.example.agriguard.modules.main.MainNav
 @Preview(showSystemUi = true)
 @Composable
 fun RegistrationMenuPreview(){
-    RegistrationMenu(
+    RegistrationMenuUI(
         rememberNavController()
     )
 }
 
 @Composable
-fun RegistrationMenu(navController: NavController){
+fun RegistrationMenuUI(navController: NavController){
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -55,7 +54,6 @@ fun RegistrationMenu(navController: NavController){
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
         Image(
             painter = painterResource(id = R.drawable.agrilogo),
             contentDescription = "Login Image",
@@ -63,6 +61,7 @@ fun RegistrationMenu(navController: NavController){
         )
         Spacer(modifier = Modifier.height(20.dp))
         Menu(navController = navController)
+        Spacer(modifier = Modifier.height(30.dp))
     }
 }
 
@@ -101,13 +100,13 @@ fun Menu(navController: NavController) {
 fun getMenuItems(navController: NavController): List<AppMenuItem> {
     return listOf(
         AppMenuItem(text = "In-Demnity") {
-            navController.navigate(MainNav.InDemnity)
+            navController.navigate(MainNav.InDemnityForm)
         },
         AppMenuItem(text = "Rice Insurance") {
-            navController.navigate(MainNav.RiceInsurance)
+            navController.navigate(MainNav.RiceInsuranceForm)
         },
         AppMenuItem(text = "Onion Insurance") {
-            navController.navigate(MainNav.OnionInsurance)
+            navController.navigate(MainNav.OnionInsuranceForm)
         },
 
     )

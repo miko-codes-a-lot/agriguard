@@ -1,4 +1,4 @@
-package com.example.agriguard.modules.main.notification
+package com.example.agriguard.modules.main.report.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -16,10 +16,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -36,19 +32,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
-import com.example.agriguard.modules.shared.ui.NotificationReportDialog
-
 
 @Preview(showSystemUi = true)
 @Composable
-fun MessageUIPreview() {
-    NotificationListUI(
+fun ReportListUIPreview() {
+    ComplaintReportListUI(
         rememberNavController()
     )
 }
 
 @Composable
-fun NotificationListUI(navController: NavController) {
+fun ComplaintReportListUI(
+    navController: NavController
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +52,7 @@ fun NotificationListUI(navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.padding(top = 35.dp))
+        Spacer(modifier = Modifier.padding(top = 20.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,7 +72,7 @@ fun NotificationListUI(navController: NavController) {
         ) {
             Column {
                 Text(
-                    text = "Notification Report List",
+                    text = "Complaint Report List",
                     fontSize = 25.sp,
                     color = Color(0xFF136204),
                     fontWeight = FontWeight.W800,
@@ -90,27 +86,15 @@ fun NotificationListUI(navController: NavController) {
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
-        NotificationList()
+        ReportList()
     }
 }
 
 @Composable
-fun NotificationList() {
+fun ReportList() {
     val notifications = listOf(
-        "Crop" to "Apr 25, 2024",
-        "Crop" to "Sep 02, 2024",
-        "Crop" to "Nov 23, 2024",
-        "Crop" to "Dec 01, 2024",
-        "Crop" to "Feb 10, 2025",
-        "Crop" to "Mar 01, 2025",
-        "Crop" to "Feb 10, 2025",
-        "Crop" to "Jan 11, 2025",
-        "Crop" to "Jan 21, 2025",
-        "Crop" to "Mar 01, 2025",
-        "Crop" to "Mar 01, 2025",
-        "Crop" to "Mar 01, 2025",
-        "Crop" to "Mar 01, 2025",
-        "Crop" to "Mar 01, 2025",
+        "Submitted Files" to "May 25, 2024",
+        "Submitted Files" to "Sep 02, 2024",
     )
 
     LazyColumn(
@@ -119,20 +103,16 @@ fun NotificationList() {
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        itemsIndexed(items = notifications) { _, (name, date) ->
-            NotificationButton(name = name, date = date)
+        itemsIndexed(items = notifications) { _, (files, date) ->
+            ReportButton(file = files, date = date)
         }
     }
 }
 
 @Composable
-private fun NotificationButton(name: String, date: String) {
-    var isReportDialogVisible by rememberSaveable { mutableStateOf(false) }
-
+private fun ReportButton(file: String, date: String) {
     ElevatedButton(
-        onClick = {
-            isReportDialogVisible = true
-        },
+        onClick = { /* Navigate Container */ },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
             contentColor = Color(0xFF136204)
@@ -152,8 +132,8 @@ private fun NotificationButton(name: String, date: String) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "$name Report",
-                fontSize = 15.sp,
+                text = "$file Report",
+                fontSize = 17.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.SansSerif,
@@ -167,10 +147,5 @@ private fun NotificationButton(name: String, date: String) {
                 fontFamily = FontFamily.SansSerif,
             )
         }
-    }
-    if (isReportDialogVisible) {
-        NotificationReportDialog(
-            onDismiss = { isReportDialogVisible = false }
-        )
     }
 }
