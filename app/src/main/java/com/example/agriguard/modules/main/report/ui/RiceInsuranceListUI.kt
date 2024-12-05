@@ -28,11 +28,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.agriguard.R
+import com.example.agriguard.modules.main.MainNav
 
 @Composable
 fun RiceInsuranceListUI(
-
+    navController: NavController
 ) {
     Column(
         modifier = Modifier
@@ -75,12 +77,12 @@ fun RiceInsuranceListUI(
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
-        RiceInsuranceList()
+        RiceInsuranceList(navController)
     }
 }
 
 @Composable
-fun RiceInsuranceList() {
+fun RiceInsuranceList(navController: NavController) {
     val indemnityList = listOf(
         "Submitted Files" to "May 25, 2024",
         "Submitted Files" to "Sep 02, 2024",
@@ -93,15 +95,15 @@ fun RiceInsuranceList() {
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         itemsIndexed(items = indemnityList) { _, (files, date) ->
-            RiceButton(file = files, date = date)
+            RiceButton(file = files, date = date, navController = navController)
         }
     }
 }
 
 @Composable
-private fun RiceButton(file: String, date: String) {
+private fun RiceButton(file: String, date: String, navController: NavController) {
     ElevatedButton(
-        onClick = { /* Navigate Container */ },
+        onClick = { navController.navigate(MainNav.RiceInsuranceForm) },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
             contentColor = Color(0xFF136204)

@@ -32,18 +32,21 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
+import com.example.agriguard.modules.main.user.model.dto.UserDto
 
 @Preview(showSystemUi = true)
 @Composable
 fun ReportListUIPreview() {
     ComplaintReportListUI(
-        rememberNavController()
+        rememberNavController(),
+        currentUser = UserDto()
     )
 }
 
 @Composable
 fun ComplaintReportListUI(
-    navController: NavController
+    navController: NavController,
+    currentUser: UserDto
 ) {
     Column(
         modifier = Modifier
@@ -52,7 +55,9 @@ fun ComplaintReportListUI(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.padding(top = 20.dp))
+        if(!currentUser.isAdmin){
+            Spacer(modifier = Modifier.padding(top = 20.dp))
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()

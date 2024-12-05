@@ -152,7 +152,7 @@ fun DashboardUI(
                     contentDescription = "Logo Image",
                     modifier = Modifier.size(105.dp)
                 )
-
+            }
                 Row(
                     modifier = Modifier
                         .padding(top = 10.dp)
@@ -278,40 +278,40 @@ fun DashboardUI(
                         }
                     }
                 }
-                PieChart()
+            PieChart()
 
-                Column(
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                OutlinedButton(
+                    onClick = { navController.navigate(MainNav.Addresses) },
                     modifier = Modifier
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.Center
+                        .fillMaxWidth()
+                        .height(70.dp)
                 ) {
-                    OutlinedButton(
-                        onClick = { navController.navigate(MainNav.Addresses) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(70.dp)
-                    ) {
-                        if (currentUser.isTechnician) {
-                            Text(
-                                text = "Create an account for a farmer",
-                                fontSize = 18.sp,
-                                fontFamily = FontFamily.SansSerif,
-                                color = Color(0xFF136204)
-                            )
-                        } else {
-                            Text(
-                                text = "Create an account for an \n admin or technician",
-                                fontSize = 18.sp,
-                                fontFamily = FontFamily.SansSerif,
-                                color = Color(0xFF136204),
-                                textAlign = TextAlign.Center,
-                                lineHeight = 24.sp,
-                                modifier = Modifier.padding(5.dp)
-                            )
-                        }
+                    if (currentUser.isTechnician) {
+                        Text(
+                            text = "Create an account for a farmer",
+                            fontSize = 18.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            color = Color(0xFF136204)
+                        )
+                    } else {
+                        Text(
+                            text = "Create an account for an \n admin or technician",
+                            fontSize = 18.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            color = Color(0xFF136204),
+                            textAlign = TextAlign.Center,
+                            lineHeight = 24.sp,
+                            modifier = Modifier.padding(5.dp)
+                        )
                     }
                 }
             }
+
         }else{
             FarmersDashboard(
                 navController = navController,

@@ -94,7 +94,7 @@ fun MenuUI(
                 "Setting" -> SettingsUI(navController, currentUser)
                 "UsersList" -> UsersUI(navController)
                 "RegistrationMenu" -> RegistrationMenuUI(navController)
-                "ReportList" -> ComplaintReportListUI(navController)
+                "ReportList" -> ComplaintReportListUI(navController, currentUser)
             }
         }
     }
@@ -174,11 +174,11 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
                 routeName = "UsersList",
                 navigation = navController,
             ),
-//            NavItem(
-//                icon = painterResource(id = R.drawable.insurance),
-//                routeName = "RegistrationMenu",
-//                navigation = navController,
-//            ),
+            NavItem(
+                icon = painterResource(id = R.drawable.insurance),
+                routeName = "ReportList",
+                navigation = navController,
+            ),
             NavItem(
                 icon = painterResource(id = R.drawable.setting),
                 routeName = "Setting",
