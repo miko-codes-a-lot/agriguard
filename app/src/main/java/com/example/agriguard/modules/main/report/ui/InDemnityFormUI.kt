@@ -71,6 +71,7 @@ fun InDemnityFormUI() {
         modifier = Modifier
             .background(Color.White)
             .fillMaxSize()
+            .padding(top = 16.dp)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -78,7 +79,7 @@ fun InDemnityFormUI() {
         item {
             Row(
                 modifier = Modifier
-                    .padding(top = 8.dp, bottom = 8.dp)
+                    .padding(top = 15.dp, bottom = 8.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
@@ -595,41 +596,7 @@ fun LocationSketch() {
     val farmLocation = remember { mutableStateListOf(initialFarmLocation()) }
     Row(
         modifier = Modifier
-            .padding(top = 15.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
-    ){
-        IconButton(
-            onClick = {
-                farmLocation.add(initialFarmLocation())
-            },
-            modifier = Modifier
-                .size(21.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add Farm Detail",
-                tint = Color(0xFF136204)
-            )
-        }
-        Spacer(modifier = Modifier.width(10.dp))
-        IconButton(
-            onClick = {
-                farmLocation.removeAt(farmLocation.lastIndex)
-            },
-            modifier = Modifier
-                .size(21.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Delete Farm Detail",
-                tint = Color(0xFF136204)
-            )
-        }
-    }
-    Row(
-        modifier = Modifier
-            .padding(top = 15.dp)
+            .padding(top = 25.dp, bottom = 30.dp)
             .fillMaxWidth()
     ){
         LazyColumn(
@@ -639,6 +606,40 @@ fun LocationSketch() {
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items(farmLocation) { farmDetail ->
+                Row(
+                    modifier = Modifier
+                        .padding(top = 15.dp, bottom = 15.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ){
+                    IconButton(
+                        onClick = {
+                            farmLocation.add(initialFarmLocation())
+                        },
+                        modifier = Modifier
+                            .size(21.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add Farm Detail",
+                            tint = Color(0xFF136204)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(20.dp))
+                    IconButton(
+                        onClick = {
+                            farmLocation.removeAt(farmLocation.lastIndex)
+                        },
+                        modifier = Modifier
+                            .size(21.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete Farm Detail",
+                            tint = Color(0xFF136204)
+                        )
+                    }
+                }
                 farmDetail.forEach { (label, state) ->
                     TextFieldFarmLocation(
                         label = label,

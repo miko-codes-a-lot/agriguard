@@ -59,6 +59,7 @@ import com.example.agriguard.modules.intro.login.viewmodel.UserState
 import com.example.agriguard.modules.main.MainNav
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
+import com.example.agriguard.modules.shared.ext.AlertLoginUI
 import kotlinx.coroutines.launch
 
 @Preview(showSystemUi = true)
@@ -157,13 +158,12 @@ fun ButtonLogin(
     val loginViewModel: LoginViewModel = hiltViewModel()
     val showAlert = rememberSaveable { mutableStateOf(false) }
 
-//    if (showAlert.value) {
-//        AlertLogInUI(
-//            onDismiss = { showAlert.value = false },
-//        )
-//    }
+    if (showAlert.value) {
+        AlertLoginUI(
+            onDismiss = { showAlert.value = false },
+        )
+    }
 
-    val userViewModel: UserViewModel = hiltViewModel()
     if(showButton) {
         ElevatedButton(
             onClick = {

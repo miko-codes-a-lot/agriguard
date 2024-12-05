@@ -156,7 +156,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         }
         composable<MainNav.RiceInsuranceList> {
             Guard(navController = navController) { currentUser ->
-                RiceInsuranceListUI()
+                RiceInsuranceListUI(navController)
             }
         }
         composable<MainNav.InDemnityForm> {
@@ -166,7 +166,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         }
         composable<MainNav.InDemnityList> {
             Guard(navController = navController) { currentUser ->
-                InDemnityListUI()
+                InDemnityListUI(navController)
             }
         }
         composable<MainNav.OnionInsuranceForm> {
@@ -176,7 +176,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         }
         composable<MainNav.OnionInsuranceList> {
             Guard(navController = navController) { currentUser ->
-                OnionInsuranceListUI()
+                OnionInsuranceListUI(navController)
             }
         }
         composable<MainNav.RiceDisease> {
@@ -211,7 +211,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         }
         composable<MainNav.ComplaintReportList> {
             Guard(navController = navController) { currentUser ->
-                ComplaintReportListUI(navController)
+                ComplaintReportListUI(navController, currentUser)
             }
         }
         composable<MainNav.Registration> {

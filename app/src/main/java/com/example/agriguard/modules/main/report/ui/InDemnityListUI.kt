@@ -28,11 +28,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.agriguard.R
+import com.example.agriguard.modules.main.MainNav
 
 @Composable
 fun InDemnityListUI(
-
+    navController: NavController
 ) {
     Column(
         modifier = Modifier
@@ -75,12 +77,12 @@ fun InDemnityListUI(
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
-        InDemnityListContainer()
+        InDemnityListContainer(navController = navController)
     }
 }
 
 @Composable
-fun InDemnityListContainer() {
+fun InDemnityListContainer(navController: NavController) {
     val indemnityList = listOf(
         "Submitted Files" to "May 25, 2024",
         "Submitted Files" to "Sep 02, 2024",
@@ -93,15 +95,15 @@ fun InDemnityListContainer() {
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         itemsIndexed(items = indemnityList) { _, (files, date) ->
-            InDemnityButton(file = files, date = date)
+            InDemnityButton(file = files, date = date, navController = navController)
         }
     }
 }
 
 @Composable
-private fun InDemnityButton(file: String, date: String) {
+private fun InDemnityButton(file: String, date: String, navController: NavController) {
     ElevatedButton(
-        onClick = { /* Navigate Container */ },
+        onClick = { navController.navigate(MainNav.InDemnityForm) },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
             contentColor = Color(0xFF136204)
