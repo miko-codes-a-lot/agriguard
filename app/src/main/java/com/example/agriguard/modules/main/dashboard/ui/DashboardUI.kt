@@ -133,7 +133,7 @@ fun DashboardUI(
                         .padding(start = 10.dp)
                 ) {
                     Text(
-                        text = "Hello, Robert",
+                        text = "Hello ${currentUser.firstName} ",
                         fontSize = 25.sp,
                         color = Color(0xFF136204),
                         fontWeight = FontWeight.W800,
@@ -318,7 +318,8 @@ fun DashboardUI(
                 isSampleFormDialogVisible = isSampleFormDialogVisible,
                 onDialogVisibilityChange = { isVisible ->
                     isSampleFormDialogVisible = isVisible
-                }
+                },
+                currentUser = currentUser
             )
         }
     }
@@ -406,7 +407,8 @@ fun updatePieChartWithData(
 fun FarmersDashboard(
     navController: NavController,
     isSampleFormDialogVisible: Boolean,
-    onDialogVisibilityChange: (Boolean) -> Unit
+    onDialogVisibilityChange: (Boolean) -> Unit,
+    currentUser: UserDto
 ) {
     Surface(
         modifier = Modifier
@@ -455,7 +457,7 @@ fun FarmersDashboard(
                         .padding(start = 10.dp)
                 ) {
                     Text(
-                        text = "Hello, Robert",
+                        text = "Hello ${currentUser.firstName} ",
                         fontSize = 25.sp,
                         color = Color(0xFF136204),
                         fontWeight = FontWeight.W800,
@@ -491,7 +493,8 @@ fun FarmersDashboard(
                     navController,
                     onCropsMonitoringClick = {
                         onDialogVisibilityChange(true)
-                    }
+                    },
+                    currentUser = currentUser
                 )
                 if (isSampleFormDialogVisible) {
                     PlantsDialog(
@@ -507,7 +510,8 @@ fun FarmersDashboard(
 @Composable
 fun CropsCategory(
     navController: NavController,
-    onCropsMonitoringClick: () -> Unit
+    onCropsMonitoringClick: () -> Unit,
+    currentUser: UserDto
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -518,7 +522,7 @@ fun CropsCategory(
     ) {
 
         val actions = listOf(
-            Triple("Indemnity ",R.drawable.inde) { navController.navigate(MainNav.InDemnityList) },
+            Triple("Indemnity ",R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
             Triple("Rice Insurance",R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList) },
             Triple("Onion Insurance",R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList) },
             Triple("Complaint List",R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList) },
