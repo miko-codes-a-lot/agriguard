@@ -1,6 +1,8 @@
 package com.example.agriguard.modules.main.report.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,12 +10,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,79 +40,127 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
+import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.user.model.dto.UserDto
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 @Composable
 fun InDemnityListUI(
-    navController: NavController
+    navController: NavController,
+    indemnityList: List<IndemnityDto>,
+    currentUser: UserDto,
 ) {
-    Column(
+    Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.padding(top = 20.dp))
-        Row(
+            .background(Color(0xFFFFFFFF)),
+        floatingActionButton = {
+            FloatingRecordsIcon(currentUser, navController)
+        }
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(horizontal = 0.dp, vertical = 4.dp)
-                .drawBehind {
-                    val strokeWidth = 1.dp.toPx()
-                    val y = size.height - strokeWidth / 2
-                    drawLine(
-                        color = Color(0xFF136204),
-                        start = Offset(0f, y),
-                        end = Offset(size.width, y),
-                        strokeWidth = strokeWidth
-                    )
-                },
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column {
-                Text(
-                    text = "In-Demnity List",
-                    fontSize = 25.sp,
-                    color = Color(0xFF136204),
-                    fontWeight = FontWeight.W800,
-                    fontFamily = FontFamily.SansSerif
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(horizontal = 0.dp, vertical = 4.dp)
+                    .drawBehind {
+                        val strokeWidth = 1.dp.toPx()
+                        val y = size.height - strokeWidth / 2
+                        drawLine(
+                            color = Color(0xFF136204),
+                            start = Offset(0f, y),
+                            end = Offset(size.width, y),
+                            strokeWidth = strokeWidth
+                        )
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "In-Demnity List",
+                        fontSize = 25.sp,
+                        color = Color(0xFF136204),
+                        fontWeight = FontWeight.W800,
+                        fontFamily = FontFamily.SansSerif
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Logo Image",
+                    modifier = Modifier.size(100.dp)
                 )
             }
-            Spacer(modifier = Modifier.weight(1f))
-            Image(painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo Image",
-                modifier = Modifier.size(100.dp)
+            Spacer(modifier = Modifier.height(10.dp))
+            InDemnityListContainer(
+                navController = navController,
+                indemnityList = indemnityList,
+                currentUser = currentUser
             )
         }
-        Spacer(modifier = Modifier.height(10.dp))
-        InDemnityListContainer(navController = navController)
     }
 }
 
 @Composable
-fun InDemnityListContainer(navController: NavController) {
-    val indemnityList = listOf(
-        "Submitted Files" to "May 25, 2024",
-        "Submitted Files" to "Sep 02, 2024",
-    )
-
+fun InDemnityListContainer(
+    navController: NavController,
+    indemnityList: List<IndemnityDto>,
+    currentUser: UserDto
+) {
     LazyColumn(
         modifier = Modifier
             .padding(bottom = 50.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        itemsIndexed(items = indemnityList) { _, (files, date) ->
-            InDemnityButton(file = files, date = date, navController = navController)
+        itemsIndexed(items = indemnityList) { _, indemnityDto ->
+            InDemnityButton(
+                indemnityId = indemnityDto,
+                navController = navController,
+                currentUser = currentUser
+            )
         }
     }
 }
 
 @Composable
-private fun InDemnityButton(file: String, date: String, navController: NavController) {
+private fun InDemnityButton(
+    indemnityId: IndemnityDto,
+    navController: NavController,
+    currentUser: UserDto
+) {
+
+    val formattedDate = if (indemnityId.fillupdate.isNotEmpty()) {
+        try {
+            val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            isoFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val displayFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+            val parsedDate = isoFormat.parse(indemnityId.fillupdate)
+            parsedDate?.let { displayFormat.format(it) } ?: "Invalid Date"
+        } catch (e: Exception) {
+            Log.e("InDemnityButton", "Date parsing failed: ${indemnityId.fillupdate}", e)
+            "Invalid Date"
+        }
+    } else {
+        "No Date Provided"
+    }
+
     ElevatedButton(
-        onClick = { navController.navigate(MainNav.InDemnityForm) },
+        onClick = {
+            if (!currentUser.isFarmers) {
+                navController.navigate(MainNav.InDemnityForm(userId = indemnityId.id!!))
+            }
+        },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
             contentColor = Color(0xFF136204)
@@ -123,7 +180,7 @@ private fun InDemnityButton(file: String, date: String, navController: NavContro
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "$file Report",
+                text = "Successfully Submitted",
                 fontSize = 17.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
@@ -131,11 +188,42 @@ private fun InDemnityButton(file: String, date: String, navController: NavContro
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = date,
+                text = formattedDate,
                 fontSize = 15.sp,
                 textAlign = TextAlign.End,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.SansSerif,
+            )
+        }
+    }
+}
+
+@Composable
+fun FloatingRecordsIcon(
+    currentUser: UserDto,
+    navController: NavController,
+) {
+    Column(
+        modifier = Modifier
+            .background(Color.Transparent),
+        horizontalAlignment = Alignment.End
+    ) {
+        FloatingActionButton(
+            onClick = {
+                navController.navigate(MainNav.InDemnityForm(currentUser.id!!))
+            },
+            containerColor = Color(0xFF136204),
+            contentColor = Color(0xFFFFFFFF),
+            shape = CircleShape,
+            modifier = Modifier
+                .size(75.dp)
+                .offset(x = (-5).dp, y = (-7).dp)
+        ){
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "Add",
+                modifier = Modifier
+                    .size(30.dp)
             )
         }
     }
