@@ -56,10 +56,10 @@ object MainNav {
     object RiceInsuranceList
 
     @Serializable
-    object InDemnityForm
+    data class InDemnityForm(val userId: String)
 
     @Serializable
-    object InDemnityList
+    data class InDemnityList(val userId: String)
 
     @Serializable
     object OnionInsuranceForm

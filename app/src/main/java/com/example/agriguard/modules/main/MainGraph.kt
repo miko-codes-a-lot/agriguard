@@ -33,6 +33,7 @@ import com.example.agriguard.modules.main.report.ui.RiceInsuranceFormUI
 import com.example.agriguard.modules.main.report.ui.RiceInsuranceListUI
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.AddressDto
+import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.service.UserService
 import com.example.agriguard.modules.main.user.ui.UserCreateUI
 import com.example.agriguard.modules.main.user.ui.UserEditUI
@@ -160,13 +161,28 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             }
         }
         composable<MainNav.InDemnityForm> {
+            val args = it.toRoute<MainNav.InDemnityForm>()
+            val userViewModel: UserViewModel = hiltViewModel()
+            val indemnityDto = userViewModel.fetchIndemnity(args.userId)
             Guard(navController = navController) { currentUser ->
-                InDemnityFormUI()
+                InDemnityFormUI(
+                    userViewModel = userViewModel,
+                    navController = navController,
+                    currentUser = currentUser,
+                    indemnityDto = indemnityDto ?: IndemnityDto()
+                )
             }
         }
         composable<MainNav.InDemnityList> {
+            val args = it.toRoute<MainNav.InDemnityList>()
+            val userViewModel: UserViewModel = hiltViewModel()
             Guard(navController = navController) { currentUser ->
-                InDemnityListUI(navController)
+                val indemnityList = userViewModel.fetchListIndemnity(args.userId)
+                    InDemnityListUI(
+                        navController = navController,
+                        indemnityList = indemnityList,
+                        currentUser = currentUser,
+                    )
             }
         }
         composable<MainNav.OnionInsuranceForm> {
