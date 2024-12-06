@@ -1,5 +1,6 @@
 package com.example.agriguard.modules.main.report.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,6 +34,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -41,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -49,24 +52,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
 
-@Preview(showSystemUi = true)
 @Composable
-fun InDemnityFormPreview() {
-    InDemnityFormUI()
-}
-
-@Composable
-fun InDemnityFormUI() {
-    var selectedDate by remember { mutableStateOf("") }
-    var othersProgram by remember { mutableStateOf("") }
+fun InDemnityFormUI(
+    userViewModel: UserViewModel,
+    navController: NavController,
+    currentUser: UserDto,
+    indemnityDto: IndemnityDto
+) {
+    var indemnity by remember { mutableStateOf(indemnityDto) }
+    var selectedDate by remember { mutableStateOf<String?>(indemnityDto.fillupdate) }
+    var isSubmitting by remember { mutableStateOf(false) }
     LazyColumn(
         modifier = Modifier
             .background(Color.White)
@@ -84,7 +90,7 @@ fun InDemnityFormUI() {
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                InDemnityDatePicker("Date", selectedDate) { newDate ->
+                InDemnityDatePicker("Date", selectedDate ?: "") { newDate ->
                     selectedDate = newDate
                 }
             }
@@ -118,24 +124,45 @@ fun InDemnityFormUI() {
             }
         }
         item {
-            FarmerInfoInDemnity()
-            ProgramInfo(othersProgram, onValueChange = { newProgram -> othersProgram = newProgram })
+            FarmerInfoInDemnity( currentUser = currentUser)
         }
         item {
-            CropsDamage()
+            ProgramInfo(
+                value = indemnity.others.orEmpty(),
+                onValueChange = { newValue -> indemnity = indemnity.copy(others = newValue) }
+            )
         }
         item {
-            LocationSketch()
+            CropsDamage(
+                indemnityDto = indemnity,
+                onIndemnityChange = { updatedDto -> indemnity = updatedDto }
+            )
+        }
+        item {
+            LocationSketch(
+                indemnityDto = indemnity,
+                onIndemnityChange = { updatedDto -> indemnity = updatedDto }
+            )
         }
         item{
-            CropsCoast()
+            CropsCoast(
+                indemnityDto = indemnity,
+                onIndemnityChange = { updatedDto -> indemnity = updatedDto }
+            )
         }
         item{
-            Verification()
+            Verification(currentUser = currentUser)
         }
         item {
             Spacer(modifier = Modifier.height(15.dp))
-            InDemnityButton()
+            InDemnityButton(
+                indemnityDto = remember { mutableStateOf(indemnity) },
+                selectedDate = selectedDate ?: "",
+                isSubmitting = remember { mutableStateOf(isSubmitting) },
+                userViewModel = userViewModel,
+                navController = navController,
+                currentUser = currentUser
+            )
         }
     }
 }
@@ -151,6 +178,7 @@ fun InDemnityDatePicker(
 ) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
+
     val datePickerDialog = remember {
         android.app.DatePickerDialog(
             context,
@@ -160,20 +188,19 @@ fun InDemnityDatePicker(
                 isoFormat.timeZone = TimeZone.getTimeZone("UTC")
                 val dateISO = isoFormat.format(calendar.time)
                 onDateChange(dateISO)
-//                onErrorChange(false)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         )
     }
+
     val displayFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
     val displayDate = try {
         val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(dateValue)
         date?.let { displayFormat.format(it) } ?: "Select Date"
     } catch (e: Exception) {
-//        "Select Date"
-        ""
+        "Select Date"
     }
 
     Row(
@@ -245,23 +272,37 @@ fun InDemnityDatePicker(
 }
 
 @Composable
-fun FarmerInfoInDemnity() {
+fun FarmerInfoInDemnity(
+    currentUser: UserDto
+) {
     val labels = listOf(
-        "FirstName" to remember{ mutableStateOf("") },"MiddleName" to remember{ mutableStateOf("") },"LastName" to remember{ mutableStateOf("") }, "Address" to remember { mutableStateOf("") }, "Mobile Number" to remember{ mutableStateOf("") },
-        "Location of Farm" to remember{ mutableStateOf("") }, "Area Insured" to remember{ mutableStateOf("") }, "Variety Planted" to remember{ mutableStateOf("") }, "Date of Sowing" to remember { mutableStateOf("") }, "Actual Date of Planting" to remember { mutableStateOf("") },
-        "CIC Number" to remember { mutableStateOf("") }, "UnderWriter/Cooperative" to remember { mutableStateOf("") }
+        "FirstName" to currentUser.firstName,
+        "MiddleName" to (currentUser.middleName ?: ""),
+        "LastName" to currentUser.lastName,
+        "Address" to (currentUser.address ?: ""),
+        "Mobile Number" to (currentUser.mobileNumber ?: "")
     )
+
     LazyColumn(
         modifier = Modifier
             .height(300.dp)
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(labels) { (label, state) ->
+        items(labels) { (label, value) ->
             TextFieldInDemnityForm(
                 label = label,
-                value = state.value,
-                onValueChange = { newvalue -> state.value = newvalue }
+                value = value,
+                onValueChange = { newValue ->
+                    when (label) {
+                        "FirstName" -> currentUser.firstName
+                        "MiddleName" -> currentUser.middleName
+                        "LastName" -> currentUser.lastName
+                        "Address" -> currentUser.address
+                        "Mobile Number" -> currentUser.middleName
+                        else -> {}
+                    }
+                }
             )
         }
     }
@@ -505,11 +546,15 @@ fun ProgramInfo( value: String, onValueChange: (String) -> Unit ) {
 
 @Composable
 fun CropsDamage(
-
+    indemnityDto: IndemnityDto,
+    onIndemnityChange: (IndemnityDto) -> Unit
 ) {
-    val Damagelabels = listOf(
-        "Cause of Damage" to remember{ mutableStateOf("") },"Date of Loss Occurrence" to remember{ mutableStateOf("") },"Age/Stage of Cultivation" to remember{ mutableStateOf("") },
-        "Area Damaged" to remember{ mutableStateOf("") }, "Extent/Degree of Damage" to remember{ mutableStateOf("") }, "Expected Date of Harvest" to remember{ mutableStateOf("") }
+    val damageLabels = listOf(
+        "Cause of Damage" to indemnityDto.causeOfDamage.orEmpty(),
+        "Age/Stage of Cultivation" to indemnityDto.ageCultivation.orEmpty(),
+        "Area Damaged" to indemnityDto.areaDamaged.orEmpty(),
+        "Degree of Damage" to indemnityDto.degreeOfDamage.orEmpty(),
+        "Expected Date of Harvest" to indemnityDto.expectedDateOfHarvest.orEmpty()
     )
     Column(
         modifier = Modifier
@@ -528,11 +573,22 @@ fun CropsDamage(
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(Damagelabels) { (label, state) ->
+        items(damageLabels) { (label, value) ->
             TextFieldDamageForm(
                 label = label,
-                value = state.value,
-                onValueChange = { newvalue -> state.value = newvalue }
+                value = value,
+                onValueChange = { newValue ->
+                    onIndemnityChange(
+                        when (label) {
+                            "Cause of Damage" -> indemnityDto.copy(causeOfDamage = newValue)
+                            "Age/Stage of Cultivation" -> indemnityDto.copy(ageCultivation = newValue)
+                            "Area Damaged" -> indemnityDto.copy(areaDamaged = newValue)
+                            "Degree of Damage" -> indemnityDto.copy(degreeOfDamage = newValue)
+                            "Expected Date of Harvest" -> indemnityDto.copy(expectedDateOfHarvest = newValue)
+                            else -> indemnityDto
+                        }
+                    )
+                }
             )
         }
     }
@@ -592,7 +648,16 @@ fun TextFieldDamageForm(label: String, value: String, onValueChange: (String) ->
 }
 
 @Composable
-fun LocationSketch() {
+fun LocationSketch(
+    indemnityDto: IndemnityDto,
+    onIndemnityChange: (IndemnityDto) -> Unit
+) {
+    val location = listOf(
+        "North" to indemnityDto.north.orEmpty(),
+        "South" to indemnityDto.south.orEmpty(),
+        "East" to indemnityDto.east.orEmpty(),
+        "West" to indemnityDto.west.orEmpty(),
+    )
     val farmLocation = remember { mutableStateListOf(initialFarmLocation()) }
     Row(
         modifier = Modifier
@@ -628,10 +693,14 @@ fun LocationSketch() {
                     Spacer(modifier = Modifier.width(20.dp))
                     IconButton(
                         onClick = {
-                            farmLocation.removeAt(farmLocation.lastIndex)
+                            if (farmLocation.size > 1) {
+                                farmLocation.removeAt(farmLocation.lastIndex)
+                            }
                         },
                         modifier = Modifier
                             .size(21.dp)
+                            .alpha(if (farmLocation.size > 1) 1f else 0.5f),
+                        enabled = farmLocation.size > 1
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -640,11 +709,21 @@ fun LocationSketch() {
                         )
                     }
                 }
-                farmDetail.forEach { (label, state) ->
+                location.forEach { (label, value) ->
                     TextFieldFarmLocation(
                         label = label,
-                        value = state.value,
-                        onValueChange = { newValue -> state.value = newValue }
+                        value = value,
+                        onValueChange = { newValue ->
+                            onIndemnityChange(
+                                when (label) {
+                                    "North" -> indemnityDto.copy(north = newValue)
+                                    "South" -> indemnityDto.copy(south = newValue)
+                                    "East" -> indemnityDto.copy(east = newValue)
+                                    "West" -> indemnityDto.copy(west = newValue)
+                                    else -> indemnityDto
+                                }
+                            )
+                        }
                     )
                 }
             }
@@ -662,7 +741,11 @@ fun initialFarmLocation(): List<Pair<String, MutableState<String>>> {
 }
 
 @Composable
-fun TextFieldFarmLocation(label: String, value: String, onValueChange: (String) -> Unit) {
+fun TextFieldFarmLocation(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
     Row(
         modifier = Modifier
             .border(1.dp, Color.Gray, RectangleShape)
@@ -686,7 +769,10 @@ fun TextFieldFarmLocation(label: String, value: String, onValueChange: (String) 
         ) {
             OutlinedTextField(
                 value = value,
-                onValueChange = onValueChange,
+                onValueChange = { newValue ->
+                    val filteredValue = newValue.filter { it.isDigit() }
+                    onValueChange(filteredValue)
+                },
                 modifier = Modifier
                     .fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -702,35 +788,35 @@ fun TextFieldFarmLocation(label: String, value: String, onValueChange: (String) 
 }
 
 @Composable
-fun CropsCoast() {
+fun CropsCoast(indemnityDto: IndemnityDto?, onIndemnityChange: (IndemnityDto) -> Unit) {
     val conditionStates = mapOf (
         "Upa Sa Pag-Gawa" to Pair(
-            remember { mutableStateOf("") },
-            remember { mutableStateOf("") }
+            remember { mutableStateOf(indemnityDto?.upaSaGawaBilang ?: "") },
+            remember { mutableStateOf(indemnityDto?.upaSaGawaHalaga ?: "") }
         ),
         "Binhi" to Pair(
-            remember { mutableStateOf("") },
-            remember { mutableStateOf("") }
+            remember { mutableStateOf(indemnityDto?.binhiBilang ?: "") },
+            remember { mutableStateOf(indemnityDto?.binhiHalaga ?: "") }
         ),
         "Abono" to Pair(
-            remember { mutableStateOf("") },
-            remember { mutableStateOf("") }
+            remember { mutableStateOf(indemnityDto?.abonoBilang ?: "") },
+            remember { mutableStateOf(indemnityDto?.abonoHalaga ?: "") }
         ),
         "Kemikal" to Pair(
-            remember { mutableStateOf("") },
-            remember { mutableStateOf("") }
+            remember { mutableStateOf(indemnityDto?.kemikalBilang ?: "") },
+            remember { mutableStateOf(indemnityDto?.kemikalHalaga ?: "") }
         ),
         "Patubig" to Pair(
-            remember { mutableStateOf("") },
-            remember { mutableStateOf("") }
+            remember { mutableStateOf(indemnityDto?.patubigBilang ?: "") },
+            remember { mutableStateOf(indemnityDto?.patubigHalaga ?: "") }
         ),
         "Iba pa" to Pair(
-            remember { mutableStateOf("") },
-            remember { mutableStateOf("") }
+            remember { mutableStateOf(indemnityDto?.ibapaBilang ?: "") },
+            remember { mutableStateOf(indemnityDto?.ibapaHalaga ?: "") }
         ),
         "Kabuuan" to Pair(
-            remember { mutableStateOf("") },
-            remember { mutableStateOf("") }
+            remember { mutableStateOf(indemnityDto?.kabuuanBilang ?: "") },
+            remember { mutableStateOf(indemnityDto?.kabuuanHalaga ?: "") }
         ),
     )
 
@@ -786,6 +872,7 @@ fun CropsCoast() {
             Spacer(modifier = Modifier.width(15.dp))
         }
     }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -796,9 +883,39 @@ fun CropsCoast() {
             LabelAndValue(
                 label = label,
                 bilangValue = state.first.value,
-                onBilangValueChange = { newValue -> state.first.value = newValue },
+                onBilangValueChange = { newValue ->
+                    state.first.value = newValue
+                    indemnityDto?.let {
+                        onIndemnityChange(
+                            it.copy(
+                                upaSaGawaBilang = if (label == "Upa Sa Pag-Gawa") newValue else it.upaSaGawaBilang,
+                                binhiBilang = if (label == "Binhi") newValue else it.binhiBilang,
+                                abonoBilang = if (label == "Abono") newValue else it.abonoBilang,
+                                kemikalBilang = if (label == "Kemikal") newValue else it.kemikalBilang,
+                                patubigBilang = if (label == "Patubig") newValue else it.patubigBilang,
+                                ibapaBilang = if (label == "Iba pa") newValue else it.ibapaBilang,
+                                kabuuanBilang = if (label == "Kabuuan") newValue else it.kabuuanBilang
+                            )
+                        )
+                    }
+                },
                 halagaValue = state.second.value,
-                onHalagaValueChange = { newValue -> state.second.value = newValue }
+                onHalagaValueChange = { newValue ->
+                    state.second.value = newValue
+                    indemnityDto?.let {
+                        onIndemnityChange(
+                            it.copy(
+                                upaSaGawaHalaga = if (label == "Upa Sa Pag-Gawa") newValue else it.upaSaGawaHalaga,
+                                binhiHalaga = if (label == "Binhi") newValue else it.binhiHalaga,
+                                abonoHalaga = if (label == "Abono") newValue else it.abonoHalaga,
+                                kemikalHalaga = if (label == "Kemikal") newValue else it.kemikalHalaga,
+                                patubigHalaga = if (label == "Patubig") newValue else it.patubigHalaga,
+                                ibapaHalaga = if (label == "Iba pa") newValue else it.ibapaHalaga,
+                                kabuuanHalaga = if (label == "Kabuuan") newValue else it.kabuuanHalaga
+                            )
+                        )
+                    }
+                }
             )
         }
     }
@@ -836,22 +953,26 @@ fun LabelAndValue(
             )
             OutlinedTextField(
                 value = bilangValue,
-                onValueChange = onBilangValueChange,
+                onValueChange = { newValue ->
+                    val filteredValue = newValue.filter { it.isDigit() }
+                    onBilangValueChange(filteredValue)
+                },
                 modifier = Modifier
                     .weight(0.9f)
                     .align(Alignment.CenterVertically),
                 shape = RectangleShape,
-//                    .border(1.dp, Color.Black),
                 singleLine = true
             )
             OutlinedTextField(
                 value = halagaValue,
-                onValueChange = onHalagaValueChange,
+                onValueChange = { newValue ->
+                    val filteredValue = newValue.filter { it.isDigit() }
+                    onHalagaValueChange(filteredValue)
+                },
                 modifier = Modifier
                     .weight(0.9f)
                     .align(Alignment.CenterVertically),
                 shape = RectangleShape,
-//                    .border(1.dp, Color.Black),
                 singleLine = true
             )
         }
@@ -859,14 +980,23 @@ fun LabelAndValue(
 }
 
 @Composable
-fun Verification() {
+fun Verification(
+    currentUser: UserDto
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 50.dp),
+            .padding(top = 30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Text(
+            text = "${currentUser.firstName} ${currentUser.middleName} ${currentUser.lastName}".uppercase(),
+            textAlign = TextAlign.Center,
+            fontSize = 17.sp,
+            color = Color.Black,
+            fontFamily = FontFamily.SansSerif
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -876,7 +1006,7 @@ fun Verification() {
             Box(
                 modifier = Modifier
                     .padding(bottom = 10.dp)
-                    .heightIn(min = 50.dp, max = 50.dp)
+                    .heightIn(min = 30.dp, max = 30.dp)
                     .fillMaxWidth()
                     .drawBehind {
                         val strokeWidth = 1.dp.toPx()
@@ -908,9 +1038,31 @@ fun Verification() {
 }
 
 @Composable
-fun InDemnityButton() {
+fun InDemnityButton(
+    indemnityDto: MutableState<IndemnityDto>,
+    selectedDate: String,
+    isSubmitting: MutableState<Boolean>,
+    userViewModel: UserViewModel,
+    navController: NavController,
+    currentUser: UserDto
+) {
     Button(
-        onClick = {},
+        onClick = {
+            if (!isSubmitting.value) {
+                indemnityDto.value = indemnityDto.value.copy(
+                    fillupdate = selectedDate,
+                    userId = currentUser.id ?: ""
+                )
+
+                if (selectedDate.isEmpty()) {
+                    Log.e("Validation", "Date must be selected before submission")
+                    return@Button
+                }
+
+                indemnityDto.value = indemnityDto.value.copy(fillupdate = selectedDate)
+                isSubmitting.value = true
+            }
+        },
         modifier = Modifier
             .width(360.dp)
             .padding(bottom = 30.dp)
@@ -919,7 +1071,26 @@ fun InDemnityButton() {
             containerColor = Color(0xFF136204),
             contentColor = Color.White
         )
-    ){
+    ) {
         Text(text = "Confirm", fontSize = 17.sp)
+    }
+
+    LaunchedEffect(isSubmitting.value) {
+        if (isSubmitting.value) {
+            try {
+                val result = userViewModel.upsertIndemnity(indemnityDto.value)
+                isSubmitting.value = false
+
+                if (result.isSuccess) {
+                    Log.d("Success", "Indemnity successfully saved!")
+                    navController.popBackStack()
+                } else {
+                    Log.e("Error", "Failed to save indemnity: ${result.exceptionOrNull()?.message}")
+                }
+            } catch (e: Exception) {
+                isSubmitting.value = false
+                Log.e("Error", "Submission failed: ${e.message}")
+            }
+        }
     }
 }
