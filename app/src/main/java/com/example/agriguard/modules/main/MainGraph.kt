@@ -34,6 +34,7 @@ import com.example.agriguard.modules.main.report.ui.RiceInsuranceListUI
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.AddressDto
 import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.user.model.dto.RiceInsuranceDto
 import com.example.agriguard.modules.main.user.service.UserService
 import com.example.agriguard.modules.main.user.ui.UserCreateUI
 import com.example.agriguard.modules.main.user.ui.UserEditUI
@@ -151,8 +152,14 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             }
         }
         composable<MainNav.RiceInsuranceForm> {
+            val userViewModel: UserViewModel = hiltViewModel()
             Guard(navController = navController) { currentUser ->
-                RiceInsuranceFormUI()
+                RiceInsuranceFormUI(
+                    navController = navController,
+                    currentUser = currentUser,
+                    riceInsuranceDto = RiceInsuranceDto(),
+                    userViewModel = userViewModel
+                )
             }
         }
         composable<MainNav.RiceInsuranceList> {
