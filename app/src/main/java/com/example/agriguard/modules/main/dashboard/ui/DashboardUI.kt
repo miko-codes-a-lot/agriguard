@@ -525,7 +525,7 @@ fun CropsCategory(
             Triple("Indemnity ",R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
             Triple("Rice Insurance",R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList) },
             Triple("Onion Insurance",R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList) },
-            Triple("Complaint List",R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList) },
+            Triple("Complaints",R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList) },
             Triple("Crop Monitoring", R.drawable.crop_monitor, onCropsMonitoringClick),
             Triple("Messages", R.drawable.messageicon) {(navController.navigate(MainNav.Message))},
         )

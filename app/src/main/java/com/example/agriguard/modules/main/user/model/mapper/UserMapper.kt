@@ -20,6 +20,7 @@ fun User.toDTO(): UserDto {
         email = email,
         dateOfBirth = dateOfBirth.toInstantString(),
         password = password,
+        nameOfSpouse =nameOfSpouse,
         isAdmin = isAdmin,
         isTechnician = isTechnician,
         isFarmers = isFarmers,
@@ -46,6 +47,7 @@ fun UserDto.toEntity(): User {
         email = userDto.email
         dateOfBirth = userDto.dateOfBirth.toRealmInstant()
         password = userDto.password
+        nameOfSpouse = userDto.nameOfSpouse
         isAdmin = userDto.isAdmin
         isTechnician = userDto.isTechnician
         isFarmers = userDto.isFarmers

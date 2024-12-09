@@ -10,6 +10,7 @@ data class UserDto(
     var email: String = "",
     var dateOfBirth: String = "",
     var password: String = "",
+    var nameOfSpouse: String? = null,
     var isAdmin: Boolean = false,
     var isTechnician: Boolean = false,
     var isFarmers: Boolean = false,

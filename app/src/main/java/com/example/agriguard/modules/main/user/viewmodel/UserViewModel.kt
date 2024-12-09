@@ -2,6 +2,7 @@ package com.example.agriguard.modules.main.user.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.user.model.dto.RiceInsuranceDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.service.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,5 +35,9 @@ class UserViewModel @Inject constructor(
 
     fun fetchIndemnity(indemnityId: String): IndemnityDto? {
         return userService.fetchOneIndemnity(indemnityId)
+    }
+
+    suspend fun upsertRiceInsurance(checkupDto: RiceInsuranceDto): Result<RiceInsuranceDto> {
+        return this.userService.upsertRiceInsurance(checkupDto)
     }
 }

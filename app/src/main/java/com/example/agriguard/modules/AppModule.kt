@@ -3,6 +3,7 @@ package com.example.agriguard.modules
 import com.example.agriguard.BuildConfig
 import com.example.agriguard.modules.main.user.model.entity.Address
 import com.example.agriguard.modules.main.user.model.entity.Indemnity
+import com.example.agriguard.modules.main.user.model.entity.RiceInsurance
 import com.example.agriguard.modules.main.user.model.entity.User
 import dagger.Module
 import dagger.Provides
@@ -30,7 +31,8 @@ object AppModule {
             val setOfEntities = setOf(
                 User::class,
                 Address::class,
-                Indemnity::class
+                Indemnity::class,
+                RiceInsurance::class
             )
 
             val config = SyncConfiguration
@@ -50,6 +52,10 @@ object AppModule {
                     add(
                         realm.query<Indemnity>("_id <> $0", null),
                         name = "Indemnity"
+                    )
+                    add(
+                        realm.query<RiceInsurance>("_id <> $0", null),
+                        name = "RiceInsurance"
                     )
                 }
                 .build()
