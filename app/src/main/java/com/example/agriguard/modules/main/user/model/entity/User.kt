@@ -16,6 +16,7 @@ class User : RealmObject {
     var email: String = ""
     var dateOfBirth: RealmInstant = RealmInstant.now()
     var password: String = ""
+    var nameOfSpouse: String? = ""
     var isAdmin: Boolean = false
     var isTechnician: Boolean = false
     var isFarmers: Boolean = false
