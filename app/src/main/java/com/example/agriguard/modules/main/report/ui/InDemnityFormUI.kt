@@ -128,8 +128,8 @@ fun InDemnityFormUI(
         }
         item {
             ProgramInfo(
-                value = indemnity.others.orEmpty(),
-                onValueChange = { newValue -> indemnity = indemnity.copy(others = newValue) }
+                indemnityDto = indemnity,
+                onIndemnityChange = { updatedDto -> indemnity = updatedDto }
             )
         }
         item {
@@ -147,7 +147,8 @@ fun InDemnityFormUI(
         item{
             CropsCoast(
                 indemnityDto = indemnity,
-                onIndemnityChange = { updatedDto -> indemnity = updatedDto }
+                onIndemnityChange = { updatedDto ->
+                    indemnity = updatedDto }
             )
         }
         item{
@@ -362,13 +363,10 @@ fun TextFieldInDemnityForm(label: String, value: String, onValueChange: (String)
 }
 
 @Composable
-fun ProgramInfo( value: String, onValueChange: (String) -> Unit ) {
-    var isRegular by remember { mutableStateOf(true) }
-    var isPunla by remember { mutableStateOf(false) }
-    var isCooperate by remember { mutableStateOf(false) }
-    var isSikatSaka by remember { mutableStateOf(false) }
-    var isRSBSA by remember { mutableStateOf(false) }
-    var isAPCPCAPPBD by remember { mutableStateOf(false) }
+fun ProgramInfo(
+    indemnityDto: IndemnityDto,
+    onIndemnityChange: (IndemnityDto) -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(top = 15.dp, bottom = 15.dp)
@@ -396,8 +394,10 @@ fun ProgramInfo( value: String, onValueChange: (String) -> Unit ) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isRegular,
-                    onCheckedChange = { isRegular = it },
+                    checked = indemnityDto.regular,
+                    onCheckedChange = { checked ->
+                        onIndemnityChange(indemnityDto.copy(regular = checked))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -412,8 +412,10 @@ fun ProgramInfo( value: String, onValueChange: (String) -> Unit ) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isPunla,
-                    onCheckedChange = { isPunla = it },
+                    checked = indemnityDto.punla,
+                    onCheckedChange = { checked ->
+                        onIndemnityChange(indemnityDto.copy(punla = checked))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -429,8 +431,10 @@ fun ProgramInfo( value: String, onValueChange: (String) -> Unit ) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isCooperate,
-                    onCheckedChange = { isCooperate = it },
+                    checked = indemnityDto.cooperativeRice,
+                    onCheckedChange = { checked ->
+                        onIndemnityChange(indemnityDto.copy(cooperativeRice = checked))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -450,8 +454,10 @@ fun ProgramInfo( value: String, onValueChange: (String) -> Unit ) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isRSBSA,
-                    onCheckedChange = { isRSBSA = it },
+                    checked = indemnityDto.rsbsa,
+                    onCheckedChange = { checked ->
+                        onIndemnityChange(indemnityDto.copy(rsbsa = checked))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -466,8 +472,10 @@ fun ProgramInfo( value: String, onValueChange: (String) -> Unit ) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isSikatSaka,
-                    onCheckedChange = { isSikatSaka = it },
+                    checked = indemnityDto.sikat,
+                    onCheckedChange = { checked ->
+                        onIndemnityChange(indemnityDto.copy(sikat = checked))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -482,8 +490,10 @@ fun ProgramInfo( value: String, onValueChange: (String) -> Unit ) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isAPCPCAPPBD,
-                    onCheckedChange = { isAPCPCAPPBD = it },
+                    checked = indemnityDto.apcpc,
+                    onCheckedChange = { checked ->
+                        onIndemnityChange(indemnityDto.copy(apcpc = checked))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -529,8 +539,10 @@ fun ProgramInfo( value: String, onValueChange: (String) -> Unit ) {
                 }
         ) {
             OutlinedTextField(
-                value = value,
-                onValueChange = onValueChange ,
+                value = indemnityDto.others.orEmpty(),
+                onValueChange = { newValue ->
+                    onIndemnityChange(indemnityDto.copy(others = newValue.takeIf { it.isNotBlank() }))
+                },
                 modifier = Modifier
                     .fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -551,6 +563,7 @@ fun CropsDamage(
 ) {
     val damageLabels = listOf(
         "Cause of Damage" to indemnityDto.causeOfDamage.orEmpty(),
+        "Date of Loss" to indemnityDto.dateOfLoss.orEmpty(),
         "Age/Stage of Cultivation" to indemnityDto.ageCultivation.orEmpty(),
         "Area Damaged" to indemnityDto.areaDamaged.orEmpty(),
         "Degree of Damage" to indemnityDto.degreeOfDamage.orEmpty(),
@@ -581,6 +594,7 @@ fun CropsDamage(
                     onIndemnityChange(
                         when (label) {
                             "Cause of Damage" -> indemnityDto.copy(causeOfDamage = newValue)
+                            "Date of Loss" -> indemnityDto.copy(dateOfLoss = newValue)
                             "Age/Stage of Cultivation" -> indemnityDto.copy(ageCultivation = newValue)
                             "Area Damaged" -> indemnityDto.copy(areaDamaged = newValue)
                             "Degree of Damage" -> indemnityDto.copy(degreeOfDamage = newValue)
@@ -671,44 +685,44 @@ fun LocationSketch(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items(farmLocation) { farmDetail ->
-                Row(
-                    modifier = Modifier
-                        .padding(top = 15.dp, bottom = 15.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ){
-                    IconButton(
-                        onClick = {
-                            farmLocation.add(initialFarmLocation())
-                        },
-                        modifier = Modifier
-                            .size(21.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add Farm Detail",
-                            tint = Color(0xFF136204)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(20.dp))
-                    IconButton(
-                        onClick = {
-                            if (farmLocation.size > 1) {
-                                farmLocation.removeAt(farmLocation.lastIndex)
-                            }
-                        },
-                        modifier = Modifier
-                            .size(21.dp)
-                            .alpha(if (farmLocation.size > 1) 1f else 0.5f),
-                        enabled = farmLocation.size > 1
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Farm Detail",
-                            tint = Color(0xFF136204)
-                        )
-                    }
-                }
+//                Row(
+//                    modifier = Modifier
+//                        .padding(top = 15.dp, bottom = 15.dp)
+//                        .fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.End
+//                ){
+//                    IconButton(
+//                        onClick = {
+//                            farmLocation.add(initialFarmLocation())
+//                        },
+//                        modifier = Modifier
+//                            .size(21.dp)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Add,
+//                            contentDescription = "Add Farm Detail",
+//                            tint = Color(0xFF136204)
+//                        )
+//                    }
+//                    Spacer(modifier = Modifier.width(20.dp))
+//                    IconButton(
+//                        onClick = {
+//                            if (farmLocation.size > 1) {
+//                                farmLocation.removeAt(farmLocation.lastIndex)
+//                            }
+//                        },
+//                        modifier = Modifier
+//                            .size(21.dp)
+//                            .alpha(if (farmLocation.size > 1) 1f else 0.5f),
+//                        enabled = farmLocation.size > 1
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Delete,
+//                            contentDescription = "Delete Farm Detail",
+//                            tint = Color(0xFF136204)
+//                        )
+//                    }
+//                }
                 location.forEach { (label, value) ->
                     TextFieldFarmLocation(
                         label = label,
@@ -1072,11 +1086,12 @@ fun InDemnityButton(
             contentColor = Color.White
         )
     ) {
-        Text(text = "Confirm", fontSize = 17.sp)
+        Text(text = "Confirm", fontSize = 17.sp, color = Color.White)
     }
 
     LaunchedEffect(isSubmitting.value) {
         if (isSubmitting.value) {
+            Log.d("InDemnityButton", "Submitting indemnity: ${indemnityDto.value}")
             try {
                 val result = userViewModel.upsertIndemnity(indemnityDto.value)
                 isSubmitting.value = false
