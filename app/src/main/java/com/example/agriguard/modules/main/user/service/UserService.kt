@@ -1,8 +1,10 @@
 package com.example.agriguard.modules.main.user.service
 
 import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.user.model.dto.RiceInsuranceDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.model.entity.Indemnity
+import com.example.agriguard.modules.main.user.model.entity.RiceInsurance
 import com.example.agriguard.modules.main.user.model.entity.User
 import com.example.agriguard.modules.main.user.model.mapper.toDTO
 import com.example.agriguard.modules.main.user.model.mapper.toEntity
@@ -114,5 +116,16 @@ class UserService  @Inject constructor(private val realm: Realm)  {
             .find()
             .firstOrNull()
             ?.toDTO()
+    }
+
+    suspend fun upsertRiceInsurance(data: RiceInsuranceDto): Result<RiceInsuranceDto> {
+        return try {
+            realm.write {
+                val riceInsurance = copyToRealm(data.toEntity(), updatePolicy = UpdatePolicy.ALL)
+                Result.success(riceInsurance.toDTO())
+            }
+        } catch (error: Exception) {
+            Result.failure(error)
+        }
     }
 }
