@@ -1,5 +1,6 @@
 package com.example.agriguard.modules.main.report.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,14 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -35,6 +34,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -48,37 +48,43 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.agriguard.R
+import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.user.model.dto.RiceInsuranceDto
+import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
+import com.example.agriguard.modules.shared.ext.toRealmInstant
+import io.realm.kotlin.types.RealmInstant
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
 
-@Preview(showSystemUi = true)
 @Composable
-fun RiceInsurancePreview(){
-    RiceInsuranceFormUI()
-}
+fun RiceInsuranceFormUI(
+    navController: NavController,
+    currentUser: UserDto,
+    riceInsuranceDto: RiceInsuranceDto,
+    userViewModel: UserViewModel
+){
+    var riceInsurance by remember { mutableStateOf(riceInsuranceDto) }
+    var fillUpdate by remember { mutableStateOf<String?>(riceInsuranceDto.fillUpDate) }
+    val isSubmitting by remember { mutableStateOf(false) }
 
-@Composable
-fun RiceInsuranceFormUI(){
-    var isNewChecked by remember { mutableStateOf(true) }
-    var isRenewalChecked by remember { mutableStateOf(false) }
-    var isSelfFinancedChecked by remember { mutableStateOf(true) }
-    var isBorrowingChecked by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf("") }
-    var insuranceID by remember { mutableStateOf("") }
-    var lender by remember { mutableStateOf("") }
     LazyColumn(
         modifier = Modifier
             .background(Color.White)
-//            .fillMaxSize()
+            .fillMaxSize()
+            .padding(top = 16.dp)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -92,12 +98,20 @@ fun RiceInsuranceFormUI(){
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-//                    InssuranceID And Lender Not Working Properly
-                    InfoFirstLine("Insurance ID", insuranceID) { newId -> insuranceID = newId }
-                    InfoFirstLine("Lender", lender) { newLender -> lender = newLender }
-                    DatePickerField("Date", selectedDate) { newDate ->
-                        selectedDate = newDate
+                    InfoFirstLine("Insurance ID", riceInsurance.insuranceId ?: "") { newId ->
+                        riceInsurance = riceInsurance.copy(insuranceId = newId)
                     }
+                    InfoFirstLine("Lender", riceInsurance.lender ?: "") { newLender ->
+                        riceInsurance = riceInsurance.copy(lender = newLender)
+                    }
+                    DatePickerField(
+                        label = "Date",
+                        dateValue = fillUpdate ?: "",
+                        showDivider = true,
+                        onDateChange = { newDate ->
+                            fillUpdate = newDate
+                        }
+                    )
                 }
             }
         }
@@ -117,8 +131,10 @@ fun RiceInsuranceFormUI(){
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
-                            checked = isNewChecked,
-                            onCheckedChange = { isNewChecked = it },
+                                checked = riceInsurance.new,
+                            onCheckedChange = { isChecked ->
+                                riceInsurance = riceInsurance.copy(new = isChecked)
+                            },
                             colors = CheckboxDefaults.colors(Color(0xFF136204))
                         )
                         Text(
@@ -133,8 +149,10 @@ fun RiceInsuranceFormUI(){
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
-                            checked = isRenewalChecked,
-                            onCheckedChange = { isRenewalChecked = it },
+                            checked = riceInsurance.renewal,
+                            onCheckedChange = { isChecked ->
+                                riceInsurance = riceInsurance.copy(renewal = isChecked)
+                            },
                             colors = CheckboxDefaults.colors(Color(0xFF136204))
                         )
                         Text(
@@ -151,8 +169,10 @@ fun RiceInsuranceFormUI(){
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
-                            checked = isSelfFinancedChecked,
-                            onCheckedChange = { isSelfFinancedChecked = it },
+                            checked = riceInsurance.selfFinanced,
+                            onCheckedChange = { isChecked ->
+                                riceInsurance = riceInsurance.copy(selfFinanced = isChecked)
+                            },
                             colors = CheckboxDefaults.colors(Color(0xFF136204))
                         )
                         Text(
@@ -166,8 +186,10 @@ fun RiceInsuranceFormUI(){
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
-                            checked = isBorrowingChecked,
-                            onCheckedChange = { isBorrowingChecked = it },
+                            checked = riceInsurance.borrowing,
+                            onCheckedChange = { isChecked ->
+                                riceInsurance = riceInsurance.copy(borrowing = isChecked)
+                            },
                             colors = CheckboxDefaults.colors(Color(0xFF136204))
                         )
                         Text(
@@ -179,22 +201,42 @@ fun RiceInsuranceFormUI(){
             }
         }
         item {
-            FarmerInfo()
+            FarmerInfo(
+                currentUser = currentUser ,
+                riceInsuranceDto = riceInsurance,
+                onUpdate = { updatedDto -> riceInsurance = updatedDto },
+//                onUserUpdate = { updatedUser -> editCurrentUser = updatedUser }
+            )
         }
         item {
-            InfoStatus()
+            InfoStatus(
+                riceInsuranceDto = riceInsurance,
+                onUpdate = { updatedDto -> riceInsurance = updatedDto }
+            )
+        }
+        item {
+            LegalBeneficiaries(
+                riceInsuranceDto = riceInsurance,
+                onUpdate = { updatedDto -> riceInsurance = updatedDto }
+            )
         }
         item{
-            LegalBeneficiaries()
+            FarmSeparate(
+                riceInsuranceDto = riceInsurance,
+                onUpdate = { updatedDto -> riceInsurance = updatedDto }
+            )
         }
         item{
-            FarmSeparate()
+            Coverage(
+                riceInsuranceDto = riceInsurance,
+                onUpdate = { updatedDto -> riceInsurance = updatedDto }
+            )
         }
         item{
-            Coverage()
-        }
-        item{
-            PCIC()
+            PCIC(
+                riceInsuranceDto = riceInsurance,
+                onUpdate = { updatedDto -> riceInsurance = updatedDto }
+            )
         }
         item{
             Row(
@@ -204,12 +246,20 @@ fun RiceInsuranceFormUI(){
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Certification()
+                Certification(
+                )
             }
         }
         item{
             Spacer(modifier = Modifier.height(15.dp))
-            RiceInsuranceButton()
+            RiceInsuranceButton(
+                riceInsuranceDto = remember { mutableStateOf(riceInsurance) },
+                selectedDate = fillUpdate ?: "",
+                isSubmitting = remember { mutableStateOf(isSubmitting) },
+                userViewModel = userViewModel,
+                navController = navController,
+                currentUser = currentUser
+            )
         }
     }
 }
@@ -272,12 +322,14 @@ fun DatePickerField(
     label: String,
     dateValue: String,
     onDateChange: (String) -> Unit,
+    showDivider: Boolean = true
 //    isError: Boolean,
 //    onErrorChange: (Boolean) -> Unit,
 //    errorMessage: String = ""
 ) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
+
     val datePickerDialog = remember {
         android.app.DatePickerDialog(
             context,
@@ -287,20 +339,19 @@ fun DatePickerField(
                 isoFormat.timeZone = TimeZone.getTimeZone("UTC")
                 val dateISO = isoFormat.format(calendar.time)
                 onDateChange(dateISO)
-//                onErrorChange(false)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         )
     }
+
     val displayFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
     val displayDate = try {
         val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(dateValue)
         date?.let { displayFormat.format(it) } ?: "Select Date"
     } catch (e: Exception) {
-//        "Select Date"
-        ""
+        "Select Date"
     }
 
     Row(
@@ -362,13 +413,15 @@ fun DatePickerField(
                             color = Color.Black
                         )
 //                    }
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .fillMaxWidth(),
-                        thickness = 1.dp,
-                        color = Color.Gray
-                    )
+                    if (showDivider) {
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .fillMaxWidth(),
+                            thickness = 1.dp,
+                            color = Color.Gray
+                        )
+                    }
                 }
             }
         }
@@ -376,11 +429,35 @@ fun DatePickerField(
 }
 
 @Composable
-fun FarmerInfo() {
+fun FarmerInfo(
+    currentUser: UserDto,
+    riceInsuranceDto: RiceInsuranceDto,
+    onUpdate: (RiceInsuranceDto) -> Unit,
+) {
+    val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+    val isoDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+    val dateOfBirthFormatted = try {
+        val date = isoDateFormat.parse(currentUser.dateOfBirth)
+        date?.let { dateFormat.format(it) } ?: currentUser.dateOfBirth
+    } catch (e: Exception) {
+        currentUser.dateOfBirth
+    }
     val labels = listOf(
-        "IP Tribe" to remember{ mutableStateOf("") },"FirstName" to remember{ mutableStateOf("") },"MiddleName" to remember{ mutableStateOf("") },"LastName" to remember{ mutableStateOf("") },"Date Of Birth" to remember{ mutableStateOf("") },
-        "If married, Name Of Spouse" to remember{ mutableStateOf("") },"No & Street/Sitio" to remember{ mutableStateOf("") },"Barangay" to remember{ mutableStateOf("") },"Municipality" to remember{ mutableStateOf("") },"Province" to remember{ mutableStateOf("") },
-        "Mobile Number" to remember{ mutableStateOf("") },"Bank Name" to remember{ mutableStateOf("") },"Bank Account No" to remember{ mutableStateOf("") },"Bank Address" to remember{ mutableStateOf("") }
+        "IP Tribe" to riceInsuranceDto.ipTribe.orEmpty(),
+        "First Name" to currentUser.firstName,
+        "Middle Name" to currentUser.middleName.orEmpty(),
+        "Last Name" to currentUser.lastName,
+        "Date of Birth" to dateOfBirthFormatted,
+        "If Married, Name of Spouse" to currentUser.nameOfSpouse.orEmpty(),
+        "No & Street/Sitio" to riceInsuranceDto.street.orEmpty(),
+        "Barangay" to riceInsuranceDto.barangay.orEmpty(),
+        "Municipality" to riceInsuranceDto.municipality.orEmpty(),
+        "Province" to riceInsuranceDto.province.orEmpty(),
+        "Mobile Number" to currentUser.mobileNumber.orEmpty(),
+        "Bank Name" to riceInsuranceDto.bankName.orEmpty(),
+        "Bank Address" to riceInsuranceDto.bankAddress.orEmpty()
     )
     LazyColumn(
         modifier = Modifier
@@ -388,11 +465,24 @@ fun FarmerInfo() {
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(labels) { (label, state) ->
+        items(labels) { (label, value) ->
             TextFieldStatusContainer(
                 label = label,
-                value = state.value,
-                onValueChange = { newvalue -> state.value = newvalue }
+                value = value,
+                onValueChange = { newValue ->
+                    onUpdate(
+                        when (label) {
+                            "IP Tribe" -> riceInsuranceDto.copy(ipTribe = newValue)
+                            "No & Street/Sitio" -> riceInsuranceDto.copy(street = newValue)
+                            "Barangay" -> riceInsuranceDto.copy(barangay = newValue)
+                            "Municipality" -> riceInsuranceDto.copy(municipality = newValue)
+                            "Province" -> riceInsuranceDto.copy(province = newValue)
+                            "Bank Name" -> riceInsuranceDto.copy(bankName = newValue)
+                            "Bank Address" -> riceInsuranceDto.copy(bankAddress = newValue)
+                            else -> riceInsuranceDto
+                        }
+                    )
+                }
             )
         }
     }
@@ -452,12 +542,10 @@ fun TextFieldStatusContainer(label: String, value: String, onValueChange: (Strin
 }
 
 @Composable
-fun InfoStatus() {
-    var isMale by remember { mutableStateOf(true) }
-    var isFeMale by remember { mutableStateOf(false) }
-    var isSingle by remember { mutableStateOf(true) }
-    var isMarried by remember { mutableStateOf(false) }
-    var isWidow by remember { mutableStateOf(false) }
+fun InfoStatus(
+    riceInsuranceDto: RiceInsuranceDto,
+    onUpdate: (RiceInsuranceDto) -> Unit
+) {
     Row(
         modifier = Modifier
             .padding(top = 15.dp)
@@ -473,8 +561,10 @@ fun InfoStatus() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isMale,
-                    onCheckedChange = { isMale = it },
+                    checked = riceInsuranceDto.male,
+                    onCheckedChange = { isChecked ->
+                        onUpdate(riceInsuranceDto.copy(male = isChecked, female = !isChecked))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -488,8 +578,10 @@ fun InfoStatus() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isFeMale,
-                    onCheckedChange = { isFeMale = it },
+                    checked = riceInsuranceDto.female,
+                    onCheckedChange = { isChecked ->
+                        onUpdate(riceInsuranceDto.copy(female = isChecked, male = !isChecked))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -510,8 +602,10 @@ fun InfoStatus() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isSingle,
-                    onCheckedChange = { isSingle = it },
+                    checked = riceInsuranceDto.single,
+                    onCheckedChange = { isChecked ->
+                        onUpdate(riceInsuranceDto.copy(single = isChecked, married = false, widow = false))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -526,8 +620,10 @@ fun InfoStatus() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isMarried,
-                    onCheckedChange = { isMarried = it },
+                    checked = riceInsuranceDto.married,
+                    onCheckedChange = { isChecked ->
+                        onUpdate(riceInsuranceDto.copy(married = isChecked, single = false, widow = false))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -548,8 +644,10 @@ fun InfoStatus() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isWidow,
-                    onCheckedChange = { isWidow = it },
+                    checked = riceInsuranceDto.widow,
+                    onCheckedChange = { isChecked ->
+                        onUpdate(riceInsuranceDto.copy(widow = isChecked, single = false, married = false))
+                    },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -562,9 +660,16 @@ fun InfoStatus() {
 }
 
 @Composable
-fun LegalBeneficiaries() {
-    val infoStatus = listOf("Name" to remember { mutableStateOf("") },
-        "Age" to remember { mutableStateOf("") }, "RelationShip" to remember { mutableStateOf("") } )
+fun LegalBeneficiaries(
+    riceInsuranceDto: RiceInsuranceDto,
+    onUpdate: (RiceInsuranceDto) -> Unit
+) {
+
+    val infoStatus = listOf(
+        "Name"  to riceInsuranceDto.nameOfBeneficiary,
+        "Age" to riceInsuranceDto.age,
+        "RelationShip" to riceInsuranceDto.relationship,
+    )
     Spacer(modifier = Modifier.height(20.dp))
     Text(
         text = "Legal Beneficiaries",
@@ -585,8 +690,16 @@ fun LegalBeneficiaries() {
             items(infoStatus) { (label, state) ->
                 LegalBeneficiariesTextField(
                     label = label,
-                    value = state.value,
-                    onValueChange = { newvalue -> state.value = newvalue }
+                    value = state ?: "",
+                    onValueChange = { newValue ->
+                        val updatedDto = when (label) {
+                            "Name" -> riceInsuranceDto.copy(nameOfBeneficiary = newValue)
+                            "Age" -> riceInsuranceDto.copy(age = newValue)
+                            "RelationShip" -> riceInsuranceDto.copy(relationship = newValue)
+                            else -> riceInsuranceDto
+                        }
+                        onUpdate(updatedDto)
+                    }
                 )
             }
         }
@@ -658,17 +771,45 @@ fun LegalBeneficiariesTextField(label: String, value: String, onValueChange: (St
 }
 
 @Composable
-fun FarmSeparate(){
-    val farmDetails = remember { mutableStateListOf(initialFarmDetail()) }
+fun FarmSeparate(
+    riceInsuranceDto: RiceInsuranceDto,
+    onUpdate: (RiceInsuranceDto) -> Unit
+){
+    val farmSeparateDetails = remember {
+        mutableStateListOf(
+            "B.1 Farm Location/LSP" to mutableStateOf(""),
+            "Sitio" to mutableStateOf(riceInsuranceDto.sitio.orEmpty()),
+            "Barangay" to mutableStateOf(riceInsuranceDto.farmlocationbarangay.orEmpty()),
+            "Municipality" to mutableStateOf(riceInsuranceDto.municipality.orEmpty()),
+            "Province" to mutableStateOf(riceInsuranceDto.farmlocationprovince.orEmpty()),
+            "B.2 Boundaries" to mutableStateOf(""),
+            "North" to mutableStateOf(riceInsuranceDto.north.orEmpty()),
+            "South" to mutableStateOf(riceInsuranceDto.south.orEmpty()),
+            "East" to mutableStateOf(riceInsuranceDto.east.orEmpty()),
+            "West" to mutableStateOf(riceInsuranceDto.west.orEmpty()),
+            "B.3 Variety" to mutableStateOf(riceInsuranceDto.variety.orEmpty()),
+            "B.4 Planting Methods" to mutableStateOf(riceInsuranceDto.platingMethod.orEmpty()),
+            "B.5 Date Of Sowing" to mutableStateOf(riceInsuranceDto.dateOfSowing.toString()),
+            "B.6 Date Of Planting" to mutableStateOf(riceInsuranceDto.dateOfPlanting.toString()),
+            "B.7 Date Of Harvest" to mutableStateOf(riceInsuranceDto.dateOfHarvest.toString()),
+            "B.8 Land Category" to mutableStateOf(riceInsuranceDto.landOfCategory.orEmpty()),
+            "B.9 Soil Types" to mutableStateOf(riceInsuranceDto.soiltypes.orEmpty()),
+            "B.10 Topography" to mutableStateOf(riceInsuranceDto.topography.orEmpty()),
+            "B.11 Source Of Irrigation's" to mutableStateOf(riceInsuranceDto.sourceOfIrrigations.orEmpty()),
+            "B.12 Tenurial Status" to mutableStateOf(riceInsuranceDto.tenurialStatus.orEmpty())
+        )
+    }
+
+
     Row(
         modifier = Modifier
             .padding(top = 15.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth(),                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
         horizontalArrangement = Arrangement.End
     ){
         IconButton(
             onClick = {
-                farmDetails.add(initialFarmDetail())
+                farmSeparateDetails.addAll(initialDetails())
             },
             modifier = Modifier
                 .size(21.dp)
@@ -682,7 +823,9 @@ fun FarmSeparate(){
         Spacer(modifier = Modifier.width(10.dp))
         IconButton(
             onClick = {
-                farmDetails.removeAt(farmDetails.lastIndex)
+                if (farmSeparateDetails.isNotEmpty()) {
+                    farmSeparateDetails.removeAt(farmSeparateDetails.lastIndex)
+                }
             },
             modifier = Modifier
                 .size(21.dp)
@@ -706,17 +849,186 @@ fun FarmSeparate(){
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            items(farmDetails) { farmDetail ->
-                farmDetail.forEach { (label, state) ->
+            items(farmSeparateDetails) { (label, state) ->
+                if (label in listOf("B.5 Date Of Sowing", "B.6 Date Of Planting", "B.7 Date Of Harvest")) {
+                    FarmerDatePickerField(
+                        label = label,
+                        dateValue = state.value,
+                        onDateChange = { newDate ->
+                            state.value = newDate
+                            val updatedDto = when (label) {
+                                "B.5 Date Of Sowing" -> riceInsuranceDto.copy(
+                                    dateOfSowing = newDate.toRealmInstant().toString()
+                                )
+                                "B.6 Date Of Planting" -> riceInsuranceDto.copy(
+                                    dateOfPlanting = newDate.toRealmInstant().toString()
+                                )
+                                "B.7 Date Of Harvest" -> riceInsuranceDto.copy(
+                                    dateOfHarvest = newDate.toRealmInstant().toString()
+                                )
+                                else -> riceInsuranceDto
+                            }
+                            onUpdate(updatedDto)
+                        }
+                    )
+                } else {
                     TextFieldSeparateStatus(
                         label = label,
                         value = state.value,
-                        onValueChange = { newValue -> state.value = newValue }
+                        onValueChange = { newValue ->
+                            state.value = newValue
+                            val updatedDto = when (label) {
+                                "Sitio" -> riceInsuranceDto.copy(sitio = newValue)
+                                "Barangay" -> riceInsuranceDto.copy(farmlocationbarangay = newValue)
+                                "Municipality" -> riceInsuranceDto.copy(municipality = newValue)
+                                "Province" -> riceInsuranceDto.copy(farmlocationprovince = newValue)
+                                "North" -> riceInsuranceDto.copy(north = newValue)
+                                "South" -> riceInsuranceDto.copy(south = newValue)
+                                "East" -> riceInsuranceDto.copy(east = newValue)
+                                "West" -> riceInsuranceDto.copy(west = newValue)
+                                else -> riceInsuranceDto
+                            }
+                            onUpdate(updatedDto)
+                        }
                     )
                 }
             }
         }
     }
+}
+
+@Composable
+fun FarmerDatePickerField(
+    label: String,
+    dateValue: String,
+    onDateChange: (String) -> Unit,
+    showDivider: Boolean = true
+//    isError: Boolean,
+//    onErrorChange: (Boolean) -> Unit,
+//    errorMessage: String = ""
+) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+
+    val datePickerDialog = remember {
+        android.app.DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                calendar.set(year, month, dayOfMonth)
+                val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                isoFormat.timeZone = TimeZone.getTimeZone("UTC")
+                val dateISO = isoFormat.format(calendar.time)
+                onDateChange(dateISO)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+    }
+
+    val displayFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+    val displayDate = try {
+        val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(dateValue)
+        date?.let { displayFormat.format(it) } ?: "Select Date"
+    } catch (e: Exception) {
+        "Select Date"
+    }
+
+    Row(
+        modifier = Modifier
+            .widthIn(min = 220.dp, max = 260.dp)
+//            .fillMaxWidth()
+            .clickable {
+                datePickerDialog.show()
+            }
+    ){
+        Row(
+            modifier = Modifier
+                .widthIn(min = 220.dp, max = 260.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif,
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.width(15.dp))
+
+            Text(" : ", fontWeight = FontWeight.Bold)
+
+            Spacer(modifier = Modifier.width(13.dp))
+
+            Surface(
+                modifier = Modifier
+                    .clickable {
+                        datePickerDialog.show()
+                    }
+                    .background(Color.Transparent),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(202.dp)
+                        .heightIn(min = 50.dp, max = 50.dp)
+                        .background(Color.White)
+                ){
+//                    if (isError) {
+//                        Text(
+//                            text = errorMessage,
+//                            color = Color.Red,
+//                            modifier = Modifier.padding(top = 4.dp),
+//                            fontSize = 12.sp
+//                        )
+//                    }else {
+                    Text(
+                        text = displayDate,
+                        fontFamily = FontFamily.SansSerif,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .padding(start = 5.dp)
+                            .align(Alignment.CenterStart),
+                        fontSize = 17.sp,
+                        color = Color.Black
+                    )
+//                    }
+                    if (showDivider) {
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .fillMaxWidth(),
+                            thickness = 1.dp,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+fun initialDetails(): List<Pair<String, MutableState<String>>> {
+    return listOf(
+        "Sitio" to mutableStateOf(""),
+        "Barangay" to mutableStateOf(""),
+        "Municipality" to mutableStateOf(""),
+        "Province" to mutableStateOf(""),
+        "North" to mutableStateOf(""),
+        "South" to mutableStateOf(""),
+        "East" to mutableStateOf(""),
+        "West" to mutableStateOf(""),
+        "B.3 Variety" to mutableStateOf(""),
+        "B.4 Planting Methods" to mutableStateOf(""),
+        "B.5 Date Of Sowing" to mutableStateOf(""),
+        "B.6 Date Of Planting" to mutableStateOf(""),
+        "B.7 Date Of Harvest" to mutableStateOf(""),
+        "B.8 Land Category" to mutableStateOf(""),
+        "B.9 Soil Types" to mutableStateOf(""),
+        "B.10 Topography" to mutableStateOf(""),
+        "B.11 Source Of Irrigation's" to mutableStateOf(""),
+        "B.12 Tenurial Status" to mutableStateOf("")
+    )
 }
 
 @Composable
@@ -761,36 +1073,11 @@ fun TextFieldSeparateStatus(label: String, value: String, onValueChange: (String
     }
 }
 
-fun initialFarmDetail(): List<Pair<String, MutableState<String>>> {
-    return listOf(
-        "B.1 Farm Location/LSP"  to mutableStateOf(""),
-        "Sitio"  to mutableStateOf(""),
-        "Barangay"  to mutableStateOf(""),
-        "Municipality"  to mutableStateOf(""),
-        "Province"  to mutableStateOf(""),
-        "B.2 Boundaries" to  mutableStateOf(""),
-        "North"  to mutableStateOf(""),
-        "South"  to mutableStateOf(""),
-        "East"  to mutableStateOf(""),
-        "West"  to mutableStateOf(""),
-        "B.3 Variety"  to mutableStateOf(""),
-        "B.4 Planting Methods"  to mutableStateOf(""),
-        "B.5 Date Of Sowing"  to mutableStateOf(""),
-        "B.6 Date Of Planting"  to mutableStateOf(""),
-        "B.7 Date Of Harvest"  to mutableStateOf(""),
-        "B.8 Land Category"  to mutableStateOf(""),
-        "B.9 Soil Types"  to mutableStateOf(""),
-        "B.10 Topography"  to mutableStateOf(""),
-        "B.11 Source Of Irrigation's"  to mutableStateOf(""),
-        "B.12 Tenurial Status" to mutableStateOf(""),
-    )
-}
-
 @Composable
-fun Coverage() {
-    var isRice by remember { mutableStateOf(true) }
-    var isMultiRisk by remember { mutableStateOf(false) }
-    var isNaturalDisaster by remember { mutableStateOf(false) }
+fun Coverage(
+    riceInsuranceDto: RiceInsuranceDto,
+    onUpdate: (RiceInsuranceDto) -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(top = 15.dp),
@@ -815,8 +1102,8 @@ fun Coverage() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isRice,
-                    onCheckedChange = { isRice = it },
+                    checked = riceInsuranceDto.rice,
+                    onCheckedChange = { onUpdate(riceInsuranceDto.copy(rice = it)) },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -830,8 +1117,8 @@ fun Coverage() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isMultiRisk,
-                    onCheckedChange = { isMultiRisk = it },
+                    checked = riceInsuranceDto.multirisk,
+                    onCheckedChange = { onUpdate(riceInsuranceDto.copy(multirisk = it)) },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -845,8 +1132,8 @@ fun Coverage() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = isNaturalDisaster,
-                    onCheckedChange = { isNaturalDisaster = it },
+                    checked = riceInsuranceDto.natural,
+                    onCheckedChange = { onUpdate(riceInsuranceDto.copy(natural = it)) },
                     colors = CheckboxDefaults.colors(Color(0xFF136204))
                 )
                 Text(
@@ -855,10 +1142,14 @@ fun Coverage() {
                 )
             }
         }
-        val coverageStatus = listOf(
-            "Amount Of Cover" to remember{ mutableStateOf("") },"Premium" to remember{ mutableStateOf("") },
-            "CLTI-ADSS" to remember{ mutableStateOf("") },"Sum insured (SI)" to remember{ mutableStateOf("") },
+
+        val coverageFields = listOf(
+            "Amount Of Cover" to riceInsuranceDto.amountOfCover,
+            "Premium" to riceInsuranceDto.premium,
+            "CLTI-ADSS" to riceInsuranceDto.cltiAdss,
+            "Sum Insured (SI)" to riceInsuranceDto.sumInsured
         )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -870,15 +1161,31 @@ fun Coverage() {
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(coverageStatus) { (label, state) ->
+                items(coverageFields) { (label, value) ->
                     TextFieldCoverage(
                         label = label,
-                        value = state.value,
-                        onValueChange = { newvalue -> state.value = newvalue }
+                        value = value ?: "",
+                        onValueChange = { newValue ->
+                            onUpdate(updateCoverageField(riceInsuranceDto, label, newValue))
+                        }
                     )
                 }
             }
         }
+    }
+}
+
+fun updateCoverageField(
+    dto: RiceInsuranceDto,
+    label: String,
+    value: String
+): RiceInsuranceDto {
+    return when (label) {
+        "Amount Of Cover" -> dto.copy(amountOfCover = value)
+        "Premium" -> dto.copy(premium = value)
+        "CLTI-ADSS" -> dto.copy(cltiAdss = value)
+        "Sum Insured (SI)" -> dto.copy(sumInsured = value)
+        else -> dto
     }
 }
 
@@ -936,12 +1243,15 @@ fun TextFieldCoverage(label: String, value: String, onValueChange: (String) -> U
 }
 
 @Composable
-fun PCIC() {
+fun PCIC(
+    riceInsuranceDto: RiceInsuranceDto,
+    onUpdate: (RiceInsuranceDto) -> Unit
+) {
     var isWet by remember { mutableStateOf(true) }
     var isDry by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
-            .padding(top = 8.dp),
+            .padding(top = 8.dp, bottom = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -1077,7 +1387,7 @@ fun TextFieldPCIC(label: String, value: String, onValueChange: (String) -> Unit)
 fun Certification() {
     Column(
         modifier = Modifier
-            .padding(top = 15.dp),
+            .padding(top = 50.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
@@ -1088,7 +1398,6 @@ fun Certification() {
         ) {
             Row(
                 modifier = Modifier
-//                    .widthIn(min = 250.dp, max = 270.dp),
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
@@ -1096,7 +1405,7 @@ fun Certification() {
                 Box(
                     modifier = Modifier
                         .padding(bottom = 10.dp)
-                        .heightIn(min = 50.dp, max = 50.dp)
+                        .heightIn(min = 20.dp, max = 20.dp)
                         .fillMaxWidth()
                         .drawBehind {
                             val strokeWidth = 1.dp.toPx()
@@ -1124,7 +1433,7 @@ fun Certification() {
                 color = Color.Black
             )
         }
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(25.dp))
         Column(
             modifier = Modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -1168,7 +1477,7 @@ fun Certification() {
                 color = Color.Black
             )
         }
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(25.dp))
         Column(
             modifier = Modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -1176,7 +1485,6 @@ fun Certification() {
         ) {
             Row(
                 modifier = Modifier
-//                    .widthIn(min = 250.dp, max = 270.dp),
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
@@ -1199,6 +1507,13 @@ fun Certification() {
                 )
             }
             Text(
+                text = "",
+                textAlign = TextAlign.Center,
+                fontSize = 17.sp,
+                color = Color.Black,
+                fontFamily = FontFamily.SansSerif
+            )
+            Text(
                 text = "Date",
                 fontSize = 16.sp,
                 fontFamily = FontFamily.SansSerif,
@@ -1209,11 +1524,35 @@ fun Certification() {
 }
 
 @Composable
-fun RiceInsuranceButton() {
+fun RiceInsuranceButton(
+    riceInsuranceDto: MutableState<RiceInsuranceDto>,
+    selectedDate: String,
+    isSubmitting: MutableState<Boolean>,
+    userViewModel: UserViewModel,
+    navController: NavController,
+    currentUser: UserDto
+) {
+    val isSubmittingState by remember { mutableStateOf(isSubmitting) }
+
     Button(
-        onClick = {},
+        onClick = {
+            if (!isSubmitting.value) {
+                if (selectedDate.isEmpty()) {
+                    Log.e("Validation", "Date must be selected before submission")
+                    return@Button
+                }
+
+                riceInsuranceDto.value = riceInsuranceDto.value.copy(
+                    fillUpDate = selectedDate,
+                    userId = currentUser.id ?: "",
+                    new = riceInsuranceDto.value.new
+                )
+
+                isSubmittingState.value = true
+            }
+        },
         modifier = Modifier
-            .padding(bottom = 30.dp)
+            .padding(bottom = 50.dp)
             .width(360.dp)
             .height(54.dp),
         colors = ButtonDefaults.buttonColors(
@@ -1221,6 +1560,22 @@ fun RiceInsuranceButton() {
             contentColor = Color.White
         )
     ){
-        Text(text = "Confirm", fontSize = 17.sp)
+        Text(text = "Confirm", fontSize = 17.sp, color = Color.White)
+    }
+
+    LaunchedEffect(isSubmittingState.value) {
+        try {
+            val result = userViewModel.upsertRiceInsurance(riceInsuranceDto.value)
+            if (result.isSuccess) {
+                Log.d("Success", "RiceInsurance successfully saved!")
+                navController.popBackStack()
+            } else {
+                Log.e("Error", "Failed to save riceInsurance: ${result.exceptionOrNull()?.message}")
+            }
+        } catch (e: Exception) {
+            Log.e("Error", "Submission failed: ${e.message}")
+        } finally {
+            isSubmittingState.value = false
+        }
     }
 }
