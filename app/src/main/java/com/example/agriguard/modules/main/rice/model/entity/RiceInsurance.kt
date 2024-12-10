@@ -1,4 +1,4 @@
-package com.example.agriguard.modules.main.user.model.entity
+package com.example.agriguard.modules.main.rice.model.entity
 
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
@@ -32,9 +32,9 @@ class RiceInsurance: RealmObject {
     var age: String? = ""
     var relationship: String? = ""
     var sitio: String? = ""
-    var farmlocationbarangay: String? = ""
-    var municipaliy: String? = ""
-    var farmlocationprovince: String? = ""
+    var farmLocationBarangay: String? = ""
+    var farmLocationMunicipality: String? = ""
+    var farmLocationProvince: String? = ""
     var north: String? = ""
     var south: String? = ""
     var east: String? = ""
@@ -45,12 +45,12 @@ class RiceInsurance: RealmObject {
     var dateOfPlanting: RealmInstant = RealmInstant.now()
     var dateOfHarvest: RealmInstant = RealmInstant.now()
     var landOfCategory: String? = ""
-    var soiltypes: String? = ""
+    var soilTypes: String? = ""
     var topography: String? = ""
     var sourceOfIrrigations: String? = ""
     var tenurialStatus: String? = ""
     var rice: Boolean = false
-    var multirisk: Boolean = false
+    var multiRisk: Boolean = false
     var natural: Boolean = false
     var amountOfCover: String? = ""
     var premium: String? = ""
