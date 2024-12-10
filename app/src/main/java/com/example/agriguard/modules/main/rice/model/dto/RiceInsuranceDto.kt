@@ -1,5 +1,8 @@
-package com.example.agriguard.modules.main.user.model.dto
+package com.example.agriguard.modules.main.rice.model.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class RiceInsuranceDto (
     var id: String? = null,
     var userId: String = "",
@@ -26,9 +29,9 @@ data class RiceInsuranceDto (
     var age: String? = null,
     var relationship: String? = null,
     var sitio: String? = null,
-    var farmlocationbarangay: String? = null,
-    var municipaliy: String? = null,
-    var farmlocationprovince: String? = null,
+    var farmLocationBarangay: String? = null,
+    var farmLocationMunicipality: String? = null,
+    var farmLocationProvince: String? = null,
     var north: String? = null,
     var south: String? = null,
     var east: String? = null,
@@ -39,12 +42,12 @@ data class RiceInsuranceDto (
     var dateOfPlanting: String = "",
     var dateOfHarvest: String = "",
     var landOfCategory: String? = null,
-    var soiltypes: String? = null,
+    var soilTypes: String? = null,
     var topography: String? = null,
     var sourceOfIrrigations: String? = null,
     var tenurialStatus: String? = null,
     var rice: Boolean = false,
-    var multirisk: Boolean = false,
+    var multiRisk: Boolean = false,
     var natural: Boolean = false,
     var amountOfCover: String? = null,
     var premium: String? = null,
