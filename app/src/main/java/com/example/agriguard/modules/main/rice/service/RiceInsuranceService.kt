@@ -2,8 +2,8 @@ package com.example.agriguard.modules.main.rice.service
 
 import com.example.agriguard.modules.main.rice.model.dto.RiceInsuranceDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
-import com.example.agriguard.modules.main.user.model.mapper.toDTO
-import com.example.agriguard.modules.main.user.model.mapper.toEntity
+import com.example.agriguard.modules.main.rice.mapper.toDTO
+import com.example.agriguard.modules.main.rice.mapper.toEntity
 import com.example.agriguard.modules.shared.ext.toInstantString
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
