@@ -3,7 +3,7 @@ package com.example.agriguard.modules
 import com.example.agriguard.BuildConfig
 import com.example.agriguard.modules.main.user.model.entity.Address
 import com.example.agriguard.modules.main.user.model.entity.Indemnity
-import com.example.agriguard.modules.main.user.model.entity.RiceInsurance
+import com.example.agriguard.modules.main.rice.model.entity.RiceInsurance
 import com.example.agriguard.modules.main.user.model.entity.User
 import dagger.Module
 import dagger.Provides
