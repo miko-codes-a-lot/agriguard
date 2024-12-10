@@ -1,7 +1,7 @@
-package com.example.agriguard.modules.main.user.model.mapper
+package com.example.agriguard.modules.main.rice.mapper
 
-import com.example.agriguard.modules.main.user.model.dto.RiceInsuranceDto
-import com.example.agriguard.modules.main.user.model.entity.RiceInsurance
+import com.example.agriguard.modules.main.rice.model.dto.RiceInsuranceDto
+import com.example.agriguard.modules.main.rice.model.entity.RiceInsurance
 import com.example.agriguard.modules.shared.ext.toInstantString
 import com.example.agriguard.modules.shared.ext.toObjectId
 import com.example.agriguard.modules.shared.ext.toRealmInstant
@@ -35,9 +35,9 @@ fun RiceInsurance.toDTO(): RiceInsuranceDto {
         age = age,
         relationship = relationship,
         sitio = sitio,
-        farmlocationbarangay = farmlocationbarangay,
-        municipaliy = municipaliy,
-        farmlocationprovince = farmlocationprovince,
+        farmLocationBarangay = farmLocationBarangay,
+        farmLocationMunicipality = farmLocationMunicipality,
+        farmLocationProvince = farmLocationProvince,
         north = north,
         south = south,
         east = east,
@@ -48,12 +48,12 @@ fun RiceInsurance.toDTO(): RiceInsuranceDto {
         dateOfPlanting = dateOfPlanting.toInstantString(),
         dateOfHarvest = dateOfHarvest.toInstantString(),
         landOfCategory = landOfCategory,
-        soiltypes = soiltypes,
+        soilTypes = soilTypes,
         topography = topography,
         sourceOfIrrigations = sourceOfIrrigations,
         tenurialStatus = tenurialStatus,
         rice = rice,
-        multirisk = multirisk,
+        multiRisk = multiRisk,
         natural = natural,
         amountOfCover = amountOfCover,
         premium = premium,
@@ -106,9 +106,9 @@ fun RiceInsuranceDto.toEntity(): RiceInsurance {
         age = riceInsuranceDto.age
         relationship = riceInsuranceDto.relationship
         sitio = riceInsuranceDto.sitio
-        farmlocationbarangay = riceInsuranceDto.farmlocationbarangay
-        municipaliy = riceInsuranceDto.municipaliy
-        farmlocationprovince = riceInsuranceDto.farmlocationprovince
+        farmLocationBarangay = riceInsuranceDto.farmLocationBarangay
+        farmLocationMunicipality = riceInsuranceDto.farmLocationMunicipality
+        farmLocationProvince = riceInsuranceDto.farmLocationProvince
         north = riceInsuranceDto.north
         south = riceInsuranceDto.south
         east = riceInsuranceDto.east
@@ -119,12 +119,12 @@ fun RiceInsuranceDto.toEntity(): RiceInsurance {
         dateOfPlanting = riceInsuranceDto.dateOfPlanting.toRealmInstant()
         dateOfHarvest = riceInsuranceDto.dateOfHarvest.toRealmInstant()
         landOfCategory = riceInsuranceDto.landOfCategory
-        soiltypes = riceInsuranceDto.soiltypes
+        soilTypes = riceInsuranceDto.soilTypes
         topography = riceInsuranceDto.topography
         sourceOfIrrigations = riceInsuranceDto.sourceOfIrrigations
         tenurialStatus = riceInsuranceDto.tenurialStatus
         rice = riceInsuranceDto.rice
-        multirisk = riceInsuranceDto.multirisk
+        multiRisk = riceInsuranceDto.multiRisk
         natural = riceInsuranceDto.natural
         amountOfCover = riceInsuranceDto.amountOfCover
         premium = riceInsuranceDto.premium
