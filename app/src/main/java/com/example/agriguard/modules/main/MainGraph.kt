@@ -1,5 +1,7 @@
 package com.example.agriguard.modules.main
 
+import android.util.Log
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -9,8 +11,8 @@ import androidx.navigation.toRoute
 import com.example.agriguard.modules.main.dashboard.ui.DashboardUI
 import com.example.agriguard.modules.main.farmer.AddressesUI
 import com.example.agriguard.modules.main.farmer.ComplaintFormUI
-import com.example.agriguard.modules.main.farmer.FarmersUI
 import com.example.agriguard.modules.main.farmer.FarmersPreviewUI
+import com.example.agriguard.modules.main.farmer.FarmersUI
 import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
 import com.example.agriguard.modules.main.menu.ui.MenuUI
 import com.example.agriguard.modules.main.message.MessageListUI
@@ -22,19 +24,19 @@ import com.example.agriguard.modules.main.module.RiceDiseaseUI
 import com.example.agriguard.modules.main.module.RicePetsModule
 import com.example.agriguard.modules.main.module.RiceWeedUI
 import com.example.agriguard.modules.main.notification.NotificationListUI
+import com.example.agriguard.modules.main.report.ui.ComplaintReportListUI
 import com.example.agriguard.modules.main.report.ui.InDemnityFormUI
 import com.example.agriguard.modules.main.report.ui.InDemnityListUI
 import com.example.agriguard.modules.main.report.ui.OnionInsuranceFormUI
 import com.example.agriguard.modules.main.report.ui.OnionInsuranceListUI
 import com.example.agriguard.modules.main.report.ui.RegistrationMenuUI
 import com.example.agriguard.modules.main.report.ui.ReportFormValidationUI
-import com.example.agriguard.modules.main.report.ui.ComplaintReportListUI
-import com.example.agriguard.modules.main.report.ui.RiceInsuranceFormUI
 import com.example.agriguard.modules.main.report.ui.RiceInsuranceListUI
+import com.example.agriguard.modules.main.rice.ui.RiceInsuranceFormUI
+import com.example.agriguard.modules.main.rice.viewmodel.RiceInsuranceViewModel
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.AddressDto
 import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
-import com.example.agriguard.modules.main.user.model.dto.RiceInsuranceDto
 import com.example.agriguard.modules.main.user.service.UserService
 import com.example.agriguard.modules.main.user.ui.UserCreateUI
 import com.example.agriguard.modules.main.user.ui.UserEditUI
@@ -42,6 +44,7 @@ import com.example.agriguard.modules.main.user.ui.UsersUI
 import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
 import com.example.agriguard.modules.shared.Guard
 import com.example.agriguard.modules.shared.ext.toObjectId
+import kotlinx.coroutines.launch
 
 fun NavGraphBuilder.mainGraph(navController: NavController) {
     navigation<MainNav>(startDestination = MainNav.Menu) {
@@ -152,14 +155,23 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             }
         }
         composable<MainNav.RiceInsuranceForm> {
-            val userViewModel: UserViewModel = hiltViewModel()
             Guard(navController = navController) { currentUser ->
+                val viewModel: RiceInsuranceViewModel = hiltViewModel()
+                val scope = rememberCoroutineScope()
                 RiceInsuranceFormUI(
-                    navController = navController,
-                    currentUser = currentUser,
-                    riceInsuranceDto = RiceInsuranceDto(),
-                    userViewModel = userViewModel
-                )
+                    viewModel
+                ) { dto ->
+                    scope.launch {
+                        val result = viewModel.upsert(dto, currentUser)
+                        if (result.isSuccess) {
+                            // show success dialog here
+                            Log.d("micool", "good: $result")
+                        } else {
+                            // show fail dialog here
+                            Log.e("micool", "fail: $result")
+                        }
+                    }
+                }
             }
         }
         composable<MainNav.RiceInsuranceList> {
