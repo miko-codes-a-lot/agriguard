@@ -57,7 +57,9 @@ fun RiceInsuranceListUI(
             .fillMaxSize()
             .background(Color(0xFFFFFFFF)),
         floatingActionButton = {
-            FloatingRecordsInsuranceIcon(currentUser, navController)
+            if(currentUser.isFarmers) {
+                FloatingRecordsInsuranceIcon(currentUser, navController)
+            }
         }
     ) { padding ->
         Column(

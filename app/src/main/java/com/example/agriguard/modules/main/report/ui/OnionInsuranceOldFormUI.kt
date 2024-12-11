@@ -2,7 +2,6 @@ package com.example.agriguard.modules.main.report.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -25,12 +23,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -45,18 +41,12 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import java.util.TimeZone
 
 @Preview(showSystemUi = true)
 @Composable
@@ -84,11 +74,11 @@ fun OnionInsuranceOldFormUI() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    CropsInfo("Crops", "Onion")
+//                    CropsInfo("Crops", "Onion")
 
-                    OnionDatePicker("Date", selectedDate) { newDate ->
-                        selectedDate = newDate
-                    }
+//                    OnionDatePicker("Date", selectedDate) { newDate ->
+//                        selectedDate = newDate
+//                    }
                 }
             }
         }
@@ -122,166 +112,59 @@ fun OnionInsuranceOldFormUI() {
         }
     }
 }
-
-@Composable
-fun CropsInfo(label: String, value: String) {
-    Column{
-        Row(
-            modifier = Modifier
-                .widthIn(min = 220.dp, max = 260.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Text(
-                text = label,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
-            Spacer(modifier = Modifier.width(5.dp))
-
-            Text(" : ", fontWeight = FontWeight.Bold)
-
-            Spacer(modifier = Modifier.width(13.dp))
-            Box(
-                modifier = Modifier
-                    .heightIn(min = 50.dp, max = 50.dp)
-                    .fillMaxWidth()
-                    .drawBehind {
-                        val strokeWidth = 1.dp.toPx()
-                        val y = size.height - strokeWidth / 2
-                        drawLine(
-                            color = Color.Gray,
-                            start = Offset(0f, y),
-                            end = Offset(size.width, y),
-                            strokeWidth = strokeWidth
-                        )
-                    }
-            ) {
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = {},
-                    textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily.SansSerif),
-                    modifier = Modifier
-                        .heightIn(min = 50.dp, max = 50.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
-                    )
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun OnionDatePicker(
-    label: String,
-    dateValue: String,
-    onDateChange: (String) -> Unit,
-//    isError: Boolean,
-//    onErrorChange: (Boolean) -> Unit,
-//    errorMessage: String = ""
-) {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance()
-    val datePickerDialog = remember {
-        android.app.DatePickerDialog(
-            context,
-            { _, year, month, dayOfMonth ->
-                calendar.set(year, month, dayOfMonth)
-                val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-                isoFormat.timeZone = TimeZone.getTimeZone("UTC")
-                val dateISO = isoFormat.format(calendar.time)
-                onDateChange(dateISO)
-//                onErrorChange(false)
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
-    }
-    val displayFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-    val displayDate = try {
-        val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(dateValue)
-        date?.let { displayFormat.format(it) } ?: "Select Date"
-    } catch (e: Exception) {
-//        "Select Date"
-        ""
-    }
-
-    Row(
-        modifier = Modifier
-            .widthIn(min = 220.dp, max = 260.dp)
-//            .fillMaxWidth()
-            .clickable {
-                datePickerDialog.show()
-            }
-    ){
-        Row(
-            modifier = Modifier
-                .widthIn(min = 220.dp, max = 260.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = label,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-                fontSize = 16.sp
-            )
-
-            Spacer(modifier = Modifier.width(15.dp))
-
-            Text(" : ", fontWeight = FontWeight.Bold)
-
-            Spacer(modifier = Modifier.width(13.dp))
-
-            Surface(
-                modifier = Modifier
-                    .clickable {
-                        datePickerDialog.show()
-                    }
-                    .background(Color.Transparent),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(202.dp)
-                        .heightIn(min = 50.dp, max = 50.dp)
-                        .background(Color.White)
-                ){
-//                    if (isError) {
-//                        Text(
-//                            text = errorMessage,
-//                            color = Color.Red,
-//                            modifier = Modifier.padding(top = 4.dp),
-//                            fontSize = 12.sp
+//
+//@Composable
+//fun CropsInfo(label: String, value: String) {
+//    Column{
+//        Row(
+//            modifier = Modifier
+//                .widthIn(min = 220.dp, max = 260.dp),
+//            horizontalArrangement = Arrangement.End,
+//            verticalAlignment = Alignment.CenterVertically
+//        ){
+//            Text(
+//                text = label,
+//                fontWeight = FontWeight.Bold,
+//                fontSize = 16.sp
+//            )
+//            Spacer(modifier = Modifier.width(5.dp))
+//
+//            Text(" : ", fontWeight = FontWeight.Bold)
+//
+//            Spacer(modifier = Modifier.width(13.dp))
+//            Box(
+//                modifier = Modifier
+//                    .heightIn(min = 50.dp, max = 50.dp)
+//                    .fillMaxWidth()
+//                    .drawBehind {
+//                        val strokeWidth = 1.dp.toPx()
+//                        val y = size.height - strokeWidth / 2
+//                        drawLine(
+//                            color = Color.Gray,
+//                            start = Offset(0f, y),
+//                            end = Offset(size.width, y),
+//                            strokeWidth = strokeWidth
 //                        )
-//                    }else {
-                    Text(
-                        text = displayDate,
-                        fontFamily = FontFamily.SansSerif,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .padding(start = 5.dp)
-                            .align(Alignment.CenterStart),
-                        fontSize = 17.sp,
-                        color = Color.Black
-                    )
 //                    }
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .fillMaxWidth(),
-                        thickness = 1.dp,
-                        color = Color.Gray
-                    )
-                }
-            }
-        }
-    }
-}
+//            ) {
+//                OutlinedTextField(
+//                    value = value,
+//                    onValueChange = {},
+//                    textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily.SansSerif),
+//                    modifier = Modifier
+//                        .heightIn(min = 50.dp, max = 50.dp),
+//                    colors = OutlinedTextFieldDefaults.colors(
+//                        focusedBorderColor = Color.Transparent,
+//                        unfocusedBorderColor = Color.Transparent,
+//                        focusedTextColor = Color.Black,
+//                        unfocusedTextColor = Color.Black
+//                    )
+//                )
+//            }
+//        }
+//    }
+//}
+
 
 @Composable
 fun FarmerOnionInfo() {
