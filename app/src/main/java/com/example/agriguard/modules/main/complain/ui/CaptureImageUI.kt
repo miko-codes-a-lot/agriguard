@@ -1,9 +1,5 @@
 package com.example.agriguard.modules.main.complain.ui
 
-import android.content.ContentValues
-import android.content.Context
-import android.os.Build
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -34,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import android.Manifest
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,18 +42,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.example.agriguard.R
+import com.example.agriguard.modules.main.complain.viewmodel.ComplaintViewModel
+import java.io.File
 
 @Composable
 fun CaptureImageUI(
+    onDismiss : () -> Unit,
     navController: NavController,
-    viewModel : ViewModel
+    viewModel: ComplaintViewModel,
 ) {
     val context = LocalContext.current
     var isPermissionGranted by remember { mutableStateOf(false) }
+
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -79,7 +79,13 @@ fun CaptureImageUI(
         }
     }
     if (isPermissionGranted) {
-        CameraPreviewScreen()
+        CameraPreviewScreen(
+            viewModel = viewModel,
+            onImageCaptured = { uri ->
+                navController.popBackStack()
+            },
+            onDismiss = onDismiss
+        )
     } else {
 
         Column(
@@ -101,25 +107,10 @@ fun CaptureImageUI(
                     contentAlignment = Alignment.Center,
 
                     ) {
-                    //            if (selectedImgUri != null) {
-                    //                AsyncImage(
-                    //                    modifier = Modifier
-                    //                        .clip(CircleShape)
-                    //                        .size(140.dp)
-                    //                        .clip(CircleShape),
-                    //                    model = selectedImgUri,
-                    //                    contentDescription = null,
-                    //                    contentScale = ContentScale.Crop
-                    //                )
-                    //            } else {
                     IconButton(
                         onClick = {
                             checkAndRequestCameraPermission()
                         },
-
-                        //                photoPickerLauncher.launch(
-                        //                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        //                )
                         modifier = Modifier
                             .size(140.dp)
                             .padding(2.dp)
@@ -145,24 +136,23 @@ fun CaptureImageUI(
 
 @Composable
 fun CameraPreviewScreen(
+    viewModel: ComplaintViewModel,
+    onImageCaptured: (Uri) -> Unit,
+    onDismiss : () -> Unit,
 ) {
+    val context = LocalContext.current
     val lensFacing = CameraSelector.LENS_FACING_BACK
     val lifecycleOwner = LocalLifecycleOwner.current
-    val context = LocalContext.current
     val preview = Preview.Builder().build()
-    val previewView = remember {
-        PreviewView(context)
-    }
+    val previewView = remember { PreviewView(context) }
     val cameraxSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-    val imageCapture = remember {
-        ImageCapture.Builder().build()
-    }
-    LaunchedEffect(lensFacing) {
+    val imageCapture = remember { ImageCapture.Builder().build() }
+
+    LaunchedEffect(Unit) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener({
             try {
                 val cameraProvider = cameraProviderFuture.get()
-
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
                     lifecycleOwner,
@@ -179,51 +169,37 @@ fun CameraPreviewScreen(
 
     Box(
         contentAlignment = Alignment.BottomCenter,
-        modifier = Modifier
-            .padding(bottom = 50.dp)
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
         Button(
             onClick = {
-                captureImage(imageCapture, context)
+                val outputOptions = ImageCapture.OutputFileOptions.Builder(
+                    File(context.cacheDir, "captured_image.jpeg")
+                ).build()
+
+                imageCapture.takePicture(
+                    outputOptions,
+                    ContextCompat.getMainExecutor(context),
+                    object : ImageCapture.OnImageSavedCallback {
+                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                            val file = File(context.cacheDir, "captured_image.jpeg")
+                            val imageBytes = file.readBytes()
+                            val base64Image = android.util.Base64.encodeToString(imageBytes, android.util.Base64.DEFAULT)
+                            viewModel.updateField { it.copy(imageBase64 = base64Image) }
+                            Toast.makeText(context, "Image Captured and Processed", Toast.LENGTH_SHORT).show()
+                            onImageCaptured(Uri.fromFile(file))
+                        }
+
+                        override fun onError(exception: ImageCaptureException) {
+                            Toast.makeText(context, "Error Capturing Image", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+                onDismiss()
             }
         ) {
-            Text(
-                text = "Capture Image"
-            )
+            Text("Capture")
         }
     }
 }
-
-private fun captureImage(imageCapture: ImageCapture, context: Context) {
-    val name = "CameraxImage.jpeg"
-    val contentValues = ContentValues().apply {
-        put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-        put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
-        }
-    }
-    val outputOptions = ImageCapture.OutputFileOptions
-        .Builder(
-            context.contentResolver,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
-        )
-        .build()
-    imageCapture.takePicture(
-        outputOptions,
-        ContextCompat.getMainExecutor(context),
-        object : ImageCapture.OnImageSavedCallback {
-            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                println("Successs")
-            }
-
-            override fun onError(exception: ImageCaptureException) {
-                println("Failed $exception")
-            }
-        }
-    )
-}
-
