@@ -19,7 +19,7 @@ import javax.inject.Inject
 class RiceInsuranceService @Inject constructor(private val realm: Realm)  {
     suspend fun upsert(data: RiceInsuranceDto, currentUser: UserDto): Result<RiceInsuranceDto> {
         val dateNow = RealmInstant.now().toInstantString()
-        if (data.id != null) {
+        if (data.id == null) {
             data.userId = currentUser.id!!
             data.createdById = currentUser.id!!
             data.createdAt = dateNow
