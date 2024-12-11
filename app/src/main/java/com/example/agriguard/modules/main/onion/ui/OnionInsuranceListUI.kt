@@ -1,4 +1,4 @@
-package com.example.agriguard.modules.main.report.ui
+package com.example.agriguard.modules.main.onion.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -41,8 +41,6 @@ import androidx.navigation.NavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
 import com.example.agriguard.modules.main.onion.model.dto.OnionInsuranceDto
-import com.example.agriguard.modules.main.rice.model.dto.RiceInsuranceDto
-import com.example.agriguard.modules.main.rice.ui.FloatingRecordsInsuranceIcon
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -59,7 +57,9 @@ fun OnionInsuranceListUI(
             .fillMaxSize()
             .background(Color(0xFFFFFFFF)),
         floatingActionButton = {
-            FloatingRecordsOnionInsurance(currentUser, navController)
+            if(currentUser.isFarmers){
+                FloatingRecordsOnionInsurance(currentUser, navController)
+            }
         }
     ) { padding ->
         Column(
