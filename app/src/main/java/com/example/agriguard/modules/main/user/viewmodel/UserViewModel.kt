@@ -23,16 +23,4 @@ class UserViewModel @Inject constructor(
     fun fetchUser(userId: String): UserDto {
         return this.userService.fetchOne(userId)
     }
-
-    suspend fun upsertIndemnity(checkupDto: IndemnityDto): Result<IndemnityDto> {
-        return this.userService.upsertIndemnity(checkupDto)
-    }
-
-    fun fetchListIndemnity(userId: String): List<IndemnityDto> {
-        return userService.fetchListIndemnity(userId)
-    }
-
-    fun fetchIndemnity(indemnityId: String): IndemnityDto? {
-        return userService.fetchOneIndemnity(indemnityId)
-    }
 }

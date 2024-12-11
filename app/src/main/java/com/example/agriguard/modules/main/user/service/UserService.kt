@@ -4,6 +4,8 @@ import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.model.entity.Indemnity
 import com.example.agriguard.modules.main.user.model.entity.User
+import com.example.agriguard.modules.main.indemnity.mapper.toDTO
+import com.example.agriguard.modules.main.indemnity.mapper.toEntity
 import com.example.agriguard.modules.main.user.model.mapper.toDTO
 import com.example.agriguard.modules.main.user.model.mapper.toEntity
 import io.realm.kotlin.Realm
@@ -100,13 +102,6 @@ class UserService  @Inject constructor(private val realm: Realm)  {
         } catch (error: Exception) {
             Result.failure(error)
         }
-    }
-
-    fun fetchListIndemnity(userId: String): List<IndemnityDto> {
-        return realm.query<Indemnity>("userId == $0", userId)
-            .sort("fillupdate", Sort.DESCENDING)
-            .find()
-            .map { it.toDTO() }
     }
 
     fun fetchOneIndemnity(indemnityId: String): IndemnityDto? {
