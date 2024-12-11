@@ -1,15 +1,11 @@
-package com.example.agriguard.modules.main.farmer
+package com.example.agriguard.modules.main.complain.ui
 
-import android.content.pm.PackageManager
-import android.Manifest
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +16,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -32,6 +30,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,25 +45,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
-import com.example.agriguard.modules.main.MainNav
-
-@Preview(showSystemUi = true)
-@Composable
-fun ComplaintFormPreview(){
-    ComplaintFormUI(
-        rememberNavController()
-    )
-}
+import com.example.agriguard.modules.main.complain.model.dto.ComplaintInsuranceDto
+import com.example.agriguard.modules.main.complain.viewmodel.ComplaintViewModel
+import com.example.agriguard.modules.main.user.model.dto.UserDto
 
 @Composable
-fun ComplaintFormUI(navController: NavController) {
+fun ComplaintFormUI(
+    navController: NavController,
+    viewModel: ComplaintViewModel,
+    onSubmit: (ComplaintInsuranceDto) -> Unit
+) {
+    val formState by viewModel.formState.collectAsState()
+    val scrollState = rememberScrollState()
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -72,6 +69,7 @@ fun ComplaintFormUI(navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.padding(top = 20.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -104,22 +102,34 @@ fun ComplaintFormUI(navController: NavController) {
                 modifier = Modifier.size(100.dp)
             )
         }
-        Spacer(modifier = Modifier.height(10.dp))
-        UploadImageUI()
-        DropDownCategory()
-        Damage()
-        Maintenance()
-        ButtonSaveForm(navController)
-    }
+        Spacer(modifier = Modifier.padding(top = 10.dp))
+        CaptureImageUI(
+            navController = navController,
+            viewModel = viewModel
+        )
 
+        DropDownCategory(
+            viewModel = viewModel
+        )
+        Damage(
+            viewModel = viewModel
+        )
+        Maintenance(
+            viewModel = viewModel
+        )
+        ButtonSaveForm(
+            navController
+        )
+    }
 }
 
 @Composable
 fun DropDownCategory(
+    viewModel: ComplaintViewModel
 
 ) {
+    val formState by viewModel.formState.collectAsState()
     var expanded by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf("Rice") }
     val listOfCategory = listOf("Rice", "Onion")
     Column(
         modifier = Modifier,
@@ -135,9 +145,9 @@ fun DropDownCategory(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = selectedCategory,
+                text = if (formState.rice) "Rice" else "Onion",
                 modifier = Modifier
-                    .padding(start = 17.dp),
+                .padding(start = 17.dp),
                 fontSize = 25.sp,
                 color = Color(0xFF136204),
                 fontWeight = FontWeight.W800,
@@ -171,8 +181,13 @@ fun DropDownCategory(
                                 .width(130.dp)
                         )
                     },onClick = {
-                        selectedCategory = item
                         expanded = false
+                        viewModel.updateField {
+                            it.copy(
+                                rice = item == "Rice",
+                                onion = item == "Onion"
+                            )
+                        }
                     }
                 )
             }
@@ -181,8 +196,10 @@ fun DropDownCategory(
 }
 
 @Composable
-fun Damage() {
-    var text by remember { mutableStateOf("") }
+fun Damage(
+    viewModel: ComplaintViewModel
+) {
+    val formState by viewModel.formState.collectAsState()
     OutlinedCard(
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent,
@@ -190,38 +207,44 @@ fun Damage() {
         modifier = Modifier
             .background(Color.White)
             .fillMaxWidth()
-            .heightIn(max = 130.dp)
+            .heightIn(max = 165.dp)
             .border(1.dp, Color(0xFF136204), RoundedCornerShape(8.dp))
     ) {
-        TextField(
-            value = text,
-            onValueChange = { newText -> text = newText },
+        Box(
             modifier = Modifier
-                .fillMaxSize(),
-            placeholder = {
-                Text(
-                    text = "Cause of Damage...",
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily.SansSerif,
-                    color = Color.Gray,
+                .padding(top = 10.dp, bottom = 8.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            TextField(
+                value = formState.causeOfDamage ?: "",
+                onValueChange = { newText -> viewModel.updateField { it.copy(causeOfDamage = newText) } },
+                modifier = Modifier.fillMaxSize(),
+                placeholder = {
+                    Text(
+                        text = "Treatment...",
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily.SansSerif,
+                        color = Color.Gray,
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedBorderColor = Color.White,
+                    focusedTextColor = Color(0xFF136204),
+                    unfocusedBorderColor = Color.White
                 )
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedBorderColor = Color.White,
-                focusedTextColor = Color(0xFF136204),
-                unfocusedBorderColor = Color.White
             )
-        )
-
+        }
     }
-
 }
 
 @Composable
-fun Maintenance() {
-    var text by remember { mutableStateOf("") }
+fun Maintenance(
+    viewModel: ComplaintViewModel
+) {
+    val formState by viewModel.formState.collectAsState()
     OutlinedCard(
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent,
@@ -230,31 +253,36 @@ fun Maintenance() {
             .padding(top = 10.dp)
             .background(Color.White)
             .fillMaxWidth()
-            .heightIn(max = 130.dp)
+            .heightIn(max = 165.dp)
             .border(1.dp, Color(0xFF136204), RoundedCornerShape(8.dp))
     ) {
-        TextField(
-            value = text,
-            onValueChange = { newText -> text = newText },
+        Box(
             modifier = Modifier
-                .fillMaxSize(),
-            placeholder = {
-                Text(
-                    text = "Treatment...",
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily.SansSerif,
-                    color = Color.Gray,
+                .padding(top = 8.dp, bottom = 8.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            TextField(
+                value = formState.treatment ?: "",
+                onValueChange = { newText -> viewModel.updateField { it.copy(treatment = newText) } },
+                modifier = Modifier.fillMaxSize(),
+                placeholder = {
+                    Text(
+                        text = "Treatment...",
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily.SansSerif,
+                        color = Color.Gray,
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedBorderColor = Color.White,
+                    focusedTextColor = Color(0xFF136204),
+                    unfocusedBorderColor = Color.White
                 )
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedBorderColor = Color.White,
-                focusedTextColor = Color(0xFF136204),
-                unfocusedBorderColor = Color.White
             )
-        )
-
+        }
     }
 }
 
@@ -266,7 +294,7 @@ fun ButtonSaveForm(
         onClick = {
         },
         modifier = Modifier
-            .padding(top = 20.dp)
+            .padding(top = 50.dp, bottom = 50.dp)
             .fillMaxWidth()
             .height(58.dp),
         colors = ButtonDefaults.buttonColors(

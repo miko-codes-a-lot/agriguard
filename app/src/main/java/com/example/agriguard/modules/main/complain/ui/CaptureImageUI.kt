@@ -1,4 +1,4 @@
-package com.example.agriguard.modules.main.farmer
+package com.example.agriguard.modules.main.complain.ui
 
 import android.content.ContentValues
 import android.content.Context
@@ -35,8 +35,6 @@ import androidx.compose.runtime.remember
 import android.Manifest
 import android.content.pm.PackageManager
 import android.widget.Toast
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,14 +45,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavController
 import com.example.agriguard.R
 
 @Composable
-fun UploadImageUI() {
+fun CaptureImageUI(
+    navController: NavController,
+    viewModel : ViewModel
+) {
     val context = LocalContext.current
     var isPermissionGranted by remember { mutableStateOf(false) }
-
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -88,11 +90,11 @@ fun UploadImageUI() {
 
             Box(
                 Modifier
-                    .height(170.dp)
+                    .height(180.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(210.dp)
+                        .size(215.dp)
                         .clip(RectangleShape)
                         .background(Color(0xFFFFFFFF))
                         .border(1.dp, Color(0xFF136204), RectangleShape),
@@ -119,7 +121,7 @@ fun UploadImageUI() {
                         //                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         //                )
                         modifier = Modifier
-                            .size(130.dp)
+                            .size(140.dp)
                             .padding(2.dp)
                             .clip(RectangleShape)
                             .align(Alignment.Center),
@@ -130,7 +132,7 @@ fun UploadImageUI() {
                             contentDescription = "Default placeholder",
                             modifier = Modifier
                                 .background(Color.White)
-                                .size(80.dp),
+                                .size(85.dp),
                             tint = Color(0xFF136204),
                         )
                     }
@@ -142,7 +144,8 @@ fun UploadImageUI() {
 }
 
 @Composable
-fun CameraPreviewScreen() {
+fun CameraPreviewScreen(
+) {
     val lensFacing = CameraSelector.LENS_FACING_BACK
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
@@ -177,11 +180,18 @@ fun CameraPreviewScreen() {
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier
+            .padding(bottom = 50.dp)
             .fillMaxSize()
     ) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
-        Button(onClick = { captureImage(imageCapture, context) }) {
-            Text(text = "Capture Image")
+        Button(
+            onClick = {
+                captureImage(imageCapture, context)
+            }
+        ) {
+            Text(
+                text = "Capture Image"
+            )
         }
     }
 }
@@ -213,7 +223,7 @@ private fun captureImage(imageCapture: ImageCapture, context: Context) {
             override fun onError(exception: ImageCaptureException) {
                 println("Failed $exception")
             }
-
-        })
+        }
+    )
 }
 
