@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.agriguard.R
-import com.example.agriguard.modules.intro.IntroNav
+import com.example.agriguard.modules.intro.login.viewmodel.LoginViewModel
 import com.example.agriguard.modules.intro.login.viewmodel.UserState
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.service.UserService
@@ -79,17 +79,13 @@ fun SettingsUI(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ){
+                val loginViewModel : LoginViewModel = hiltViewModel()
                 Button(
                     onClick = {
                         coroutineScope.launch {
                             showButton = false
                             vm.signOut()
-                            navController.navigate(IntroNav.Login) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    inclusive = true
-                                }
-                                launchSingleTop = true
-                            }
+                            loginViewModel.logout(navController)
                         }
                     },
                     modifier = Modifier,
