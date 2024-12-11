@@ -3,6 +3,7 @@ package com.example.agriguard.modules.main.rice.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.agriguard.modules.main.rice.service.RiceInsuranceService
 import com.example.agriguard.modules.main.rice.model.dto.RiceInsuranceDto
+import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,5 +23,9 @@ class RiceInsuranceViewModel @Inject constructor(
 
     suspend fun upsert(data: RiceInsuranceDto, currentUser: UserDto): Result<RiceInsuranceDto> {
         return service.upsert(data, currentUser)
+    }
+
+    fun fetchListRiceInsurance(userId: String): List<RiceInsuranceDto> {
+        return service.fetchListInsurance(userId)
     }
 }

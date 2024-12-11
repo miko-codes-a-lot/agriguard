@@ -33,7 +33,7 @@ import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
 
 @Composable
-fun RiceInsuranceListUI(
+fun RiceInsuranceOldListUI(
     navController: NavController
 ) {
     Column(
@@ -77,66 +77,66 @@ fun RiceInsuranceListUI(
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
-        RiceInsuranceList(navController)
+//        RiceInsuranceList(navController)
     }
 }
 
-@Composable
-fun RiceInsuranceList(navController: NavController) {
-    val indemnityList = listOf(
-        "Submitted Files" to "May 25, 2024",
-        "Submitted Files" to "Sep 02, 2024",
-    )
-
-    LazyColumn(
-        modifier = Modifier
-            .padding(bottom = 50.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        itemsIndexed(items = indemnityList) { _, (files, date) ->
-            RiceButton(file = files, date = date, navController = navController)
-        }
-    }
-}
-
-@Composable
-private fun RiceButton(file: String, date: String, navController: NavController) {
-    ElevatedButton(
-        onClick = { navController.navigate(MainNav.RiceInsuranceForm) },
-        colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = Color(0xFFFFFFFF),
-            contentColor = Color(0xFF136204)
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(63.dp),
-        elevation = ButtonDefaults.elevatedButtonElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 8.dp
-        ),
-        shape = RectangleShape
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "$file Report",
-                fontSize = 17.sp,
-                textAlign = TextAlign.Start,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = date,
-                fontSize = 15.sp,
-                textAlign = TextAlign.End,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-            )
-        }
-    }
-}
+//@Composable
+//fun RiceInsuranceList(navController: NavController) {
+//    val indemnityList = listOf(
+//        "Submitted Files" to "May 25, 2024",
+//        "Submitted Files" to "Sep 02, 2024",
+//    )
+//
+//    LazyColumn(
+//        modifier = Modifier
+//            .padding(bottom = 50.dp)
+//            .fillMaxSize(),
+//        verticalArrangement = Arrangement.spacedBy(10.dp)
+//    ) {
+//        itemsIndexed(items = indemnityList) { _, (files, date) ->
+//            RiceButton(file = files, date = date, navController = navController)
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun RiceButton(file: String, date: String, navController: NavController) {
+//    ElevatedButton(
+//        onClick = { navController.navigate(MainNav.RiceInsuranceForm) },
+//        colors = ButtonDefaults.elevatedButtonColors(
+//            containerColor = Color(0xFFFFFFFF),
+//            contentColor = Color(0xFF136204)
+//        ),
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .height(63.dp),
+//        elevation = ButtonDefaults.elevatedButtonElevation(
+//            defaultElevation = 4.dp,
+//            pressedElevation = 8.dp
+//        ),
+//        shape = RectangleShape
+//    ) {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxSize(),
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Text(
+//                text = "$file Report",
+//                fontSize = 17.sp,
+//                textAlign = TextAlign.Start,
+//                fontWeight = FontWeight.Bold,
+//                fontFamily = FontFamily.SansSerif,
+//            )
+//            Spacer(modifier = Modifier.weight(1f))
+//            Text(
+//                text = date,
+//                fontSize = 15.sp,
+//                textAlign = TextAlign.End,
+//                fontWeight = FontWeight.Bold,
+//                fontFamily = FontFamily.SansSerif,
+//            )
+//        }
+//    }
+//}

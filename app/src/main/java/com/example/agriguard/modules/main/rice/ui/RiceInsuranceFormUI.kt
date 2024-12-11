@@ -2,16 +2,23 @@ package com.example.agriguard.modules.main.rice.ui
 
 import android.app.DatePickerDialog
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,10 +29,22 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.agriguard.modules.main.rice.model.dto.RiceInsuranceDto
 import com.example.agriguard.modules.main.rice.viewmodel.RiceInsuranceViewModel
+import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.example.agriguard.modules.shared.ui.CheckBoxField
+import com.example.agriguard.modules.shared.ui.DatePickerField
+import com.example.agriguard.modules.shared.ui.TextField
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -34,23 +53,31 @@ import java.util.TimeZone
 
 @Composable
 fun RiceInsuranceFormUI(
+    navController: NavController,
+    currentUser: UserDto,
     viewModel: RiceInsuranceViewModel,
     onSubmit: (RiceInsuranceDto) -> Unit
 ) {
     val formState by viewModel.formState.collectAsState()
     val scrollState = rememberScrollState()
-
+    val context = LocalContext.current
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(50.dp)
+            .background(Color.White)
+            .fillMaxSize()
+            .padding(16.dp)
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        Spacer(modifier = Modifier.padding(top = 50.dp))
         TextField("Insurance ID", formState.insuranceId) { value -> viewModel.updateField { it.copy(insuranceId = value) } }
         TextField("Lender", formState.lender) { value -> viewModel.updateField { it.copy(lender = value) } }
-        TextField("Fill Up Date", formState.fillUpDate) { value -> viewModel.updateField { it.copy(fillUpDate = value) } }
-
+        DatePickerField(
+            context = context,
+            label = "Fill Up Date",
+            value = formState.fillUpDate,
+            onChange = { value -> viewModel.updateField { it.copy(fillUpDate = value) } }
+        )
         CheckBoxField("New", formState.new) { value -> viewModel.updateField { it.copy(new = value) } }
         CheckBoxField("Renewal", formState.renewal) { value -> viewModel.updateField { it.copy(renewal = value) } }
         CheckBoxField("Self-Financed", formState.selfFinanced) { value -> viewModel.updateField { it.copy(selfFinanced = value) } }
@@ -89,7 +116,6 @@ fun RiceInsuranceFormUI(
         TextField("Plating Method", formState.platingMethod) { value -> viewModel.updateField { it.copy(platingMethod = value) } }
 
 
-        val context = LocalContext.current
         DatePickerField(
             context = context,
             label = "Date of Sowing",
@@ -146,82 +172,16 @@ fun RiceInsuranceFormUI(
         TextField("To", formState.to) { value -> viewModel.updateField { it.copy(to = value) } }
 
         Button(
-            onClick = { onSubmit(formState) },
+            onClick = {
+                val updatedFormState = formState.copy(userId = currentUser.id!!)
+                onSubmit(updatedFormState)
+                navController.popBackStack()
+            },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("Submit")
         }
-    }
-}
 
-@Composable
-fun DatePickerField(
-    context: Context,
-    label: String,
-    value: String?,
-    onChange: (String) -> Unit
-) {
-    var displayedDate by rememberSaveable { mutableStateOf("") }
-
-    val displayDateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-    val saveDateFormat =  SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
-        timeZone = TimeZone.getTimeZone("UTC")
-    }
-
-    LaunchedEffect(value) {
-        displayedDate = if (value.isNullOrEmpty()) "" else {
-            try {
-                val parsedDate = saveDateFormat.parse(value) // Parse ISO date
-                displayDateFormat.format(parsedDate!!) // Convert to friendly format
-            } catch (e: ParseException) {
-                "" // Handle invalid date format gracefully
-            }
-        }
-    }
-
-    val calendar = Calendar.getInstance()
-    val datePickerDialog = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            calendar.set(year, month, dayOfMonth)
-
-            displayedDate = displayDateFormat.format(calendar.time) // Friendly date
-            onChange(saveDateFormat.format(calendar.time)) // ISO 8601 date
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
-
-    Text("$label: $displayedDate")
-    Button(
-        onClick = {
-            datePickerDialog.show()
-        }
-    ) {
-        Text("Pick a date")
-    }
-}
-
-@Composable
-fun TextField(label: String, value: String?, onChange: (String) -> Unit) {
-    var text by rememberSaveable { mutableStateOf(value.orEmpty()) }
-
-    OutlinedTextField(
-        value = text,
-        onValueChange = {
-            text = it
-            onChange(it)
-        },
-        label = { Text(label) },
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Composable
-fun CheckBoxField(label: String, value: Boolean, onChange: (Boolean) -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth()) {
-        Checkbox(checked = value, onCheckedChange = onChange)
-        Text(label, modifier = Modifier.padding(start = 8.dp))
+        Spacer(modifier = Modifier.padding(bottom = 50.dp))
     }
 }
