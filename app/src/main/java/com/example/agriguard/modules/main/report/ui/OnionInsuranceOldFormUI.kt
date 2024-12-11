@@ -61,11 +61,11 @@ import java.util.TimeZone
 @Preview(showSystemUi = true)
 @Composable
 fun OnionInsuranceFormPreview() {
-    OnionInsuranceFormUI()
+    OnionInsuranceOldFormUI()
 }
 
 @Composable
-fun OnionInsuranceFormUI() {
+fun OnionInsuranceOldFormUI() {
     var selectedDate by remember { mutableStateOf("") }
     LazyColumn(
         modifier = Modifier
