@@ -1,8 +1,5 @@
 package com.example.agriguard.modules.main.dashboard.ui
 
-import android.graphics.Typeface
-import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -47,26 +44,17 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
+import com.example.agriguard.modules.main.report.ui.PieChart
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.shared.ui.PlantsDialog
-import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
 
 @Composable
 fun DashboardUI(
@@ -86,7 +74,7 @@ fun DashboardUI(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        if(!currentUser.isFarmers) {
+        if(!currentUser.isFarmers && !currentUser.isTechnician) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -255,7 +243,7 @@ fun DashboardUI(
                                                     color = Color(0xFF136204),
                                                     fontFamily = FontFamily.SansSerif,
                                                     fontSize = 16.sp,
-                                                    textAlign = TextAlign.Center,
+                                                     textAlign = TextAlign.Center,
                                                     modifier = Modifier
                                                         .fillMaxWidth()
                                                 )
@@ -282,14 +270,7 @@ fun DashboardUI(
                         .fillMaxWidth()
                         .height(70.dp)
                 ) {
-                    if (currentUser.isTechnician) {
-                        Text(
-                            text = "Create an account for a farmer",
-                            fontSize = 18.sp,
-                            fontFamily = FontFamily.SansSerif,
-                            color = Color(0xFF136204)
-                        )
-                    } else {
+                    if (currentUser.isAdmin) {
                         Text(
                             text = "Create an account for an \n admin or technician",
                             fontSize = 18.sp,
@@ -314,84 +295,6 @@ fun DashboardUI(
             )
         }
     }
-}
-
-val getPieChartData = listOf(
-    PieChartData("Damage", 83.60F),
-    PieChartData("Undamage", 16.40F),
-)
-
-data class PieChartData(var status: String?, var value: Float?)
-
-@Composable
-fun PieChart() {
-    Column(
-        modifier = Modifier
-            .padding(top = 30.dp)
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        AndroidView(factory = { context ->
-            PieChart(context).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                )
-                this.description.isEnabled = false
-
-                this.isDrawHoleEnabled = false
-
-                this.legend.isEnabled = false
-
-                this.legend.textSize = 14F
-
-                this.legend.horizontalAlignment =
-                    Legend.LegendHorizontalAlignment.CENTER
-
-                ContextCompat.getColor(context, R.color.white)
-            }
-        },
-            modifier = Modifier
-                .size(250.dp),
-            update = {  pieChart ->
-                updatePieChartWithData(pieChart, getPieChartData)
-            }
-        )
-    }
-}
-
-fun updatePieChartWithData(
-    chart: PieChart,
-    data: List<PieChartData>
-) {
-    val entries = ArrayList<PieEntry>()
-
-    for (i in data.indices) {
-        val item = data[i]
-        entries.add(PieEntry(item.value ?: 0.toFloat(), item.status ?: ""))
-    }
-
-    val dataSet = PieDataSet(entries, "")
-    val greenColor = Color(0xFF8dc63e)
-    val lightGreenColor = Color(0xFF136204)
-
-    dataSet.colors = arrayListOf(
-        greenColor.toArgb(),
-        lightGreenColor.toArgb()
-    )
-    dataSet.yValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
-    dataSet.xValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
-    dataSet.sliceSpace = 2f
-    dataSet.valueTextSize = 18f
-    dataSet.valueTypeface = Typeface.DEFAULT_BOLD
-
-    val percentageTextColor = Color.White 
-    dataSet.valueTextColor = percentageTextColor.toArgb()
-    val pieData = PieData(dataSet)
-
-    chart.data = pieData
-    chart.invalidate()
 }
 
 @Composable
@@ -512,24 +415,28 @@ fun CropsCategory(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        val actions = listOf(
-            Triple("INFO HUB", R.drawable.crop_monitor, onCropsMonitoringClick),
-            Triple("COMPLAINTS",R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList) },
-            Triple("RICE INSURANCE",R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList(userId = currentUser.id!!)) },
-            Triple("ONION INSURANCE",R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList(userId = currentUser.id!!)) },
-            Triple("INDEMNITY ",R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
-            Triple("MESSAGES", R.drawable.messageicon) {(navController.navigate(MainNav.Message))},
-        )
+        val actions = if (currentUser.isTechnician) {
+            listOf(
+                Triple("INFO HUB", R.drawable.crop_monitor, onCropsMonitoringClick),
+                Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList) },
+                Triple("RICE INSURANCE", R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList(userId = currentUser.id!!)) },
+                Triple("ONION INSURANCE", R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList(userId = currentUser.id!!)) },
+                Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
+                Triple("MESSAGES", R.drawable.messageicon) { navController.navigate(MainNav.Message) }
+            )
+        } else {
+            listOf(
+                Triple("INFO HUB", R.drawable.crop_monitor, onCropsMonitoringClick),
+                Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList) },
+                Triple("RICE INSURANCE", R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList(userId = currentUser.id!!)) },
+                Triple("ONION INSURANCE", R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList(userId = currentUser.id!!)) },
+                Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
+                Triple("MESSAGES", R.drawable.messageicon) { navController.navigate(MainNav.Message) }
+            )
+        }
 
         items(actions.size) { index ->
             val (title,imageRes, action) = actions[index]
-
-//            val isHighlighted = when (title) {
-//                "RICE INSURANCE" -> currentUser.riceInsurance.isNotEmpty()
-//                "ONION INSURANCE" -> currentUser.onionInsurance.isNotEmpty()
-//                "INDEMNITY " -> currentUser.indemnity.isNotEmpty()
-//                else -> false
-//            }
 
             OutlinedCard(
                 onClick = { action() },
