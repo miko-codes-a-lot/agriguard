@@ -24,7 +24,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.dashboard.ui.DashboardUI
 import com.example.agriguard.modules.main.farmer.AddressesUI
-import com.example.agriguard.modules.main.farmer.ComplaintFormUI
 import com.example.agriguard.modules.main.menu.model.NavItem
 import com.example.agriguard.modules.main.message.MessageListUI
 import com.example.agriguard.modules.main.message.MessageUI
@@ -85,7 +84,6 @@ fun MenuUI(
         ) {
             when (routeName) {
                 "Dashboard" -> DashboardUI(navController, currentUser)
-                "ComplainForm" -> ComplaintFormUI(navController)
                 "AddressList" -> AddressesUI(navController)
                 "MessageList" -> MessageListUI(navController)
                 "Message" -> MessageUI(navController)
@@ -110,23 +108,8 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
                 navigation = navController,
             ),
 //            NavItem(
-//                icon =  painterResource(id = R.drawable.notification),
-//                routeName = "NotificationList",
-//                navigation = navController,
-//            ),
-            NavItem(
-                icon =  painterResource(id = R.drawable.add),
-                routeName = "ComplainForm",
-                navigation = navController,
-            ),
-//            NavItem(
-//                icon =  painterResource(id = R.drawable.message),
-//                routeName = "Message",
-//                navigation = navController,
-//            ),
-//            NavItem(
-//                icon = painterResource(id = R.drawable.insurance),
-//                routeName = "RegistrationMenu",
+//                icon =  painterResource(id = R.drawable.add),
+//                routeName = "ComplainForm",
 //                navigation = navController,
 //            ),
             NavItem(
@@ -161,8 +144,7 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
                 routeName = "Setting",
                 navigation = navController,
             ),
-
-            )
+        )
         userDto.isAdmin -> listOf(
             NavItem(
                 icon = painterResource(id = R.drawable.home),
