@@ -20,7 +20,7 @@ import javax.inject.Inject
 class OnionInsuranceService @Inject constructor(private val realm: Realm)  {
     suspend fun upsert(data: OnionInsuranceDto, currentUser: UserDto): Result<OnionInsuranceDto> {
         val dateNow = RealmInstant.now().toInstantString()
-        if (data.id != null) {
+        if (data.id == null) {
             data.userId = currentUser.id!!
             data.createdById = currentUser.id!!
             data.createdAt = dateNow
