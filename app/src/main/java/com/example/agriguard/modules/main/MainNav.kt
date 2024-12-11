@@ -91,4 +91,7 @@ object MainNav {
     @Serializable
     object Registration
 
+    @Serializable
+    object ReportDashboard
+
 }

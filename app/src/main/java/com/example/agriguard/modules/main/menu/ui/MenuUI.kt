@@ -29,8 +29,9 @@ import com.example.agriguard.modules.main.message.MessageListUI
 import com.example.agriguard.modules.main.message.MessageUI
 import com.example.agriguard.modules.main.notification.NotificationListUI
 import com.example.agriguard.modules.main.report.ui.ReportFormValidationUI
-import com.example.agriguard.modules.main.report.ui.ComplaintReportListUI
+import com.example.agriguard.modules.main.complain.ui.ComplaintReportListUI
 import com.example.agriguard.modules.main.report.ui.RegistrationMenuUI
+import com.example.agriguard.modules.main.report.ui.ReportDashboardUI
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.ui.UsersUI
@@ -49,7 +50,7 @@ fun MenuUI(
     navController: NavController,
     currentUser: UserDto
 ) {
-    var routeName by rememberSaveable { mutableStateOf("Dashboard") }
+    var routeName by rememberSaveable { mutableStateOf("HomeDashboard") }
     val navItems = getNavItems(navController, currentUser)
     Scaffold(
         bottomBar = {
@@ -75,7 +76,7 @@ fun MenuUI(
             }
         }
     ) {
-            paddingValues ->
+        paddingValues ->
         Column(
             modifier = Modifier
                 .background(Color.White)
@@ -83,9 +84,10 @@ fun MenuUI(
                 .padding(paddingValues)
         ) {
             when (routeName) {
-                "Dashboard" -> DashboardUI(navController, currentUser)
+                "HomeDashboard" -> DashboardUI(navController, currentUser)
                 "AddressList" -> AddressesUI(navController)
                 "MessageList" -> MessageListUI(navController)
+                "Report" -> ReportDashboardUI()
                 "Message" -> MessageUI(navController)
                 "FormValidation" -> ReportFormValidationUI(navController)
                 "NotificationList" -> NotificationListUI(navController)
@@ -104,14 +106,9 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
         userDto.isFarmers -> listOf(
             NavItem(
                 icon = painterResource(id = R.drawable.home),
-                routeName = "Dashboard",
+                routeName = "HomeDashboard",
                 navigation = navController,
             ),
-//            NavItem(
-//                icon =  painterResource(id = R.drawable.add),
-//                routeName = "ComplainForm",
-//                navigation = navController,
-//            ),
             NavItem(
                 icon = painterResource(id = R.drawable.setting),
                 routeName = "Setting",
@@ -121,21 +118,16 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
         userDto.isTechnician -> listOf(
             NavItem(
                 icon = painterResource(id = R.drawable.home),
-                routeName = "Dashboard",
+                routeName = "HomeDashboard",
                 navigation = navController,
             ),
             NavItem(
-                icon =  painterResource(id = R.drawable.notification),
-                routeName = "NotificationList",
+                icon = painterResource(id = R.drawable.report_icon),
+                routeName = "Report",
                 navigation = navController,
             ),
             NavItem(
-                icon =  painterResource(id = R.drawable.message),
-                routeName = "MessageList",
-                navigation = navController,
-            ),
-            NavItem(
-                icon =  painterResource(id = R.drawable.userlist),
+                icon =  painterResource(id = R.drawable.farmer),
                 routeName = "AddressList",
                 navigation = navController,
             ),
@@ -148,7 +140,7 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
         userDto.isAdmin -> listOf(
             NavItem(
                 icon = painterResource(id = R.drawable.home),
-                routeName = "Dashboard",
+                routeName = "HomeDashboard",
                 navigation = navController,
             ),
             NavItem(
