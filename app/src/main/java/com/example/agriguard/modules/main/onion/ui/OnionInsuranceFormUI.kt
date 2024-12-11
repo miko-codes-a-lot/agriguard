@@ -1,23 +1,47 @@
 package com.example.agriguard.modules.main.onion.ui
 
-import android.annotation.SuppressLint
+import android.app.DatePickerDialog
+import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.agriguard.modules.main.onion.model.dto.OnionInsuranceDto
 import com.example.agriguard.modules.main.onion.viewmodel.OnionInsuranceViewmodel
@@ -25,6 +49,11 @@ import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.shared.ui.CheckBoxField
 import com.example.agriguard.modules.shared.ui.DatePickerField
 import com.example.agriguard.modules.shared.ui.TextField
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
 
 @Composable
 fun OnionInsuranceFormUI(
@@ -44,12 +73,55 @@ fun OnionInsuranceFormUI(
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        DatePickerField(
+        Row(
+            modifier = Modifier
+                .padding(top = 8.dp,bottom = 8.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Column {
+                CropsInfo("Crops", "Onion")
+                OnionDatePicker(
+                    context = context,
+                    "Date",
+                    value = formState.fillUpDate,
+                    onChange = { value -> viewModel.updateField { it.copy(fillUpDate = value) } }
+                )
+            }
+        }
+        TextFieldOnionStatus(
             context = context,
-            label = "Fill Up Date",
-            value = formState.fillUpDate,
-            onChange = { value -> viewModel.updateField { it.copy(fillUpDate = value) } }
+            label = "IP Tribe",
+            value = formState.ipTribe,
+            onChange = { value -> viewModel.updateField { it.copy(ipTribe = value) } }
         )
+        TextFieldOnionStatus(
+            context = context,
+            label = "FirstName",
+            value = currentUser.firstName,
+            onChange = { value -> viewModel.updateField { it.copy(ipTribe = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "MiddleName",
+            value = currentUser.middleName,
+            onChange = { }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "LastName",
+            value = currentUser.lastName,
+            onChange = {  }
+        )
+
+
+
+
+
+
+
+
         TextField(
             "IP Tribe",
             formState.ipTribe
@@ -247,11 +319,222 @@ fun OnionInsuranceFormUI(
             onClick = {
                 val updatedFormState = formState.copy(userId = currentUser.id!!)
                     onSubmit(updatedFormState)
-                    navController.popBackStack()
+//                    navController.popBackStack()
                 },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("Submit")
+        }
+    }
+}
+
+@Composable
+fun CropsInfo(label: String, value: String) {
+    Column{
+        Row(
+            modifier = Modifier
+                .widthIn(min = 220.dp, max = 260.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = label,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+
+            Text(" : ", fontWeight = FontWeight.Bold)
+
+            Spacer(modifier = Modifier.width(13.dp))
+            Box(
+                modifier = Modifier
+                    .heightIn(min = 50.dp, max = 50.dp)
+                    .fillMaxWidth()
+                    .drawBehind {
+                        val strokeWidth = 1.dp.toPx()
+                        val y = size.height - strokeWidth / 2
+                        drawLine(
+                            color = Color.Gray,
+                            start = Offset(0f, y),
+                            end = Offset(size.width, y),
+                            strokeWidth = strokeWidth
+                        )
+                    }
+            ) {
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = {},
+                    textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily.SansSerif),
+                    modifier = Modifier
+                        .heightIn(min = 50.dp, max = 50.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun OnionDatePicker(
+    context: Context,
+    label: String,
+    value: String?,
+    onChange: (String) -> Unit
+) {
+    var displayedDate by rememberSaveable { mutableStateOf("") }
+
+    val displayDateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+    val saveDateFormat =  SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+
+    LaunchedEffect(value) {
+        displayedDate = if (value.isNullOrEmpty()) "" else {
+            try {
+                val parsedDate = saveDateFormat.parse(value)
+                displayDateFormat.format(parsedDate!!)
+            } catch (e: ParseException) {
+                ""
+            }
+        }
+    }
+
+    val calendar = Calendar.getInstance()
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            calendar.set(year, month, dayOfMonth)
+
+            displayedDate = displayDateFormat.format(calendar.time)
+            onChange(saveDateFormat.format(calendar.time))
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+
+    Row(
+        modifier = Modifier
+            .widthIn(min = 220.dp, max = 260.dp)
+            .clickable {
+                datePickerDialog.show()
+            }
+    ){
+        Row(
+            modifier = Modifier
+                .widthIn(min = 220.dp, max = 260.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif,
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.width(15.dp))
+
+            Text(" : ", fontWeight = FontWeight.Bold)
+
+            Spacer(modifier = Modifier.width(13.dp))
+
+            Surface(
+                modifier = Modifier
+                    .clickable {
+                        datePickerDialog.show()
+                    }
+                    .background(Color.Transparent),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(202.dp)
+                        .heightIn(min = 50.dp, max = 50.dp)
+                        .background(Color.White)
+                ){
+                    Text(
+                        text = displayedDate,
+                        fontFamily = FontFamily.SansSerif,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .padding(start = 5.dp)
+                            .align(Alignment.CenterStart),
+                        fontSize = 17.sp,
+                        color = Color.Black
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .fillMaxWidth(),
+                        thickness = 1.dp,
+                        color = Color.Gray
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TextFieldOnionStatus(
+    context: Context,
+    label: String,
+    value: String?,
+    onChange: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = label,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            modifier =  Modifier
+                .padding(top = 5.dp)
+        )
+        Text(
+            text = " : ",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            color = Color.Black,
+            modifier =  Modifier
+                .padding(top = 5.dp, start = 5.dp, end = 5.dp)
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .drawBehind {
+                    val strokeWidth = 1.dp.toPx()
+                    val y = size.height - strokeWidth / 2
+                    drawLine(
+                        color = Color.Gray,
+                        start = Offset(0f, y),
+                        end = Offset(size.width, y),
+                        strokeWidth = strokeWidth
+                    )
+                }
+        ) {
+            OutlinedTextField(
+                value = value.toString(),
+                onValueChange = onChange,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
+                )
+            )
         }
     }
 }
