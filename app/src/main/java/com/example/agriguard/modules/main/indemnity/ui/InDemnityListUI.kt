@@ -1,4 +1,4 @@
-package com.example.agriguard.modules.main.report.ui
+package com.example.agriguard.modules.main.indemnity.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -57,7 +57,9 @@ fun InDemnityListUI(
             .fillMaxSize()
             .background(Color(0xFFFFFFFF)),
         floatingActionButton = {
-            FloatingRecordsIcon(currentUser, navController)
+            if(currentUser.isFarmers){
+                FloatingRecordsIcon(currentUser, navController)
+            }
         }
     ) { padding ->
         Column(
