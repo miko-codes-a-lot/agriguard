@@ -34,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +56,7 @@ import com.example.agriguard.modules.main.user.model.dto.UserDto
 
 @Composable
 fun ComplaintFormUI(
+    currentUser: UserDto,
     navController: NavController,
     viewModel: ComplaintViewModel,
     onSubmit: (ComplaintInsuranceDto) -> Unit
@@ -62,6 +64,7 @@ fun ComplaintFormUI(
     val formState by viewModel.formState.collectAsState()
     val scrollState = rememberScrollState()
     val context = LocalContext.current
+    val onDismiss = rememberSaveable { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -105,7 +108,8 @@ fun ComplaintFormUI(
         Spacer(modifier = Modifier.padding(top = 10.dp))
         CaptureImageUI(
             navController = navController,
-            viewModel = viewModel
+            viewModel = viewModel,
+            onDismiss = { onDismiss.value = false },
         )
 
         DropDownCategory(
@@ -118,7 +122,10 @@ fun ComplaintFormUI(
             viewModel = viewModel
         )
         ButtonSaveForm(
-            navController
+            currentUser = currentUser,
+            navController = navController,
+            viewModel =  viewModel,
+            onSubmit = onSubmit
         )
     }
 }
@@ -288,13 +295,33 @@ fun Maintenance(
 
 @Composable
 fun ButtonSaveForm(
-    navController: NavController
+    currentUser: UserDto,
+    navController: NavController,
+    viewModel: ComplaintViewModel,
+    onSubmit: (ComplaintInsuranceDto) -> Unit
 ) {
+    val formState by viewModel.formState.collectAsState()
+//    Button(
+//        onClick = {
+//            val updatedFormState = formState.copy(userId = currentUser.id!!)
+//            onSubmit(updatedFormState)
+//            navController.popBackStack()
+//        },
+//        modifier = Modifier.align(Alignment.End)
+//    ) {
+//        Text("Submit")
+//    }
     Button(
         onClick = {
+            val updatedFormState = formState.copy(
+                userId = currentUser.id!!,
+                imageBase64 = formState.imageBase64
+            )
+            onSubmit(updatedFormState)
+            navController.popBackStack()
         },
         modifier = Modifier
-            .padding(top = 50.dp, bottom = 50.dp)
+            .padding(top = 30.dp, bottom = 25.dp)
             .fillMaxWidth()
             .height(58.dp),
         colors = ButtonDefaults.buttonColors(
