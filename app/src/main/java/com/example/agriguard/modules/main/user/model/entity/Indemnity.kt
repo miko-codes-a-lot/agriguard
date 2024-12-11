@@ -18,11 +18,11 @@ class Indemnity: RealmObject {
     var apcpc: Boolean = false
     var others: String? = ""
     var causeOfDamage: String? = ""
-    var dateOfLoss: String? = ""
+    var dateOfLoss: RealmInstant = RealmInstant.now()
     var ageCultivation: String? = ""
     var areaDamaged: String? = ""
     var degreeOfDamage: String? = ""
-    var expectedDateOfHarvest: String? = ""
+    var expectedDateOfHarvest: RealmInstant = RealmInstant.now()
     var north: String? = ""
     var south: String? = ""
     var east: String? = ""
