@@ -1,4 +1,4 @@
-package com.example.agriguard.modules.main.report.ui
+package com.example.agriguard.modules.main.complain.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -43,8 +43,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
 import com.example.agriguard.modules.main.complain.model.dto.ComplaintInsuranceDto
-import com.example.agriguard.modules.main.complain.model.entity.ComplaintInsurance
-import com.example.agriguard.modules.main.onion.model.dto.OnionInsuranceDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
