@@ -32,7 +32,7 @@ object MainNav {
     object Dashboard
 
     @Serializable
-    object ComplainForm
+    data class ComplainForm(val userId: String)
 
     @Serializable
     object Message
@@ -50,10 +50,10 @@ object MainNav {
     object Setting
 
     @Serializable
-    object RiceInsuranceForm
+    data class RiceInsuranceForm(val userId: String)
 
     @Serializable
-    object RiceInsuranceList
+    data class RiceInsuranceList(val userId: String)
 
     @Serializable
     data class InDemnityForm(val userId: String)
@@ -62,10 +62,10 @@ object MainNav {
     data class InDemnityList(val userId: String)
 
     @Serializable
-    object OnionInsuranceForm
+    data class OnionInsuranceForm(val userId: String)
 
     @Serializable
-    object OnionInsuranceList
+    data class OnionInsuranceList(val userId: String)
 
     @Serializable
     object RiceDisease

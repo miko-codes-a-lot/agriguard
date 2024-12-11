@@ -1,6 +1,8 @@
 package com.example.agriguard.modules
 
 import com.example.agriguard.BuildConfig
+import com.example.agriguard.modules.main.complain.model.entity.ComplaintInsurance
+import com.example.agriguard.modules.main.onion.model.entity.OnionInsurance
 import com.example.agriguard.modules.main.user.model.entity.Address
 import com.example.agriguard.modules.main.user.model.entity.Indemnity
 import com.example.agriguard.modules.main.rice.model.entity.RiceInsurance
@@ -32,7 +34,9 @@ object AppModule {
                 User::class,
                 Address::class,
                 Indemnity::class,
-                RiceInsurance::class
+                RiceInsurance::class,
+                OnionInsurance::class,
+                ComplaintInsurance::class
             )
 
             val config = SyncConfiguration
@@ -56,6 +60,14 @@ object AppModule {
                     add(
                         realm.query<RiceInsurance>("_id <> $0", null),
                         name = "RiceInsurance"
+                    )
+                    add(
+                        realm.query<OnionInsurance>("_id <> $0", null),
+                        name = "OnionInsurance"
+                    )
+                    add(
+                        realm.query<ComplaintInsurance>("_id <> $0", null),
+                        name = "ComplaintInsurance"
                     )
                 }
                 .build()

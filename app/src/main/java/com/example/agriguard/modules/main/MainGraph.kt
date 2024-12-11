@@ -10,10 +10,12 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.example.agriguard.modules.main.dashboard.ui.DashboardUI
 import com.example.agriguard.modules.main.farmer.AddressesUI
-import com.example.agriguard.modules.main.farmer.ComplaintFormUI
+import com.example.agriguard.modules.main.complain.ui.ComplaintFormUI
+import com.example.agriguard.modules.main.complain.viewmodel.ComplaintViewModel
 import com.example.agriguard.modules.main.farmer.FarmersPreviewUI
 import com.example.agriguard.modules.main.farmer.FarmersUI
 import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
+import com.example.agriguard.modules.main.indemnity.viewmodel.IndemnityViewModel
 import com.example.agriguard.modules.main.menu.ui.MenuUI
 import com.example.agriguard.modules.main.message.MessageListUI
 import com.example.agriguard.modules.main.message.MessageUI
@@ -25,18 +27,18 @@ import com.example.agriguard.modules.main.module.RicePetsModule
 import com.example.agriguard.modules.main.module.RiceWeedUI
 import com.example.agriguard.modules.main.notification.NotificationListUI
 import com.example.agriguard.modules.main.report.ui.ComplaintReportListUI
-import com.example.agriguard.modules.main.report.ui.InDemnityFormUI
+import com.example.agriguard.modules.main.indemnity.ui.IndemnityFormUI
+import com.example.agriguard.modules.main.onion.ui.OnionInsuranceFormUI
+import com.example.agriguard.modules.main.onion.viewmodel.OnionInsuranceViewmodel
 import com.example.agriguard.modules.main.report.ui.InDemnityListUI
-import com.example.agriguard.modules.main.report.ui.OnionInsuranceFormUI
 import com.example.agriguard.modules.main.report.ui.OnionInsuranceListUI
 import com.example.agriguard.modules.main.report.ui.RegistrationMenuUI
 import com.example.agriguard.modules.main.report.ui.ReportFormValidationUI
-import com.example.agriguard.modules.main.report.ui.RiceInsuranceListUI
 import com.example.agriguard.modules.main.rice.ui.RiceInsuranceFormUI
+import com.example.agriguard.modules.main.rice.ui.RiceInsuranceListUI
 import com.example.agriguard.modules.main.rice.viewmodel.RiceInsuranceViewModel
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.AddressDto
-import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.service.UserService
 import com.example.agriguard.modules.main.user.ui.UserCreateUI
 import com.example.agriguard.modules.main.user.ui.UserEditUI
@@ -58,9 +60,38 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 DashboardUI(navController, currentUser)
             }
         }
+//            OnionInsuranceFormUI(
+//                navController = navController,
+//                currentUser = currentUser,
+//                viewModel = viewModel
+//            ) { dto ->
+//                scope.launch {
+//                    val result = viewModel.upsert(dto, currentUser)
+//                    if (result.isSuccess) {
+//                        Log.d("micool", "good: $result")
+//                    } else {
+//                        Log.e("micool", "fail: $result")
+//                    }
+//                }
+//            }
         composable<MainNav.ComplainForm> {
+            val args = it.toRoute<MainNav.ComplainForm>()
+            val viewModel: ComplaintViewModel = hiltViewModel();
+            val scope = rememberCoroutineScope()
             Guard(navController = navController) { currentUser ->
-                ComplaintFormUI(navController)
+                ComplaintFormUI(
+                    navController = navController,
+                    viewModel = viewModel,
+                ){ dto ->
+                    scope.launch {
+                        val result = viewModel.upsertComplaint(dto, currentUser)
+                        if (result.isSuccess) {
+                            Log.d("micool", "good: $result")
+                        } else {
+                            Log.e("micool", "fail: $result")
+                        }
+                    }
+                }
             }
         }
         composable<MainNav.Users> {
@@ -159,7 +190,9 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 val viewModel: RiceInsuranceViewModel = hiltViewModel()
                 val scope = rememberCoroutineScope()
                 RiceInsuranceFormUI(
-                    viewModel
+                    navController = navController,
+                    currentUser = currentUser,
+                    viewModel,
                 ) { dto ->
                     scope.launch {
                         val result = viewModel.upsert(dto, currentUser)
@@ -175,28 +208,42 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             }
         }
         composable<MainNav.RiceInsuranceList> {
+            val args = it.toRoute<MainNav.RiceInsuranceList>()
+            val riceInsuranceViewModel: RiceInsuranceViewModel = hiltViewModel()
             Guard(navController = navController) { currentUser ->
-                RiceInsuranceListUI(navController)
+                val riceInsurance = riceInsuranceViewModel.fetchListRiceInsurance(args.userId)
+                RiceInsuranceListUI(
+                    navController,
+                    riceInsuranceList = riceInsurance,
+                    currentUser = currentUser,
+                )
             }
         }
         composable<MainNav.InDemnityForm> {
-            val args = it.toRoute<MainNav.InDemnityForm>()
-            val userViewModel: UserViewModel = hiltViewModel()
-            val indemnityDto = userViewModel.fetchIndemnity(args.userId)
             Guard(navController = navController) { currentUser ->
-                InDemnityFormUI(
-                    userViewModel = userViewModel,
+                val viewModel: IndemnityViewModel = hiltViewModel()
+                val scope = rememberCoroutineScope()
+                IndemnityFormUI(
                     navController = navController,
                     currentUser = currentUser,
-                    indemnityDto = indemnityDto ?: IndemnityDto()
-                )
+                    viewModel = viewModel
+                ) { dto ->
+                    scope.launch {
+                        val result = viewModel.upsert(dto, currentUser)
+                        if (result.isSuccess) {
+                            Log.d("micool", "good: $result")
+                        } else {
+                            Log.e("micool", "fail: $result")
+                        }
+                    }
+                }
             }
         }
         composable<MainNav.InDemnityList> {
             val args = it.toRoute<MainNav.InDemnityList>()
-            val userViewModel: UserViewModel = hiltViewModel()
+            val indemnityViewModel: IndemnityViewModel = hiltViewModel()
             Guard(navController = navController) { currentUser ->
-                val indemnityList = userViewModel.fetchListIndemnity(args.userId)
+                val indemnityList = indemnityViewModel.fetchListIndemnity(args.userId)
                     InDemnityListUI(
                         navController = navController,
                         indemnityList = indemnityList,
@@ -206,12 +253,34 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         }
         composable<MainNav.OnionInsuranceForm> {
             Guard(navController = navController) { currentUser ->
-                OnionInsuranceFormUI()
+                val viewModel: OnionInsuranceViewmodel = hiltViewModel()
+                val scope = rememberCoroutineScope()
+                OnionInsuranceFormUI(
+                    navController = navController,
+                    currentUser = currentUser,
+                    viewModel = viewModel
+                ) { dto ->
+                    scope.launch {
+                        val result = viewModel.upsert(dto, currentUser)
+                        if (result.isSuccess) {
+                            Log.d("micool", "good: $result")
+                        } else {
+                            Log.e("micool", "fail: $result")
+                        }
+                    }
+                }
             }
         }
         composable<MainNav.OnionInsuranceList> {
+            val args = it.toRoute<MainNav.OnionInsuranceForm>()
+            val onionInsuranceViewModel: OnionInsuranceViewmodel = hiltViewModel()
             Guard(navController = navController) { currentUser ->
-                OnionInsuranceListUI(navController)
+                val onionInsurance = onionInsuranceViewModel.fetchListOnionInsurance(args.userId)
+                OnionInsuranceListUI(
+                    navController = navController,
+                    onionInsuranceList = onionInsurance,
+                    currentUser = currentUser,
+                )
             }
         }
         composable<MainNav.RiceDisease> {

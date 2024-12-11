@@ -1,4 +1,4 @@
-package com.example.agriguard.modules.main.user.model.mapper
+package com.example.agriguard.modules.main.indemnity.mapper
 
 import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.model.entity.Indemnity
@@ -21,11 +21,11 @@ fun Indemnity.toDTO(): IndemnityDto {
         apcpc = apcpc,
         others = others,
         causeOfDamage = causeOfDamage,
-        dateOfLoss = dateOfLoss,
+        dateOfLoss = dateOfLoss.toInstantString(),
         ageCultivation = ageCultivation,
         areaDamaged = areaDamaged,
         degreeOfDamage = degreeOfDamage,
-        expectedDateOfHarvest = expectedDateOfHarvest,
+        expectedDateOfHarvest = expectedDateOfHarvest.toInstantString(),
         north = north,
         south = south,
         east = east,
@@ -67,11 +67,11 @@ fun IndemnityDto.toEntity(): Indemnity {
         apcpc = indemnityDto.apcpc
         others = indemnityDto.others
         causeOfDamage = indemnityDto.causeOfDamage
-        dateOfLoss = indemnityDto.dateOfLoss
+        dateOfLoss = indemnityDto.dateOfLoss.toRealmInstant()
         ageCultivation = indemnityDto.ageCultivation
         areaDamaged = indemnityDto.areaDamaged
         degreeOfDamage = indemnityDto.degreeOfDamage
-        expectedDateOfHarvest = indemnityDto.expectedDateOfHarvest
+        expectedDateOfHarvest = indemnityDto.expectedDateOfHarvest.toRealmInstant()
         north = indemnityDto.north
         south = indemnityDto.south
         east = indemnityDto.east
