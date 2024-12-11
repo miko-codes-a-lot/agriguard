@@ -14,9 +14,10 @@ fun Guard(navController: NavController, render: @Composable (currentUser: UserDt
     val userId = rememberSaveable { mutableStateOf(loginViewModel.getLoggedInUserId()) }
 
     if (userId.value != null) {
-        val currentUser = loginViewModel.getUserLocal()!!
-        render(currentUser)
-    } else {
-        loginViewModel.logout(navController)
+        val currentUser = loginViewModel.getUserLocal()
+        if (currentUser != null) {
+            return render(currentUser)
+        }
     }
+    loginViewModel.logout(navController)
 }
