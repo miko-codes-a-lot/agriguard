@@ -2,10 +2,11 @@ package com.example.agriguard.modules
 
 import com.example.agriguard.BuildConfig
 import com.example.agriguard.modules.main.complain.model.entity.ComplaintInsurance
+import com.example.agriguard.modules.main.notify.model.entity.Notify
 import com.example.agriguard.modules.main.onion.model.entity.OnionInsurance
+import com.example.agriguard.modules.main.rice.model.entity.RiceInsurance
 import com.example.agriguard.modules.main.user.model.entity.Address
 import com.example.agriguard.modules.main.user.model.entity.Indemnity
-import com.example.agriguard.modules.main.rice.model.entity.RiceInsurance
 import com.example.agriguard.modules.main.user.model.entity.User
 import dagger.Module
 import dagger.Provides
@@ -36,7 +37,8 @@ object AppModule {
                 Indemnity::class,
                 RiceInsurance::class,
                 OnionInsurance::class,
-                ComplaintInsurance::class
+                ComplaintInsurance::class,
+                Notify::class
             )
 
             val config = SyncConfiguration
