@@ -178,6 +178,7 @@ fun ButtonLogin(
                     coroutineScope.launch {
                         showButton = false
                         vm.signIn()
+                        loginViewModel.loadSpecificDataByUser()
 
                         navController.navigate(MainNav.Menu) {
                             popUpTo(0)
