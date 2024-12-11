@@ -68,15 +68,6 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 
-@Preview(showSystemUi = true)
-@Composable
-fun HomeUIPreview() {
-    DashboardUI(
-        rememberNavController(),
-        currentUser = TODO()
-    )
-}
-
 @Composable
 fun DashboardUI(
     navController: NavController,
@@ -522,16 +513,24 @@ fun CropsCategory(
     ) {
 
         val actions = listOf(
-            Triple("Indemnity ",R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
-            Triple("Rice Insurance",R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList) },
-            Triple("Onion Insurance",R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList) },
-            Triple("Complaints",R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList) },
-            Triple("Crop Monitoring", R.drawable.crop_monitor, onCropsMonitoringClick),
-            Triple("Messages", R.drawable.messageicon) {(navController.navigate(MainNav.Message))},
+            Triple("INFO HUB", R.drawable.crop_monitor, onCropsMonitoringClick),
+            Triple("COMPLAINTS",R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList) },
+            Triple("RICE INSURANCE",R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList(userId = currentUser.id!!)) },
+            Triple("ONION INSURANCE",R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList(userId = currentUser.id!!)) },
+            Triple("INDEMNITY ",R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
+            Triple("MESSAGES", R.drawable.messageicon) {(navController.navigate(MainNav.Message))},
         )
 
         items(actions.size) { index ->
             val (title,imageRes, action) = actions[index]
+
+//            val isHighlighted = when (title) {
+//                "RICE INSURANCE" -> currentUser.riceInsurance.isNotEmpty()
+//                "ONION INSURANCE" -> currentUser.onionInsurance.isNotEmpty()
+//                "INDEMNITY " -> currentUser.indemnity.isNotEmpty()
+//                else -> false
+//            }
+
             OutlinedCard(
                 onClick = { action() },
                 colors = CardDefaults.cardColors(
