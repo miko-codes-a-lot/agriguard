@@ -53,6 +53,7 @@ import java.util.TimeZone
 fun ReportListUIPreview() {
     ComplaintReportListUI(
         rememberNavController(),
+        complaintInsuranceList = listOf(),
         currentUser = UserDto()
     )
 }
@@ -60,6 +61,7 @@ fun ReportListUIPreview() {
 @Composable
 fun ComplaintReportListUI(
     navController: NavController,
+    complaintInsuranceList: List<ComplaintInsuranceDto>,
     currentUser: UserDto
 ) {
     Scaffold(
@@ -113,7 +115,11 @@ fun ComplaintReportListUI(
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
-//            ReportList()
+            ReportList(
+                navController = navController,
+                complaintInsuranceList = complaintInsuranceList,
+                currentUser = currentUser
+            )
         }
     }
 }
@@ -121,7 +127,7 @@ fun ComplaintReportListUI(
 @Composable
 fun ReportList(
     navController: NavController,
-    complaintInsurance: List<ComplaintInsuranceDto>,
+    complaintInsuranceList: List<ComplaintInsuranceDto>,
     currentUser: UserDto
 ) {
     LazyColumn(
@@ -130,7 +136,7 @@ fun ReportList(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        itemsIndexed(items = complaintInsurance) { _, Complaints ->
+        itemsIndexed(items = complaintInsuranceList) { _, Complaints ->
             ReportButton(
                 complaintInsurance = Complaints,
                 navController = navController,
@@ -165,9 +171,7 @@ private fun ReportButton(
 
     ElevatedButton(
         onClick = {
-//            if (!currentUser.isFarmers) {
-//                navController.navigate(MainNav.OnionInsuranceForm(userId = onionInsurance.id!!))
-//            }
+            navController.navigate(MainNav.ComplainForm(userId = complaintInsurance.id!!))
         },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
