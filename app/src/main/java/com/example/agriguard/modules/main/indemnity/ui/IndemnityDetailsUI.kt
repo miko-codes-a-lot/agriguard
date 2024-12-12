@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,15 +28,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
-import com.example.agriguard.modules.main.indemnity.model.entity.Indemnity
+import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun IndemnityPreview(
+fun IndemnityDetailsUI(
     title: String,
+    currentUser: UserDto,
     indemnity: IndemnityDto,
+    onClickEdit: () -> Unit = {},
+    onClickLike: (isLike: Boolean) -> Unit = {},
 ) {
+    val status = rememberSaveable { mutableStateOf(indemnity.status) }
+
     val statesValue = remember(indemnity) {
         listOf(
             "User ID" to indemnity.userId,
@@ -94,6 +101,35 @@ fun IndemnityPreview(
             modifier = Modifier
                 .padding(bottom = 3.dp, top = 7.dp)
         )
+
+        if (currentUser.isFarmers && (status.value == "pending" || status.value == "rejected")) {
+            Button(
+                onClick = {
+                    onClickEdit()
+                }
+            ) {
+                Text("Edit")
+            }
+        } else if (currentUser.isTechnician && (status.value == "pending" || status.value == "rejected")) {
+            Button(
+                onClick = {
+                    status.value = "approved"
+                    onClickLike(true)
+                }
+            ) {
+                Text("Like")
+            }
+            if (status.value == "pending") {
+                Button(
+                    onClick = {
+                        status.value = "rejected"
+                        onClickLike(false)
+                    }
+                ) {
+                    Text("Dislike")
+                }
+            }
+        }
 
         ViewData(statesValue)
 
