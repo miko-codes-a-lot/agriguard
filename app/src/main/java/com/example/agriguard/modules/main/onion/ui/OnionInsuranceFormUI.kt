@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -18,6 +19,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -28,7 +31,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,8 +49,6 @@ import com.example.agriguard.modules.main.onion.model.dto.OnionInsuranceDto
 import com.example.agriguard.modules.main.onion.viewmodel.OnionInsuranceViewmodel
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.shared.ui.CheckBoxField
-import com.example.agriguard.modules.shared.ui.DatePickerField
-import com.example.agriguard.modules.shared.ui.TextField
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -73,13 +73,14 @@ fun OnionInsuranceFormUI(
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        Spacer(modifier = Modifier.padding(top = 30.dp))
         Row(
             modifier = Modifier
-                .padding(top = 8.dp,bottom = 8.dp)
+                .padding(top = 8.dp, bottom = 8.dp, start = 140.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             Column {
                 CropsInfo("Crops", "Onion")
                 OnionDatePicker(
@@ -100,7 +101,7 @@ fun OnionInsuranceFormUI(
             context = context,
             label = "FirstName",
             value = currentUser.firstName,
-            onChange = { value -> viewModel.updateField { it.copy(ipTribe = value) } }
+            onChange = { }
         )
         TextFieldOnionStatus(
             context = context,
@@ -112,218 +113,476 @@ fun OnionInsuranceFormUI(
             context = context,
             label = "LastName",
             value = currentUser.lastName,
-            onChange = {  }
+            onChange = { }
         )
-
-
-
-
-
-
-
-
-        TextField(
-            "IP Tribe",
-            formState.ipTribe
-        ) { value -> viewModel.updateField { it.copy(ipTribe = value) } }
-        TextField("First Name", currentUser.firstName) { }
-        TextField("Middle Name", currentUser.middleName) { }
-        TextField("Last Name", currentUser.lastName) { }
-        TextField("Date Of Birth", currentUser.dateOfBirth) { }
-        TextField("Mobile Number", currentUser.mobileNumber) { }
-        TextField("Address", currentUser.address) { }
-//        TextField("If married, Name Of Spouse", currentUser.nameOfSpouse) { }
-        CheckBoxField(
-            "Male",
-            formState.male
-        ) { value -> viewModel.updateField { it.copy(male = value) } }
-        CheckBoxField(
-            "Female",
-            formState.female
-        ) { value -> viewModel.updateField { it.copy(female = value) } }
-        CheckBoxField(
-            "Single",
-            formState.single
-        ) { value -> viewModel.updateField { it.copy(single = value) } }
-        CheckBoxField("Married", formState.married) { value ->
-            viewModel.updateField {
-                it.copy(
-                    married = value
-                )
+        val saveDateFormat =
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
             }
+
+        val displayDateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+
+        val formattedDate = try {
+            val parsedDate = saveDateFormat.parse(currentUser.dateOfBirth)
+            displayDateFormat.format(parsedDate)
+        } catch (e: ParseException) {
         }
-        CheckBoxField(
-            "Widow",
-            formState.widow
-        ) { value -> viewModel.updateField { it.copy(widow = value) } }
-        Text(text = "Legal Beneficiaries")
-        TextField("Name", formState.nameOfBeneficiary) { value ->
-            viewModel.updateField {
-                it.copy(
-                    nameOfBeneficiary = value
-                )
-            }
-        }
-        TextField("Age", formState.ageOfBeneficiary) { value ->
-            viewModel.updateField {
-                it.copy(
-                    ageOfBeneficiary = value
-                )
-            }
-        }
-        TextField(
-            "RelationShip",
-            formState.relationshipOfBeneficiary
-        ) { value -> viewModel.updateField { it.copy(relationshipOfBeneficiary = value) } }
-        Text(text = "Name Of Plantation")
-        TextField(
-            "Farm Location",
-            formState.farmLocation
-        ) { value -> viewModel.updateField { it.copy(farmLocation = value) } }
-        TextField(
-            "Area",
-            formState.area
-        ) { value -> viewModel.updateField { it.copy(area = value) } }
-        TextField("Soil Type", formState.soilType) { value ->
-            viewModel.updateField {
-                it.copy(
-                    soilType = value
-                )
-            }
-        }
-        TextField(
-            "Soil Ph",
-            formState.soilPh
-        ) { value -> viewModel.updateField { it.copy(soilPh = value) } }
-        TextField("Topography", formState.topography) { value ->
-            viewModel.updateField {
-                it.copy(
-                    topography = value
-                )
-            }
-        }
-        Text(text = "Variety Of Planted")
-        TextField(
-            "Variety",
-            formState.variety
-        ) { value -> viewModel.updateField { it.copy(variety = value) } }
-        DatePickerField(
+
+        TextFieldOnionStatus(
             context = context,
-            label = "Date Of Planting",
+            label = "Date Of Birth",
+            value = formattedDate.toString(),
+            onChange = { }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Mobile Number",
+            value = currentUser.mobileNumber,
+            onChange = { }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Address",
+            value = currentUser.address,
+            onChange = { }
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CheckBoxField(
+                    "Male",
+                    formState.male
+                ) { value ->
+                    viewModel.updateField {
+                        it.copy(
+                            male = value,
+                            female = !value
+                        )
+                    }
+                }
+                CheckBoxField(
+                    "Female",
+                    formState.female
+                ) { value ->
+                    viewModel.updateField {
+                        it.copy(
+                            female = value,
+                            male = !value
+                        )
+                    }
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CheckStatusField(
+                    "Single",
+                    formState.single
+                ) { value ->
+                    viewModel.updateField {
+                        it.copy(
+                            single = value,
+                            married = !value && it.married,
+                            widow = !value && it.widow
+                        )
+                    }
+                }
+                CheckStatusField(
+                    "Married",
+                    formState.married
+                ) { value ->
+                    viewModel.updateField {
+                        it.copy(
+                            married = value,
+                            single = !value && it.single,
+                            widow = !value && it.widow
+                        )
+                    }
+                }
+                CheckStatusField(
+                    "Widow",
+                    formState.widow
+                ) { value ->
+                    viewModel.updateField {
+                        it.copy(
+                            widow = value,
+                            single = !value && it.single,
+                            married = !value && it.married
+                        )
+                    }
+                }
+            }
+        }
+        Row(
+            modifier = Modifier
+                .padding(top = 15.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Legal Beneficiaries",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif
+            )
+        }
+        TextFieldOnionStatus(
+            context = context,
+            label = "Name",
+            value = formState.nameOfBeneficiary,
+            onChange = { value -> viewModel.updateField { it.copy(nameOfBeneficiary = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Age",
+            value = formState.ageOfBeneficiary,
+            onChange = { value -> viewModel.updateField { it.copy(ageOfBeneficiary = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "RelationShip",
+            value = formState.relationshipOfBeneficiary,
+            onChange = { value -> viewModel.updateField { it.copy(relationshipOfBeneficiary = value) } }
+        )
+        Row(
+            modifier = Modifier
+                .padding(top = 15.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "1. Name Of Plantation",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif
+            )
+        }
+        TextFieldOnionStatus(
+            context = context,
+            label = "Farm Location",
+            value = formState.farmLocation,
+            onChange = { value -> viewModel.updateField { it.copy(farmLocation = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Area",
+            value = formState.area,
+            onChange = { value -> viewModel.updateField { it.copy(area = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Soil Type",
+            value = formState.soilType,
+            onChange = { value -> viewModel.updateField { it.copy(soilType = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Soil Ph",
+            value = formState.soilPh,
+            onChange = { value -> viewModel.updateField { it.copy(soilPh = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Topography",
+            value = formState.topography,
+            onChange = { value -> viewModel.updateField { it.copy(topography = value) } }
+        )
+        Row(
+            modifier = Modifier
+                .padding(top = 15.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "2. Variety Of Planted",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif
+            )
+        }
+        TextFieldOnionStatus(
+            context = context,
+            label = "Variety",
+            value = formState.variety,
+            onChange = { value -> viewModel.updateField { it.copy(variety = value) } }
+        )
+        OnionDatePicker(
+            context = context,
+            "Date of Planting",
             value = formState.dateOfPlanting,
             onChange = { value -> viewModel.updateField { it.copy(dateOfPlanting = value) } }
         )
-        DatePickerField(
+        OnionDatePicker(
             context = context,
-            label = "Estd Date Of Harvest",
+            "Estd Date of Harvest",
             value = formState.estdDateOfHarvest,
             onChange = { value -> viewModel.updateField { it.copy(estdDateOfHarvest = value) } }
         )
-        TextField("Age Group", formState.ageGroup) { value ->
-            viewModel.updateField {
-                it.copy(
-                    ageGroup = value
+        TextFieldOnionStatus(
+            context = context,
+            label = "Age Group",
+            value = formState.ageGroup,
+            onChange = { value -> viewModel.updateField { it.copy(ageGroup = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "No. of Hills",
+            value = formState.noOfHills,
+            onChange = { value -> viewModel.updateField { it.copy(noOfHills = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "3. Type of Irrigation",
+            value = formState.typeOfIrrigation,
+            onChange = { value -> viewModel.updateField { it.copy(typeOfIrrigation = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "4. Average Yield",
+            value = formState.averageYield,
+            onChange = { value -> viewModel.updateField { it.copy(averageYield = value) } }
+        )
+        Row(
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "5. Cost of Production Inputs (CPI)",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif
+            )
+        }
+        TextFieldOnionStatus(
+            context = context,
+            label = "Land Preparation",
+            value = formState.landPreparation,
+            onChange = { value -> viewModel.updateField { it.copy(landPreparation = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Materials Item",
+            value = formState.materialsItem,
+            onChange = { value -> viewModel.updateField { it.copy(materialsItem = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Materials Quantity",
+            value = formState.materialsQuantity,
+            onChange = { value -> viewModel.updateField { it.copy(materialsQuantity = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Materials Cost",
+            value = formState.materialsCost,
+            onChange = { value -> viewModel.updateField { it.copy(materialsCost = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Labor Work force",
+            value = formState.laborWorkForce,
+            onChange = { value -> viewModel.updateField { it.copy(laborWorkForce = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Labor Quantity",
+            value = formState.laborQuantity,
+            onChange = { value -> viewModel.updateField { it.copy(laborQuantity = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Labor Cost",
+            value = formState.laborCost,
+            onChange = { value -> viewModel.updateField { it.copy(laborCost = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Total Cost (Php)",
+            value = formState.totalCoast,
+            onChange = { value -> viewModel.updateField { it.copy(totalCoast = value) } }
+        )
+        Row(
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "6. Farm Information",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif
+            )
+        }
+        TextFieldOnionStatus(
+            context = context,
+            label = "Sitio",
+            value = formState.farmLocationSitio,
+            onChange = { value -> viewModel.updateField { it.copy(farmLocationSitio = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Barangay",
+            value = formState.farmLocatioBarangay,
+            onChange = { value -> viewModel.updateField { it.copy(farmLocatioBarangay = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Municipality",
+            value = formState.farmLocationMunicipality,
+            onChange = { value -> viewModel.updateField { it.copy(farmLocationMunicipality = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "Province",
+            value = formState.farmLocationProvince,
+            onChange = { value -> viewModel.updateField { it.copy(farmLocationProvince = value) } }
+        )
+        Row(
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Boundaries",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif
+            )
+        }
+        TextFieldOnionStatus(
+            context = context,
+            label = "North",
+            value = formState.north,
+            onChange = { value -> viewModel.updateField { it.copy(north = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "South",
+            value = formState.south,
+            onChange = { value -> viewModel.updateField { it.copy(south = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "East",
+            value = formState.east,
+            onChange = { value -> viewModel.updateField { it.copy(east = value) } }
+        )
+        TextFieldOnionStatus(
+            context = context,
+            label = "West",
+            value = formState.west,
+            onChange = { value -> viewModel.updateField { it.copy(west = value) } }
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 55.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 10.dp)
+                        .heightIn(min = 50.dp, max = 50.dp)
+                        .fillMaxWidth()
+                        .drawBehind {
+                            val strokeWidth = 1.dp.toPx()
+                            val y = size.height - strokeWidth / 2
+                            drawLine(
+                                color = Color.Gray,
+                                start = Offset(0f, y),
+                                end = Offset(size.width, y),
+                                strokeWidth = strokeWidth
+                            )
+                        }
                 )
             }
+            Text(
+                text = "Signature of Proposer",
+                fontSize = 16.sp,
+                fontFamily = FontFamily.SansSerif,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
+            )
         }
-        TextField("No. Of Hills", formState.noOfHills) { value ->
-            viewModel.updateField {
-                it.copy(
-                    noOfHills = value
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 50.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 10.dp)
+                        .heightIn(min = 50.dp, max = 50.dp)
+                        .fillMaxWidth()
+                        .drawBehind {
+                            val strokeWidth = 1.dp.toPx()
+                            val y = size.height - strokeWidth / 2
+                            drawLine(
+                                color = Color.Gray,
+                                start = Offset(0f, y),
+                                end = Offset(size.width, y),
+                                strokeWidth = strokeWidth
+                            )
+                        }
                 )
             }
+            Text(
+                text = "Name and Signature of Supervising PT",
+                fontSize = 16.sp,
+                fontFamily = FontFamily.SansSerif,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
+            )
         }
-        TextField(
-            "Type Of Irrigation",
-            formState.typeOfIrrigation
-        ) { value -> viewModel.updateField { it.copy(typeOfIrrigation = value) } }
-        TextField(
-            "Average Yield",
-            formState.averageYield
-        ) { value -> viewModel.updateField { it.copy(averageYield = value) } }
-        Text(text = "Cost Of Production Inputs (CPI)")
-        TextField(
-            "land Preparation",
-            formState.landPreparation
-        ) { value -> viewModel.updateField { it.copy(landPreparation = value) } }
-        TextField(
-            "Materials Item",
-            formState.materialsItem
-        ) { value -> viewModel.updateField { it.copy(materialsItem = value) } }
-        TextField(
-            "Materials Quantity",
-            formState.materialsQuantity
-        ) { value -> viewModel.updateField { it.copy(materialsQuantity = value) } }
-        TextField(
-            "Materials Cost",
-            formState.materialsCost
-        ) { value -> viewModel.updateField { it.copy(materialsCost = value) } }
-        TextField(
-            "Labor Work Force",
-            formState.laborWorkForce
-        ) { value -> viewModel.updateField { it.copy(laborWorkForce = value) } }
-        TextField(
-            "Labor Quantity",
-            formState.laborQuantity
-        ) { value -> viewModel.updateField { it.copy(laborQuantity = value) } }
-        TextField("Labor Cost", formState.laborCost) { value ->
-            viewModel.updateField {
-                it.copy(
-                    laborCost = value
-                )
-            }
-        }
-        TextField(
-            "Total Cost (PHP)",
-            formState.totalCoast
-        ) { value -> viewModel.updateField { it.copy(totalCoast = value) } }
-        Text(text = "Farm Location/LSP")
-        TextField("Sitio", formState.farmLocationSitio) { value ->
-            viewModel.updateField {
-                it.copy(
-                    farmLocationSitio = value
-                )
-            }
-        }
-        TextField(
-            "Barangay",
-            formState.farmLocatioBarangay
-        ) { value -> viewModel.updateField { it.copy(farmLocatioBarangay = value) } }
-        TextField(
-            "Municipality",
-            formState.farmLocationMunicipality
-        ) { value -> viewModel.updateField { it.copy(farmLocationMunicipality = value) } }
-        TextField(
-            "Province",
-            formState.farmLocationProvince
-        ) { value -> viewModel.updateField { it.copy(farmLocationProvince = value) } }
-        Text(text = "Boundaries")
-        TextField(
-            "North",
-            formState.north
-        ) { value -> viewModel.updateField { it.copy(north = value) } }
-        TextField(
-            "South",
-            formState.south
-        ) { value -> viewModel.updateField { it.copy(south = value) } }
-        TextField(
-            "East",
-            formState.east
-        ) { value -> viewModel.updateField { it.copy(east = value) } }
-        TextField(
-            "West",
-            formState.west
-        ) { value -> viewModel.updateField { it.copy(west = value) } }
 
         Button(
             onClick = {
                 val updatedFormState = formState.copy(userId = currentUser.id!!)
-                    onSubmit(updatedFormState)
-//                    navController.popBackStack()
-                },
-            modifier = Modifier.align(Alignment.End)
+                onSubmit(updatedFormState)
+                    navController.popBackStack()
+            },
+            modifier = Modifier
+                .width(360.dp)
+                .padding(bottom = 50.dp)
+                .height(54.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF136204),
+                contentColor = Color.White
+            )
         ) {
-            Text("Submit")
+            Text(text = "Submit", fontSize = 17.sp)
         }
     }
 }
@@ -421,14 +680,14 @@ fun OnionDatePicker(
 
     Row(
         modifier = Modifier
-            .widthIn(min = 220.dp, max = 260.dp)
+            .fillMaxWidth()
             .clickable {
                 datePickerDialog.show()
             }
     ){
         Row(
             modifier = Modifier
-                .widthIn(min = 220.dp, max = 260.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -454,7 +713,7 @@ fun OnionDatePicker(
             ) {
                 Box(
                     modifier = Modifier
-                        .width(202.dp)
+                        .fillMaxWidth()
                         .heightIn(min = 50.dp, max = 50.dp)
                         .background(Color.White)
                 ){
@@ -524,7 +783,7 @@ fun TextFieldOnionStatus(
                 }
         ) {
             OutlinedTextField(
-                value = value.toString(),
+                value = value ?: "",
                 onValueChange = onChange,
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -536,5 +795,17 @@ fun TextFieldOnionStatus(
                 )
             )
         }
+    }
+}
+
+@Composable
+fun CheckStatusField(label: String, value: Boolean, onChange: (Boolean) -> Unit) {
+    Row(modifier = Modifier.
+    width(115.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ){
+        Checkbox(checked = value, onCheckedChange = onChange)
+        Text(label, modifier = Modifier.padding(start = 1.dp))
     }
 }
