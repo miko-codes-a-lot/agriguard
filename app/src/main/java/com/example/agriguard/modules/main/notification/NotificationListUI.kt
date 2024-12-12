@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Text
@@ -30,25 +30,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
+import com.example.agriguard.modules.main.notify.model.dto.NotifyDto
+import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.shared.ui.NotificationReportDialog
 
-
-@Preview(showSystemUi = true)
 @Composable
-fun MessageUIPreview() {
-    NotificationListUI(
-        rememberNavController()
-    )
-}
-
-@Composable
-fun NotificationListUI(navController: NavController) {
+fun NotificationListUI(
+    navController: NavController,
+    notifyList: List<NotifyDto>,
+    currentUser: UserDto
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -90,48 +85,47 @@ fun NotificationListUI(navController: NavController) {
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
-        NotificationList()
+        NotificationList(
+            navController = navController,
+            notifyList = notifyList,
+            currentUser = currentUser
+        )
     }
 }
 
 @Composable
-fun NotificationList() {
-    val notifications = listOf(
-        "Crop" to "Apr 25, 2024",
-        "Crop" to "Sep 02, 2024",
-        "Crop" to "Nov 23, 2024",
-        "Crop" to "Dec 01, 2024",
-        "Crop" to "Feb 10, 2025",
-        "Crop" to "Mar 01, 2025",
-        "Crop" to "Feb 10, 2025",
-        "Crop" to "Jan 11, 2025",
-        "Crop" to "Jan 21, 2025",
-        "Crop" to "Mar 01, 2025",
-        "Crop" to "Mar 01, 2025",
-        "Crop" to "Mar 01, 2025",
-        "Crop" to "Mar 01, 2025",
-        "Crop" to "Mar 01, 2025",
-    )
-
+fun NotificationList(
+    navController: NavController,
+    notifyList: List<NotifyDto>,
+    currentUser: UserDto
+) {
     LazyColumn(
         modifier = Modifier
             .padding(bottom = 50.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        itemsIndexed(items = notifications) { _, (name, date) ->
-            NotificationButton(name = name, date = date)
+        items(notifyList) { notify ->
+            NotificationButton(notifyDto = notify, navController = navController, currentUser = currentUser)
         }
     }
 }
 
 @Composable
-private fun NotificationButton(name: String, date: String) {
+private fun NotificationButton(
+    notifyDto: NotifyDto,
+    navController: NavController,
+    currentUser : UserDto
+) {
     var isReportDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     ElevatedButton(
         onClick = {
-            isReportDialogVisible = true
+            if(currentUser.isFarmers) {
+                isReportDialogVisible = true
+            }else{
+                navController
+            }
         },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
@@ -139,7 +133,7 @@ private fun NotificationButton(name: String, date: String) {
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(63.dp),
+            .height(65.dp),
         elevation = ButtonDefaults.elevatedButtonElevation(
             defaultElevation = 4.dp,
             pressedElevation = 8.dp
@@ -148,19 +142,13 @@ private fun NotificationButton(name: String, date: String) {
     ) {
         Row(
             modifier = Modifier
+                .padding(3.dp)
                 .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "$name Report",
-                fontSize = 15.sp,
-                textAlign = TextAlign.Start,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = date,
+                text = notifyDto.message,
                 fontSize = 15.sp,
                 textAlign = TextAlign.End,
                 fontWeight = FontWeight.Bold,
