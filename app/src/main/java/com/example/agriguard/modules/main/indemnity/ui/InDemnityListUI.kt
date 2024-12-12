@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
-import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
