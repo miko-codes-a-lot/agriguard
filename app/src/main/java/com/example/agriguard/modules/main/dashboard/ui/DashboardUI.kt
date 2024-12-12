@@ -421,7 +421,7 @@ fun CropsCategory(
                 Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList(userId = currentUser.id!!)) },
                 Triple("RICE INSURANCE", R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList(userId = currentUser.id!!)) },
                 Triple("ONION INSURANCE", R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList(userId = currentUser.id!!)) },
-                Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
+                Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.IndemnityList) },
                 Triple("MESSAGES", R.drawable.messageicon) { navController.navigate(MainNav.Message) }
             )
         } else {
@@ -430,7 +430,7 @@ fun CropsCategory(
                 Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList(userId = currentUser.id!!)) },
                 Triple("RICE INSURANCE", R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList(userId = currentUser.id!!)) },
                 Triple("ONION INSURANCE", R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList(userId = currentUser.id!!)) },
-                Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
+                Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.IndemnityList) },
                 Triple("MESSAGES", R.drawable.messageicon) { navController.navigate(MainNav.Message) }
             )
         }

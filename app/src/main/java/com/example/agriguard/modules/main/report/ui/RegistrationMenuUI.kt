@@ -99,8 +99,8 @@ fun Menu(navController: NavController) {
 
 fun getMenuItems(navController: NavController): List<AppMenuItem> {
     return listOf(
-        AppMenuItem(text = "In-Demnity") {
-            navController.navigate(MainNav.InDemnityForm)
+        AppMenuItem(text = "Indemnity") {
+            navController.navigate(MainNav.IndemnityCreate)
         },
         AppMenuItem(text = "Rice Insurance") {
             navController.navigate(MainNav.RiceInsuranceForm)
