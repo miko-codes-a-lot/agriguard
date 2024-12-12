@@ -21,7 +21,15 @@ class ComplaintViewModel @Inject constructor (
     }
 
     suspend fun upsertComplaint(complaintDto: ComplaintInsuranceDto, currentUser: UserDto): Result<ComplaintInsuranceDto> {
-        return service.upsertComplaint(complaintDto)
+        return service.upsertComplaint(complaintDto, currentUser)
+    }
+
+    fun fetchListComplaint(userId: String): List<ComplaintInsuranceDto> {
+        return service.fetchListComplaintInsurance(userId)
+    }
+
+    fun fetchComplaint(userId: String): ComplaintInsuranceDto? {
+        return service.fetchUserComplaintInsurance(userId)
     }
 
 }
