@@ -6,7 +6,7 @@ import com.example.agriguard.modules.main.notify.model.entity.Notify
 import com.example.agriguard.modules.main.onion.model.entity.OnionInsurance
 import com.example.agriguard.modules.main.rice.model.entity.RiceInsurance
 import com.example.agriguard.modules.main.user.model.entity.Address
-import com.example.agriguard.modules.main.user.model.entity.Indemnity
+import com.example.agriguard.modules.main.indemnity.model.entity.Indemnity
 import com.example.agriguard.modules.main.user.model.entity.User
 import dagger.Module
 import dagger.Provides
