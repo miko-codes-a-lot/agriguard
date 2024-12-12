@@ -47,6 +47,7 @@ fun Indemnity.toDTO(): IndemnityDto {
         status = status,
         createdById = createdById?.toHexString(),
         createdAt = createdAt.toInstantString(),
+        reviewById = reviewById?.toHexString(),
         lastUpdatedById = lastUpdatedById?.toHexString(),
         lastUpdatedAt = lastUpdatedAt.toInstantString(),
         deletedById = deletedById?.toHexString(),
@@ -94,6 +95,7 @@ fun IndemnityDto.toEntity(): Indemnity {
         status = indemnityDto.status
         createdById = indemnityDto.createdById?.toObjectId()
         createdAt = indemnityDto.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
+        reviewById = indemnityDto.reviewById?.toObjectId()
         lastUpdatedById = indemnityDto.lastUpdatedById?.toObjectId()
         lastUpdatedAt = indemnityDto.lastUpdatedAt.toRealmInstantNullable() ?: RealmInstant.now()
         deletedById = indemnityDto.deletedById?.toObjectId()
