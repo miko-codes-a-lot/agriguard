@@ -2,7 +2,7 @@ package com.example.agriguard.modules.main.indemnity.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.agriguard.modules.main.indemnity.service.IndemnityInsuranceService
-import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
