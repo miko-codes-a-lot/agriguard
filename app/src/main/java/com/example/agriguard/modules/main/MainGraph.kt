@@ -8,7 +8,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import com.example.agriguard.modules.main.complain.ui.ComplaintInsuranceFormUI
 import com.example.agriguard.modules.main.complain.ui.ComplaintReportListUI
 import com.example.agriguard.modules.main.complain.viewmodel.ComplaintViewModel
 import com.example.agriguard.modules.main.dashboard.ui.DashboardUI
@@ -16,7 +15,8 @@ import com.example.agriguard.modules.main.farmer.AddressesUI
 import com.example.agriguard.modules.main.farmer.FarmersPreviewUI
 import com.example.agriguard.modules.main.farmer.FarmersUI
 import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
-import com.example.agriguard.modules.main.indemnity.ui.InDemnityListUI
+import com.example.agriguard.modules.main.indemnity.ui.IndemnityDetailsUI
+import com.example.agriguard.modules.main.indemnity.ui.IndemnityListUI
 import com.example.agriguard.modules.main.indemnity.ui.IndemnityFormUI
 import com.example.agriguard.modules.main.indemnity.viewmodel.IndemnityViewModel
 import com.example.agriguard.modules.main.menu.ui.MenuUI
@@ -66,7 +66,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             val args = it.toRoute<MainNav.ComplainForm>()
             val userViewModel: UserViewModel = hiltViewModel()
             Guard(navController = navController) { currentUser ->
-                ComplaintInsuranceFormUI()
+//                ComplaintInsuranceFormUI()
             }
         }
         composable<MainNav.Users> {
@@ -192,17 +192,53 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 )
             }
         }
-        composable<MainNav.InDemnityForm> {
-            Guard(navController = navController) { currentUser ->
+        composable<MainNav.IndemnityDetails> {
+            Guard(navController) { currentUser ->
+                val args = it.toRoute<MainNav.IndemnityDetails>()
                 val viewModel: IndemnityViewModel = hiltViewModel()
+                val indemnityDto = viewModel.fetchOne(args.id)
+
+                val scope = rememberCoroutineScope()
+                IndemnityDetailsUI(
+                    title = "Indemnity Details",
+                    currentUser = currentUser,
+                    indemnity = indemnityDto,
+                    onClickEdit = {
+                        navController.navigate(MainNav.IndemnityEdit(args.id))
+                    },
+                    onClickLike = { isLike ->
+                        scope.launch {
+                            val status = if (isLike) "approved" else "rejected"
+
+                            scope.launch {
+                                indemnityDto.status = status
+                                val result = viewModel.upsert(indemnityDto, currentUser)
+                                if (result.isSuccess) {
+                                    Log.d("micool", "good: $result")
+                                } else {
+                                    Log.e("micool", "fail: $result")
+                                }
+                            }
+                        }
+                    }
+                )
+            }
+        }
+        composable<MainNav.IndemnityEdit> {
+            Guard(navController) { currentUser ->
+                val args = it.toRoute<MainNav.IndemnityEdit>()
+                val viewModel: IndemnityViewModel = hiltViewModel()
+                val indemnityDto = viewModel.fetchOne(args.id)
+                viewModel.setFormState(indemnityDto)
+
                 val scope = rememberCoroutineScope()
                 IndemnityFormUI(
                     navController = navController,
                     currentUser = currentUser,
                     viewModel = viewModel
-                ) { dto ->
+                ) { data ->
                     scope.launch {
-                        val result = viewModel.upsert(dto, currentUser)
+                        val result = viewModel.upsert(data, currentUser)
                         if (result.isSuccess) {
                             Log.d("micool", "good: $result")
                         } else {
@@ -212,12 +248,32 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 }
             }
         }
-        composable<MainNav.InDemnityList> {
-            val args = it.toRoute<MainNav.InDemnityList>()
+        composable<MainNav.IndemnityCreate> {
+            Guard(navController) { currentUser ->
+                val viewModel: IndemnityViewModel = hiltViewModel()
+
+                val scope = rememberCoroutineScope()
+                IndemnityFormUI(
+                    navController = navController,
+                    currentUser = currentUser,
+                    viewModel = viewModel
+                ) { data ->
+                    scope.launch {
+                        val result = viewModel.upsert(data, currentUser)
+                        if (result.isSuccess) {
+                            Log.d("micool", "good: $result")
+                        } else {
+                            Log.e("micool", "fail: $result")
+                        }
+                    }
+                }
+            }
+        }
+        composable<MainNav.IndemnityList> {
             val indemnityViewModel: IndemnityViewModel = hiltViewModel()
             Guard(navController = navController) { currentUser ->
-                val indemnityList = indemnityViewModel.fetchListIndemnity(args.userId)
-                    InDemnityListUI(
+                val indemnityList = indemnityViewModel.fetchAll(currentUser)
+                    IndemnityListUI(
                         navController = navController,
                         indemnityList = indemnityList,
                         currentUser = currentUser,
