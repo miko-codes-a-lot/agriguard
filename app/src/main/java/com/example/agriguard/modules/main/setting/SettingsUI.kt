@@ -75,6 +75,7 @@ fun SettingsUI(
         if(showButton){
             Row(
                 modifier = Modifier
+                    .padding(top = 10.dp)
                     .height(50.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -104,7 +105,7 @@ fun SettingsUI(
                             painter = painterResource(id = R.drawable.exit),
                             contentDescription = "Logout",
                             tint = Color.Red,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(35.dp)
                         )
                     }
                 }
@@ -140,9 +141,11 @@ fun Profile(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .background(Color.White)
+            .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         UserImageUI(
             onImageSelected = { newUri ->
