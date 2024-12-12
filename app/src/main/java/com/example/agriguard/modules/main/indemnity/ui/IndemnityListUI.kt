@@ -47,7 +47,7 @@ import java.util.Locale
 import java.util.TimeZone
 
 @Composable
-fun InDemnityListUI(
+fun IndemnityListUI(
     navController: NavController,
     indemnityList: List<IndemnityDto>,
     currentUser: UserDto,
@@ -58,7 +58,7 @@ fun InDemnityListUI(
             .background(Color(0xFFFFFFFF)),
         floatingActionButton = {
             if(currentUser.isFarmers){
-                FloatingRecordsIcon(currentUser, navController)
+                FloatingRecordsIcon(navController)
             }
         }
     ) { padding ->
@@ -104,20 +104,18 @@ fun InDemnityListUI(
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
-            InDemnityListContainer(
+            IndemnityListContainer(
                 navController = navController,
                 indemnityList = indemnityList,
-                currentUser = currentUser
             )
         }
     }
 }
 
 @Composable
-fun InDemnityListContainer(
+fun IndemnityListContainer(
     navController: NavController,
     indemnityList: List<IndemnityDto>,
-    currentUser: UserDto
 ) {
     LazyColumn(
         modifier = Modifier
@@ -126,22 +124,19 @@ fun InDemnityListContainer(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         itemsIndexed(items = indemnityList) { _, indemnityDto ->
-            InDemnityButton(
+            IndemnityButton(
                 indemnityId = indemnityDto,
-                navController = navController,
-                currentUser = currentUser
+                navController = navController
             )
         }
     }
 }
 
 @Composable
-private fun InDemnityButton(
+private fun IndemnityButton(
     indemnityId: IndemnityDto,
-    navController: NavController,
-    currentUser: UserDto
+    navController: NavController
 ) {
-
     val formattedDate = if (indemnityId.fillupdate.isNotEmpty()) {
         try {
             val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
@@ -159,9 +154,8 @@ private fun InDemnityButton(
 
     ElevatedButton(
         onClick = {
-            if (!currentUser.isFarmers) {
-                navController.navigate(MainNav.InDemnityForm(userId = indemnityId.id!!))
-            }
+            val route = MainNav.IndemnityDetails(indemnityId.id!!)
+            navController.navigate(route)
         },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
@@ -202,7 +196,6 @@ private fun InDemnityButton(
 
 @Composable
 fun FloatingRecordsIcon(
-    currentUser: UserDto,
     navController: NavController,
 ) {
     Column(
@@ -212,7 +205,7 @@ fun FloatingRecordsIcon(
     ) {
         FloatingActionButton(
             onClick = {
-                navController.navigate(MainNav.InDemnityForm(currentUser.id!!))
+                navController.navigate(MainNav.IndemnityCreate)
             },
             containerColor = Color(0xFF136204),
             contentColor = Color(0xFFFFFFFF),
