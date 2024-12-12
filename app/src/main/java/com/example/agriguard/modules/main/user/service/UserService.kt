@@ -1,17 +1,16 @@
 package com.example.agriguard.modules.main.user.service
 
-import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
-import com.example.agriguard.modules.main.user.model.entity.Indemnity
+import com.example.agriguard.modules.main.indemnity.model.entity.Indemnity
 import com.example.agriguard.modules.main.user.model.entity.User
-import com.example.agriguard.modules.main.indemnity.mapper.toDTO
-import com.example.agriguard.modules.main.indemnity.mapper.toEntity
+import com.example.agriguard.modules.main.indemnity.model.mapper.toDTO
+import com.example.agriguard.modules.main.indemnity.model.mapper.toEntity
 import com.example.agriguard.modules.main.user.model.mapper.toDTO
 import com.example.agriguard.modules.main.user.model.mapper.toEntity
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.query.Sort
 import org.mongodb.kbson.ObjectId
 import javax.inject.Inject
 
