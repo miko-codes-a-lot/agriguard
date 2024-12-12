@@ -8,13 +8,16 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.example.agriguard.modules.main.complain.ui.ComplaintInsuranceFormUI
+import com.example.agriguard.modules.main.complain.ui.ComplaintReportListUI
+import com.example.agriguard.modules.main.complain.viewmodel.ComplaintViewModel
 import com.example.agriguard.modules.main.dashboard.ui.DashboardUI
 import com.example.agriguard.modules.main.farmer.AddressesUI
-import com.example.agriguard.modules.main.complain.ui.ComplaintInsuranceFormUI
-import com.example.agriguard.modules.main.complain.viewmodel.ComplaintViewModel
 import com.example.agriguard.modules.main.farmer.FarmersPreviewUI
 import com.example.agriguard.modules.main.farmer.FarmersUI
 import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
+import com.example.agriguard.modules.main.indemnity.ui.InDemnityListUI
+import com.example.agriguard.modules.main.indemnity.ui.IndemnityFormUI
 import com.example.agriguard.modules.main.indemnity.viewmodel.IndemnityViewModel
 import com.example.agriguard.modules.main.menu.ui.MenuUI
 import com.example.agriguard.modules.main.message.MessageListUI
@@ -26,12 +29,10 @@ import com.example.agriguard.modules.main.module.RiceDiseaseUI
 import com.example.agriguard.modules.main.module.RicePetsModule
 import com.example.agriguard.modules.main.module.RiceWeedUI
 import com.example.agriguard.modules.main.notification.NotificationListUI
-import com.example.agriguard.modules.main.complain.ui.ComplaintReportListUI
-import com.example.agriguard.modules.main.indemnity.ui.IndemnityFormUI
+import com.example.agriguard.modules.main.notify.viewmodel.NotifyViewModel
 import com.example.agriguard.modules.main.onion.ui.OnionInsuranceFormUI
-import com.example.agriguard.modules.main.onion.viewmodel.OnionInsuranceViewmodel
-import com.example.agriguard.modules.main.indemnity.ui.InDemnityListUI
 import com.example.agriguard.modules.main.onion.ui.OnionInsuranceListUI
+import com.example.agriguard.modules.main.onion.viewmodel.OnionInsuranceViewmodel
 import com.example.agriguard.modules.main.report.ui.RegistrationMenuUI
 import com.example.agriguard.modules.main.report.ui.ReportDashboardUI
 import com.example.agriguard.modules.main.report.ui.ReportFormValidationUI
@@ -61,53 +62,11 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 DashboardUI(navController, currentUser)
             }
         }
-//            OnionInsuranceFormUI(
-//                navController = navController,
-//                currentUser = currentUser,
-//                viewModel = viewModel
-//            ) { dto ->
-//                scope.launch {
-//                    val result = viewModel.upsert(dto, currentUser)
-//                    if (result.isSuccess) {
-//                        Log.d("micool", "good: $result")
-//                    } else {
-//                        Log.e("micool", "fail: $result")
-//                    }
-//                }
-//            }
         composable<MainNav.ComplainForm> {
             val args = it.toRoute<MainNav.ComplainForm>()
-            val viewModel: ComplaintViewModel = hiltViewModel();
-            val scope = rememberCoroutineScope()
+            val userViewModel: UserViewModel = hiltViewModel()
             Guard(navController = navController) { currentUser ->
-                ComplaintInsuranceFormUI(
-                    currentUser = currentUser,
-                    navController = navController,
-                    viewModel = viewModel,
-                ){ dto ->
-                    scope.launch {
-                        val result = viewModel.upsertComplaint(dto, currentUser)
-                        if (result.isSuccess) {
-                            Log.d("micool", "good: $result")
-                        } else {
-                            Log.e("micool", "fail: $result")
-                        }
-                    }
-                }
-//                ComplaintFormUI(
-//                    currentUser = currentUser,
-//                    navController = navController,
-//                    viewModel = viewModel,
-//                ){ dto ->
-//                    scope.launch {
-//                        val result = viewModel.upsertComplaint(dto, currentUser)
-//                        if (result.isSuccess) {
-//                            Log.d("micool", "good: $result")
-//                        } else {
-//                            Log.e("micool", "fail: $result")
-//                        }
-//                    }
-//                }
+                ComplaintInsuranceFormUI()
             }
         }
         composable<MainNav.Users> {
@@ -187,7 +146,9 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         }
         composable<MainNav.NotificationList> {
             Guard(navController = navController) { currentUser ->
-                NotificationListUI(navController)
+                val notifyViewModel: NotifyViewModel = hiltViewModel()
+                val notifyList = notifyViewModel.fetchAllNotify()
+                NotificationListUI(navController, notifyList, currentUser )
             }
         }
         composable<MainNav.FormValidation> {
@@ -202,25 +163,21 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             }
         }
         composable<MainNav.RiceInsuranceForm> {
+            val args = it.toRoute<MainNav.RiceInsuranceForm>()
+            val viewModel: RiceInsuranceViewModel = hiltViewModel()
+            val scope = rememberCoroutineScope()
             Guard(navController = navController) { currentUser ->
-                val viewModel: RiceInsuranceViewModel = hiltViewModel()
-                val scope = rememberCoroutineScope()
                 RiceInsuranceFormUI(
                     navController = navController,
                     currentUser = currentUser,
-                    viewModel,
-                ) { dto ->
-                    scope.launch {
-                        val result = viewModel.upsert(dto, currentUser)
-                        if (result.isSuccess) {
-                            // show success dialog here
-                            Log.d("micool", "good: $result")
-                        } else {
-                            // show fail dialog here
-                            Log.e("micool", "fail: $result")
+                    viewModel = viewModel,
+                    onSubmit = { updatedDto ->
+                        scope.launch {
+                            viewModel.upsert(updatedDto, currentUser)
+                            navController.popBackStack()
                         }
                     }
-                }
+                )
             }
         }
         composable<MainNav.RiceInsuranceList> {
@@ -330,8 +287,15 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             }
         }
         composable<MainNav.ComplaintReportList> {
+            val args = it.toRoute<MainNav.ComplaintReportList>()
+            val complaintViewModel: ComplaintViewModel = hiltViewModel()
+            val complaintInsurance = complaintViewModel.fetchListComplaint(args.userId)
             Guard(navController = navController) { currentUser ->
-                ComplaintReportListUI(navController, currentUser)
+                ComplaintReportListUI(
+                    navController = navController,
+                    complaintInsuranceList = complaintInsurance,
+                    currentUser = currentUser
+                )
             }
         }
         composable<MainNav.Registration> {
