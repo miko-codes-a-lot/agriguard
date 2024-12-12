@@ -68,6 +68,7 @@ fun RiceInsurance.toDTO(): RiceInsuranceDto {
         periodOfCover = periodOfCover,
         from = from,
         to = to,
+        status = status,
         createdById = createdById?.toHexString(),
         createdAt = createdAt.toInstantString(),
         lastUpdatedById = lastUpdatedById?.toHexString(),
@@ -139,6 +140,7 @@ fun RiceInsuranceDto.toEntity(): RiceInsurance {
         periodOfCover = riceInsuranceDto.periodOfCover
         from = riceInsuranceDto.from
         to = riceInsuranceDto.to
+        status = riceInsuranceDto.status
         createdById = riceInsuranceDto.createdById?.toObjectId()
         createdAt = riceInsuranceDto.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
         lastUpdatedById = riceInsuranceDto.lastUpdatedById?.toObjectId()
