@@ -12,6 +12,7 @@ data class ComplaintInsuranceDto (
     var treatment: String? = null,
     var imageBase64: String? = null,
     var createdById: String? = null,
+    var status: String? = "pending",
     var createdAt: String? = null,
     var lastUpdatedById: String? = null,
     var lastUpdatedAt: String? = null,

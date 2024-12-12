@@ -1,4 +1,4 @@
-package com.example.agriguard.modules.main.user.model.dto
+package com.example.agriguard.modules.main.indemnity.model.dto
 
 data class IndemnityDto(
     var id: String? = null,
@@ -36,6 +36,7 @@ data class IndemnityDto(
     var ibapaHalaga: String? = null,
     var kabuuanBilang: String? = null,
     var kabuuanHalaga: String? = null,
+    var status: String? = "pending",
     var createdById: String? = null,
     var createdAt: String? = null,
     var lastUpdatedById: String? = null,

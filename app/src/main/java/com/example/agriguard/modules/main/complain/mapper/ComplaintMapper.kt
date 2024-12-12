@@ -17,6 +17,7 @@ fun ComplaintInsurance.toDTO(): ComplaintInsuranceDto {
         causeOfDamage = causeOfDamage,
         treatment = treatment,
         imageBase64 = imageBase64,
+        status = status,
         createdById = createdById?.toHexString(),
         createdAt = createdAt.toInstantString(),
         lastUpdatedById = lastUpdatedById?.toHexString(),
@@ -35,6 +36,7 @@ fun ComplaintInsuranceDto.toEntity(): ComplaintInsurance {
         causeOfDamage = complaint.causeOfDamage
         treatment = complaint.treatment
         imageBase64 = complaint.imageBase64
+        status = complaint.status
         createdAt = complaint.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
         lastUpdatedById = complaint.lastUpdatedById?.toObjectId()
         lastUpdatedAt = complaint.lastUpdatedAt.toRealmInstantNullable() ?: RealmInstant.now()

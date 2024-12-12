@@ -48,6 +48,7 @@ class OnionInsurance:RealmObject {
     var south: String? = ""
     var east: String? = ""
     var west: String? = ""
+    var status: String? = "pending"
     var createdById: ObjectId? = null
     var createdAt: RealmInstant = RealmInstant.now()
     var lastUpdatedById: ObjectId? = null

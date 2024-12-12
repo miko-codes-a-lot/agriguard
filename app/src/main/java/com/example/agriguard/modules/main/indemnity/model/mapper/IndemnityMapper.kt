@@ -1,7 +1,7 @@
-package com.example.agriguard.modules.main.indemnity.mapper
+package com.example.agriguard.modules.main.indemnity.model.mapper
 
-import com.example.agriguard.modules.main.user.model.dto.IndemnityDto
-import com.example.agriguard.modules.main.user.model.entity.Indemnity
+import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.indemnity.model.entity.Indemnity
 import com.example.agriguard.modules.shared.ext.toInstantString
 import com.example.agriguard.modules.shared.ext.toObjectId
 import com.example.agriguard.modules.shared.ext.toRealmInstant
@@ -44,6 +44,7 @@ fun Indemnity.toDTO(): IndemnityDto {
         ibapaHalaga = ibapaHalaga,
         kabuuanBilang = kabuuanBilang,
         kabuuanHalaga = kabuuanHalaga,
+        status = status,
         createdById = createdById?.toHexString(),
         createdAt = createdAt.toInstantString(),
         lastUpdatedById = lastUpdatedById?.toHexString(),
@@ -90,6 +91,7 @@ fun IndemnityDto.toEntity(): Indemnity {
         ibapaHalaga = indemnityDto.ibapaHalaga
         kabuuanBilang = indemnityDto.kabuuanBilang
         kabuuanHalaga = indemnityDto.kabuuanHalaga
+        status = indemnityDto.status
         createdById = indemnityDto.createdById?.toObjectId()
         createdAt = indemnityDto.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
         lastUpdatedById = indemnityDto.lastUpdatedById?.toObjectId()

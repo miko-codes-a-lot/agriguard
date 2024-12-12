@@ -62,6 +62,7 @@ data class RiceInsuranceDto (
     var periodOfCover: String? = null,
     var from: String? = null,
     var to: String? = null,
+    var status: String? = "pending",
     var createdById: String? = null,
     var createdAt: String? = null,
     var lastUpdatedById: String? = null,

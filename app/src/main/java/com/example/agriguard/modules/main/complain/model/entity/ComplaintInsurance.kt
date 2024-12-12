@@ -14,6 +14,7 @@ class ComplaintInsurance: RealmObject {
     var causeOfDamage: String? = ""
     var treatment: String? = ""
     var imageBase64: String? = null
+    var status: String? = "pending"
     var createdById: ObjectId? = null
     var createdAt: RealmInstant = RealmInstant.now()
     var lastUpdatedById: ObjectId? = null

@@ -65,6 +65,7 @@ class RiceInsurance: RealmObject {
     var periodOfCover: String? = ""
     var from: String? = ""
     var to: String? = ""
+    var status: String? = "pending"
     var createdById: ObjectId? = null
     var createdAt: RealmInstant = RealmInstant.now()
     var lastUpdatedById: ObjectId? = null

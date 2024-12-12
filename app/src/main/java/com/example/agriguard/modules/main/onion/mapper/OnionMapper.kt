@@ -51,6 +51,7 @@ fun OnionInsurance.toDTO(): OnionInsuranceDto {
         south = south,
         east = east,
         west = west,
+        status = status,
         createdById = createdById?.toHexString(),
         createdAt = createdAt.toInstantString(),
         lastUpdatedById = lastUpdatedById?.toHexString(),
@@ -102,6 +103,7 @@ fun OnionInsuranceDto.toEntity(): OnionInsurance {
         south = onionInsurance.south
         east = onionInsurance.east
         west = onionInsurance.west
+        status = onionInsurance.status
         createdById = onionInsurance.createdById?.toObjectId()
         createdAt = onionInsurance.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
         lastUpdatedById = onionInsurance.lastUpdatedById?.toObjectId()

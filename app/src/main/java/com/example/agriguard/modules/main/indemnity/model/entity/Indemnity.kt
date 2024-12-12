@@ -1,4 +1,4 @@
-package com.example.agriguard.modules.main.user.model.entity
+package com.example.agriguard.modules.main.indemnity.model.entity
 
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
@@ -41,6 +41,7 @@ class Indemnity: RealmObject {
     var ibapaHalaga: String? = ""
     var kabuuanBilang: String? = ""
     var kabuuanHalaga: String? = ""
+    var status: String? = "pending"
     var createdById: ObjectId? = null
     var createdAt: RealmInstant = RealmInstant.now()
     var lastUpdatedById: ObjectId? = null

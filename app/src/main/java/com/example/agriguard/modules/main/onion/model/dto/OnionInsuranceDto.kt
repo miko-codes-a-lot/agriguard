@@ -44,6 +44,7 @@ data class OnionInsuranceDto (
     var south: String? = null,
     var east: String? = null,
     var west: String? = null,
+    var status: String? = "pending",
     var createdById: String? = null,
     var createdAt: String? = null,
     var lastUpdatedById: String? = null,
