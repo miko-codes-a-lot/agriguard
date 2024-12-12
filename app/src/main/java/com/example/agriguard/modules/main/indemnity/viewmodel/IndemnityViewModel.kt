@@ -1,8 +1,8 @@
 package com.example.agriguard.modules.main.indemnity.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.agriguard.modules.main.indemnity.service.IndemnityInsuranceService
 import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.indemnity.service.IndemnityInsuranceService
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,15 +16,23 @@ class IndemnityViewModel @Inject constructor(
     private val _formState = MutableStateFlow(IndemnityDto())
     val formState: StateFlow<IndemnityDto> = _formState
 
+    fun setFormState(indemnityDto: IndemnityDto) {
+        _formState.value = indemnityDto
+    }
+
     fun updateField(field: (IndemnityDto) -> IndemnityDto) {
         _formState.value = field(_formState.value)
+    }
+
+    fun fetchOne(id: String): IndemnityDto {
+        return service.fetchOne(id)
     }
 
     suspend fun upsert(data: IndemnityDto, currentUser: UserDto): Result<IndemnityDto> {
         return service.upsert(data, currentUser)
     }
 
-    fun fetchListIndemnity(userId: String): List<IndemnityDto> {
-        return service.fetchListIndemnity(userId)
+    fun fetchAll(userDto: UserDto): List<IndemnityDto> {
+        return service.fetchAll(userDto = userDto)
     }
 }
