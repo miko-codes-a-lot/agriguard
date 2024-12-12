@@ -418,7 +418,7 @@ fun CropsCategory(
         val actions = if (currentUser.isTechnician) {
             listOf(
                 Triple("INFO HUB", R.drawable.crop_monitor, onCropsMonitoringClick),
-                Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList) },
+                Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList(userId = currentUser.id!!)) },
                 Triple("RICE INSURANCE", R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList(userId = currentUser.id!!)) },
                 Triple("ONION INSURANCE", R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList(userId = currentUser.id!!)) },
                 Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
@@ -427,7 +427,7 @@ fun CropsCategory(
         } else {
             listOf(
                 Triple("INFO HUB", R.drawable.crop_monitor, onCropsMonitoringClick),
-                Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList) },
+                Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintReportList(userId = currentUser.id!!)) },
                 Triple("RICE INSURANCE", R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList(userId = currentUser.id!!)) },
                 Triple("ONION INSURANCE", R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList(userId = currentUser.id!!)) },
                 Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.InDemnityList(userId = currentUser.id!!)) },
@@ -462,7 +462,7 @@ fun CropsCategory(
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = title,
-                        fontSize = 17.sp,
+                        fontSize = 16.sp,
                         color = Color(0xFF136204),
                         fontWeight = FontWeight.W500,
                         fontFamily = FontFamily.SansSerif,
