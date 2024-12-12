@@ -86,7 +86,7 @@ object MainNav {
     object RiceWeed
 
     @Serializable
-    object ComplaintReportList
+    data class ComplaintReportList(val userId: String)
 
     @Serializable
     object Registration

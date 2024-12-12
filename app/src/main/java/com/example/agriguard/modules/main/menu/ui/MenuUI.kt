@@ -90,11 +90,9 @@ fun MenuUI(
                 "Report" -> ReportDashboardUI()
                 "Message" -> MessageUI(navController)
                 "FormValidation" -> ReportFormValidationUI(navController)
-                "NotificationList" -> NotificationListUI(navController)
                 "Setting" -> SettingsUI(navController, currentUser)
                 "UsersList" -> UsersUI(navController)
                 "RegistrationMenu" -> RegistrationMenuUI(navController)
-                "ReportList" -> ComplaintReportListUI(navController, currentUser)
             }
         }
     }
@@ -146,11 +144,6 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
             NavItem(
                 icon =  painterResource(id = R.drawable.users),
                 routeName = "UsersList",
-                navigation = navController,
-            ),
-            NavItem(
-                icon = painterResource(id = R.drawable.insurance),
-                routeName = "ReportList",
                 navigation = navController,
             ),
             NavItem(
