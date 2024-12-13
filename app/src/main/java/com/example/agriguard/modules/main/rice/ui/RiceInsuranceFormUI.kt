@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -46,16 +45,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.agriguard.modules.main.onion.ui.CheckStatusField
-import com.example.agriguard.modules.main.onion.ui.CropsInfo
-import com.example.agriguard.modules.main.onion.ui.OnionDatePicker
-import com.example.agriguard.modules.main.onion.ui.TextFieldOnionStatus
 import com.example.agriguard.modules.main.rice.model.dto.RiceInsuranceDto
 import com.example.agriguard.modules.main.rice.viewmodel.RiceInsuranceViewModel
 import com.example.agriguard.modules.main.user.model.dto.UserDto
-import com.example.agriguard.modules.shared.ui.CheckBoxField
-import com.example.agriguard.modules.shared.ui.DatePickerField
-import com.example.agriguard.modules.shared.ui.TextField
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -67,20 +59,11 @@ fun RiceInsuranceFormUI(
     navController: NavController,
     currentUser: UserDto,
     viewModel: RiceInsuranceViewModel,
-//    riceInsuranceDto: RiceInsuranceDto?,
     onSubmit: (RiceInsuranceDto) -> Unit
 ) {
     val formState by viewModel.formState.collectAsState()
     val scrollState = rememberScrollState()
     val context = LocalContext.current
-
-//    LaunchedEffect(riceInsuranceDto) {
-//        if (riceInsuranceDto != null) {
-//            viewModel.updateField { riceInsuranceDto }
-//        } else {
-//            viewModel.resetFormState()
-//        }
-//    }
 
     Column(
         modifier = Modifier

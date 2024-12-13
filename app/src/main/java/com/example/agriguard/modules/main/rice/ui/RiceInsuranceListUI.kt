@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
-import com.example.agriguard.modules.main.rice.model.dto.RiceInsuranceDto
+import com.example.agriguard.modules.main.rice.model.dto.RiceWIthUserDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -49,7 +49,7 @@ import java.util.TimeZone
 @Composable
 fun RiceInsuranceListUI(
     navController: NavController,
-    riceInsuranceList: List<RiceInsuranceDto>,
+    riceInsuranceList: List<RiceWIthUserDto>,
     currentUser: UserDto,
 ) {
     Scaffold(
@@ -58,7 +58,7 @@ fun RiceInsuranceListUI(
             .background(Color(0xFFFFFFFF)),
         floatingActionButton = {
             if(currentUser.isFarmers) {
-                FloatingRecordsInsuranceIcon(currentUser, navController)
+                FloatingRecordsInsuranceIcon(navController)
             }
         }
     ) { padding ->
@@ -116,7 +116,7 @@ fun RiceInsuranceListUI(
 @Composable
 fun RiceInsuranceListContainer(
     navController: NavController,
-    riceInsuranceList: List<RiceInsuranceDto>,
+    riceInsuranceList: List<RiceWIthUserDto>,
     currentUser: UserDto
 ) {
     LazyColumn(
@@ -127,7 +127,7 @@ fun RiceInsuranceListContainer(
     ) {
         itemsIndexed(items = riceInsuranceList) { _, RiceInsuranceDto ->
             RiceInsuranceButton(
-                riceInsurance = RiceInsuranceDto,
+                riceWithUser = RiceInsuranceDto,
                 navController = navController,
                 currentUser = currentUser
             )
@@ -137,20 +137,21 @@ fun RiceInsuranceListContainer(
 
 @Composable
 private fun RiceInsuranceButton(
-    riceInsurance: RiceInsuranceDto,
+    riceWithUser: RiceWIthUserDto,
     navController: NavController,
     currentUser: UserDto
 ) {
-
-    val formattedDate = if (riceInsurance.fillUpDate.isNotEmpty()) {
+    val riceInsurance = riceWithUser.rice
+    val user = riceWithUser.user
+    val formattedDate = if (riceWithUser.rice.fillUpDate.isNotEmpty()) {
         try {
             val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
             isoFormat.timeZone = TimeZone.getTimeZone("UTC")
             val displayFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-            val parsedDate = isoFormat.parse(riceInsurance.fillUpDate)
+            val parsedDate = isoFormat.parse(riceWithUser.rice.fillUpDate)
             parsedDate?.let { displayFormat.format(it) } ?: "Invalid Date"
         } catch (e: Exception) {
-            Log.e("InDemnityButton", "Date parsing failed: ${riceInsurance.fillUpDate}", e)
+            Log.e("InDemnityButton", "Date parsing failed: ${riceWithUser.rice.fillUpDate}", e)
             "Invalid Date"
         }
     } else {
@@ -159,9 +160,7 @@ private fun RiceInsuranceButton(
 
     ElevatedButton(
         onClick = {
-            if (!currentUser.isFarmers) {
-                navController.navigate(MainNav.RiceInsuranceForm(userId = riceInsurance.id!!))
-            }
+            navController.navigate(MainNav.RiceInsuranceDetails(riceInsurance.id!!))
         },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
@@ -181,8 +180,10 @@ private fun RiceInsuranceButton(
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val text = if (currentUser.isFarmers) formattedDate
+            else "${user.firstName} ${user.lastName} - $formattedDate"
             Text(
-                text = "Successfully Submitted",
+                text = text,
                 fontSize = 17.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
@@ -190,11 +191,12 @@ private fun RiceInsuranceButton(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = formattedDate,
-                fontSize = 15.sp,
+                text = "${riceInsurance.status}",
+                fontSize = 17.sp,
                 textAlign = TextAlign.End,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.SansSerif,
+                color = if(riceInsurance.status == "approved") Color(0xFF136204) else if (riceInsurance.status == "rejected") Color.Red else Color.Red
             )
         }
     }
@@ -202,7 +204,6 @@ private fun RiceInsuranceButton(
 
 @Composable
 fun FloatingRecordsInsuranceIcon(
-    currentUser: UserDto,
     navController: NavController,
 ) {
     Column(
@@ -212,7 +213,7 @@ fun FloatingRecordsInsuranceIcon(
     ) {
         FloatingActionButton(
             onClick = {
-                navController.navigate(MainNav.RiceInsuranceForm(currentUser.id!!))
+                navController.navigate(MainNav.RiceCreate)
             },
             containerColor = Color(0xFF136204),
             contentColor = Color(0xFFFFFFFF),
