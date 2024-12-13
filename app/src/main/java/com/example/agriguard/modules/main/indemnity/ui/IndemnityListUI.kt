@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
-import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityWithUserDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -49,7 +49,7 @@ import java.util.TimeZone
 @Composable
 fun IndemnityListUI(
     navController: NavController,
-    indemnityList: List<IndemnityDto>,
+    indemnityWithUser: List<IndemnityWithUserDto>,
     currentUser: UserDto,
 ) {
     Scaffold(
@@ -89,7 +89,7 @@ fun IndemnityListUI(
             ) {
                 Column {
                     Text(
-                        text = "In-Demnity List",
+                        text = "InDemnity List",
                         fontSize = 25.sp,
                         color = Color(0xFF136204),
                         fontWeight = FontWeight.W800,
@@ -106,7 +106,8 @@ fun IndemnityListUI(
             Spacer(modifier = Modifier.height(10.dp))
             IndemnityListContainer(
                 navController = navController,
-                indemnityList = indemnityList,
+                indemnityWithUser = indemnityWithUser,
+                currentUser = currentUser
             )
         }
     }
@@ -115,7 +116,8 @@ fun IndemnityListUI(
 @Composable
 fun IndemnityListContainer(
     navController: NavController,
-    indemnityList: List<IndemnityDto>,
+    indemnityWithUser: List<IndemnityWithUserDto>,
+    currentUser: UserDto
 ) {
     LazyColumn(
         modifier = Modifier
@@ -123,10 +125,11 @@ fun IndemnityListContainer(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        itemsIndexed(items = indemnityList) { _, indemnityDto ->
+        itemsIndexed(items = indemnityWithUser) { _, indemnityDto ->
             IndemnityButton(
-                indemnityId = indemnityDto,
-                navController = navController
+                indemnityWithUser = indemnityDto,
+                navController = navController,
+                currentUser = currentUser
             )
         }
     }
@@ -134,18 +137,21 @@ fun IndemnityListContainer(
 
 @Composable
 private fun IndemnityButton(
-    indemnityId: IndemnityDto,
-    navController: NavController
+    indemnityWithUser: IndemnityWithUserDto,
+    navController: NavController,
+    currentUser: UserDto
 ) {
-    val formattedDate = if (indemnityId.fillupdate.isNotEmpty()) {
+    val indemnity = indemnityWithUser.indemnity
+    val user = indemnityWithUser.user
+    val formattedDate = if (indemnityWithUser.indemnity.fillUpdate.isNotEmpty()) {
         try {
             val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
             isoFormat.timeZone = TimeZone.getTimeZone("UTC")
             val displayFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-            val parsedDate = isoFormat.parse(indemnityId.fillupdate)
+            val parsedDate = isoFormat.parse(indemnityWithUser.indemnity.fillUpdate)
             parsedDate?.let { displayFormat.format(it) } ?: "Invalid Date"
         } catch (e: Exception) {
-            Log.e("InDemnityButton", "Date parsing failed: ${indemnityId.fillupdate}", e)
+            Log.e("InDemnityButton", "Date parsing failed: ${indemnityWithUser.indemnity.fillUpdate}", e)
             "Invalid Date"
         }
     } else {
@@ -154,7 +160,7 @@ private fun IndemnityButton(
 
     ElevatedButton(
         onClick = {
-            val route = MainNav.IndemnityDetails(indemnityId.id!!)
+            val route = MainNav.IndemnityDetails(indemnity.id!!)
             navController.navigate(route)
         },
         colors = ButtonDefaults.elevatedButtonColors(
@@ -175,8 +181,10 @@ private fun IndemnityButton(
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val text = if (currentUser.isFarmers) formattedDate
+            else "${user.firstName} ${user.lastName} - $formattedDate"
             Text(
-                text = "Successfully Submitted",
+                text = text,
                 fontSize = 17.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
@@ -184,11 +192,12 @@ private fun IndemnityButton(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = formattedDate,
-                fontSize = 15.sp,
+                text = "${indemnity.status}",
+                fontSize = 17.sp,
                 textAlign = TextAlign.End,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.SansSerif,
+                color = if(indemnity.status == "approved") Color(0xFF136204) else if (indemnity.status == "rejected") Color.Red else Color.Red
             )
         }
     }

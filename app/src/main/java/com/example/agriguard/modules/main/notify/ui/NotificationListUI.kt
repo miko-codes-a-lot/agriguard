@@ -1,7 +1,10 @@
-package com.example.agriguard.modules.main.notification
+package com.example.agriguard.modules.main.notify.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Text
@@ -40,9 +44,8 @@ import com.example.agriguard.modules.shared.ui.NotificationReportDialog
 
 @Composable
 fun NotificationListUI(
-    navController: NavController,
     notifyList: List<NotifyDto>,
-    currentUser: UserDto
+    onClick: (NotifyDto) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -71,7 +74,7 @@ fun NotificationListUI(
         ) {
             Column {
                 Text(
-                    text = "Notification Report List",
+                    text = "Notifications",
                     fontSize = 25.sp,
                     color = Color(0xFF136204),
                     fontWeight = FontWeight.W800,
@@ -86,18 +89,16 @@ fun NotificationListUI(
         }
         Spacer(modifier = Modifier.height(10.dp))
         NotificationList(
-            navController = navController,
             notifyList = notifyList,
-            currentUser = currentUser
+            onClick = onClick
         )
     }
 }
 
 @Composable
 fun NotificationList(
-    navController: NavController,
     notifyList: List<NotifyDto>,
-    currentUser: UserDto
+    onClick: (NotifyDto) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -106,7 +107,10 @@ fun NotificationList(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         items(notifyList) { notify ->
-            NotificationButton(notifyDto = notify, navController = navController, currentUser = currentUser)
+            NotificationButton(
+                notifyDto = notify,
+                onClick = onClick
+            )
         }
     }
 }
@@ -114,19 +118,12 @@ fun NotificationList(
 @Composable
 private fun NotificationButton(
     notifyDto: NotifyDto,
-    navController: NavController,
-    currentUser : UserDto
+    onClick: (NotifyDto) -> Unit
 ) {
     var isReportDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     ElevatedButton(
-        onClick = {
-            if(currentUser.isFarmers) {
-                isReportDialogVisible = true
-            }else{
-                navController
-            }
-        },
+        onClick = { onClick (notifyDto) },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
             contentColor = Color(0xFF136204)
@@ -147,6 +144,22 @@ private fun NotificationButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
+            if (!notifyDto.read) {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color.Red,
+                            shape = CircleShape
+                        )
+                        .size(13.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Color.Red,
+                            shape = CircleShape
+                        )
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = notifyDto.message,
                 fontSize = 15.sp,

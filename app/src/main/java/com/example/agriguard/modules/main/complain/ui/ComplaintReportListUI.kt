@@ -69,7 +69,9 @@ fun ComplaintReportListUI(
             .fillMaxSize()
             .background(Color(0xFFFFFFFF)),
         floatingActionButton = {
-            FloatingComplaint(currentUser, navController)
+            if(currentUser.isFarmers){
+                FloatingComplaint(currentUser, navController)
+            }
         }
     ) { padding ->
         Column(
@@ -171,7 +173,7 @@ private fun ReportButton(
 
     ElevatedButton(
         onClick = {
-            navController.navigate(MainNav.ComplainForm(userId = complaintInsurance.id!!))
+            navController.navigate(MainNav.ComplainCreate)
         },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
@@ -222,7 +224,7 @@ fun FloatingComplaint(
     ) {
         FloatingActionButton(
             onClick = {
-                navController.navigate(MainNav.ComplainForm(userId = currentUser.id!!))
+                navController.navigate(MainNav.ComplainCreate)
             },
             containerColor = Color(0xFF136204),
             contentColor = Color(0xFFFFFFFF),
