@@ -43,7 +43,6 @@ fun ComplaintInsurancePreview(
 ) {
     val statesValue = remember(complaintInsurance) {
         listOf(
-            "User ID" to complaintInsurance.userId,
             "Rice" to if (complaintInsurance.rice) "Yes" else "No",
             "Onion" to if (complaintInsurance.onion) "Yes" else "No",
             "Cause of Damage" to (complaintInsurance.causeOfDamage ?: "N/A"),

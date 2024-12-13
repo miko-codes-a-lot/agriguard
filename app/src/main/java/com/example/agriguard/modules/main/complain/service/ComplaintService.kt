@@ -9,7 +9,10 @@ import com.example.agriguard.modules.shared.ext.toInstantString
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
+import org.mongodb.kbson.BsonObjectId.Companion.invoke
+import org.mongodb.kbson.ObjectId
 import javax.inject.Inject
 
 class ComplaintService @Inject constructor(private val realm: Realm) {
@@ -19,6 +22,7 @@ class ComplaintService @Inject constructor(private val realm: Realm) {
             data.userId = currentUser.id!!
             data.createdById = currentUser.id!!
             data.createdAt = dateNow
+            data.reviewById = currentUser.createdById
         }
         data.lastUpdatedById = currentUser.id!!
         data.lastUpdatedAt = dateNow
@@ -33,16 +37,31 @@ class ComplaintService @Inject constructor(private val realm: Realm) {
         }
     }
 
-    fun fetchListComplaintInsurance(userId: String): List<ComplaintInsuranceDto> {
-        return realm.query<ComplaintInsurance>("userId == $0", userId)
+    fun fetchList(userDto: UserDto): List<ComplaintInsuranceDto> {
+        val queryBuilder = StringBuilder()
+
+        if (userDto.isFarmers) queryBuilder.append("userId == $0")
+        if (userDto.isTechnician) queryBuilder.append("reviewById == $0")
+
+        val userId = if (userDto.isAdmin) null
+        else if (userDto.isTechnician) ObjectId(userDto.id!!)
+        else userDto.id!!
+
+        val query = if (userDto.isAdmin) realm.query<ComplaintInsurance>()
+            else realm.query<ComplaintInsurance>(queryBuilder.toString(), userId)
+
+        return query
+            .sort("createdAt", Sort.DESCENDING)
             .find()
             .map { it.toDTO() }
     }
 
-    fun fetchUserComplaintInsurance(userId: String): ComplaintInsuranceDto? {
-        val result = realm.query<ComplaintInsurance>("userId == $0", userId)
+    fun fetchOne(id: String): ComplaintInsuranceDto {
+        return realm.query<ComplaintInsurance>("_id == $0", ObjectId(id))
             .find()
-            .firstOrNull()
-        return result?.toDTO()
+            .first()
+            .run {
+                toDTO()
+            }
     }
 }
