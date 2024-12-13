@@ -138,7 +138,8 @@ fun ComplaintInsuranceFormUI(
             .fillMaxSize()
             .padding(16.dp)
             .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.padding(top = 20.dp))
         Row(
@@ -342,74 +343,74 @@ fun ComplaintInsuranceFormUI(
                                 tint = Color(0xFF136204),
                             )
                         }
+
                     }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .width(130.dp)
-                                .padding(10.dp)
-                                .clickable { expanded = !expanded },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = if (formState.rice) "Rice" else "Onion",
-                                modifier = Modifier
-                                    .padding(start = 17.dp),
-                                fontSize = 25.sp,
-                                color = Color(0xFF136204),
-                                fontWeight = FontWeight.W800,
-                                fontFamily = FontFamily.SansSerif,
-                            )
-                            Icon(
-                                painter = if (expanded) painterResource(id = R.drawable.ic_arrow_up) else painterResource(id = R.drawable.ic_arrow_down),
-                                contentDescription = "Dropdown Icon",
-                                tint = Color(0xFF136204),
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                            modifier = Modifier
-                                .width(130.dp)
-                                .background(color = Color.White)
-                                .heightIn(max = 200.dp)
-                        ) {
-                            listOfCategory.forEach { item ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            text = item,
-                                            color = Color(0xFF136204),
-                                            fontFamily = FontFamily.SansSerif,
-                                            fontSize = 16.sp,
-                                            textAlign = TextAlign.Center,
-                                            modifier = Modifier
-                                                .width(130.dp)
-                                        )
-                                    },onClick = {
-                                        expanded = false
-                                        viewModel.updateField {
-                                            it.copy(
-                                                rice = item == "Rice",
-                                                onion = item == "Onion"
-                                            )
-                                        }
-                                    }
-                                )
-                            }
-                        }
                 }
             }
 
+            Column(
+                modifier = Modifier
+                    .width(130.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(
+                    modifier = Modifier
+                        .width(130.dp)
+                        .padding(10.dp)
+                        .clickable { expanded = !expanded },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = if (formState.rice) "Rice" else "Onion",
+                        modifier = Modifier
+                            .padding(start = 17.dp),
+                        fontSize = 25.sp,
+                        color = Color(0xFF136204),
+                        fontWeight = FontWeight.W800,
+                        fontFamily = FontFamily.SansSerif,
+                    )
+                    Icon(
+                        painter = if (expanded) painterResource(id = R.drawable.ic_arrow_up) else painterResource(id = R.drawable.ic_arrow_down),
+                        contentDescription = "Dropdown Icon",
+                        tint = Color(0xFF136204),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .width(130.dp)
+                        .background(color = Color.White)
+                        .heightIn(max = 200.dp)
+                ) {
+                    listOfCategory.forEach { item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = item,
+                                    color = Color(0xFF136204),
+                                    fontFamily = FontFamily.SansSerif,
+                                    fontSize = 16.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .width(130.dp)
+                                )
+                            },onClick = {
+                                expanded = false
+                                viewModel.updateField {
+                                    it.copy(
+                                        rice = item == "Rice",
+                                        onion = item == "Onion"
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
             }
-
             ComplainTextField(
                 "Sanhi ng Pinsala",
                 formState.treatment
