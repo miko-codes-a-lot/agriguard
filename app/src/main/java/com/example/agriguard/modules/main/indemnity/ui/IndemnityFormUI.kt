@@ -86,8 +86,8 @@ fun IndemnityFormUI(
                 OnionDatePicker(
                     context = context,
                     "Date",
-                    value = formState.fillupdate,
-                    onChange = { value -> viewModel.updateField { it.copy(fillupdate = value) } }
+                    value = formState.fillUpdate,
+                    onChange = { value -> viewModel.updateField { it.copy(fillUpdate = value) } }
                 )
             }
         }
