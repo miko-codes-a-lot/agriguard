@@ -103,10 +103,10 @@ fun getMenuItems(navController: NavController): List<AppMenuItem> {
             navController.navigate(MainNav.IndemnityCreate)
         },
         AppMenuItem(text = "Rice Insurance") {
-            navController.navigate(MainNav.RiceInsuranceForm)
+            navController.navigate(MainNav.RiceCreate)
         },
         AppMenuItem(text = "Onion Insurance") {
-            navController.navigate(MainNav.OnionInsuranceForm)
+            navController.navigate(MainNav.OnionCreate)
         },
 
     )
