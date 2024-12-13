@@ -27,9 +27,7 @@ import com.example.agriguard.modules.main.farmer.AddressesUI
 import com.example.agriguard.modules.main.menu.model.NavItem
 import com.example.agriguard.modules.main.message.MessageListUI
 import com.example.agriguard.modules.main.message.MessageUI
-import com.example.agriguard.modules.main.notification.NotificationListUI
 import com.example.agriguard.modules.main.report.ui.ReportFormValidationUI
-import com.example.agriguard.modules.main.complain.ui.ComplaintReportListUI
 import com.example.agriguard.modules.main.report.ui.RegistrationMenuUI
 import com.example.agriguard.modules.main.report.ui.ReportDashboardUI
 import com.example.agriguard.modules.main.setting.SettingsUI
@@ -120,11 +118,6 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
                 navigation = navController,
             ),
             NavItem(
-                icon = painterResource(id = R.drawable.report_icon),
-                routeName = "Report",
-                navigation = navController,
-            ),
-            NavItem(
                 icon =  painterResource(id = R.drawable.farmer),
                 routeName = "AddressList",
                 navigation = navController,
@@ -139,6 +132,11 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
             NavItem(
                 icon = painterResource(id = R.drawable.home),
                 routeName = "HomeDashboard",
+                navigation = navController,
+            ),
+            NavItem(
+                icon = painterResource(id = R.drawable.report_icon),
+                routeName = "Report",
                 navigation = navController,
             ),
             NavItem(
