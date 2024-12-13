@@ -2,6 +2,7 @@ package com.example.agriguard.modules.main.indemnity.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityWithUserDto
 import com.example.agriguard.modules.main.indemnity.service.IndemnityInsuranceService
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +33,7 @@ class IndemnityViewModel @Inject constructor(
         return service.upsert(data, currentUser)
     }
 
-    fun fetchAll(userDto: UserDto): List<IndemnityDto> {
+    fun fetchAll(userDto: UserDto): List<IndemnityWithUserDto> {
         return service.fetchAll(userDto = userDto)
     }
 }
