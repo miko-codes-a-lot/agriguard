@@ -9,11 +9,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -23,10 +29,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.agriguard.R
 import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
@@ -37,15 +45,14 @@ fun IndemnityDetailsUI(
     title: String,
     currentUser: UserDto,
     indemnity: IndemnityDto,
+    status: MutableState<String> = rememberSaveable { mutableStateOf("pending") },
     onClickEdit: () -> Unit = {},
     onClickLike: (isLike: Boolean) -> Unit = {},
 ) {
-    val status = rememberSaveable { mutableStateOf(indemnity.status) }
-
     val statesValue = remember(indemnity) {
         listOf(
-            "User ID" to indemnity.userId,
-            "Fill Up Date" to dateFormatContainer(indemnity.fillupdate.toString()),
+            "Status" to (indemnity.status ?: "Pending"),
+            "Fill Up Date" to dateFormatContainer(indemnity.fillUpdate),
             "Regular" to if (indemnity.regular) "Yes" else "No",
             "Punla" to if (indemnity.punla) "Yes" else "No",
             "Cooperative Rice" to if (indemnity.cooperativeRice) "Yes" else "No",
@@ -54,11 +61,11 @@ fun IndemnityDetailsUI(
             "APCPC" to if (indemnity.apcpc) "Yes" else "No",
             "Others" to (indemnity.others ?: ""),
             "Cause of Damage" to (indemnity.causeOfDamage ?: ""),
-            "Date of Loss" to dateFormatContainer(indemnity.dateOfLoss.toString()),
+            "Date of Loss" to dateFormatContainer(indemnity.dateOfLoss),
             "Age of Cultivation" to (indemnity.ageCultivation ?: ""),
             "Area Damaged" to (indemnity.areaDamaged ?: ""),
             "Degree of Damage" to (indemnity.degreeOfDamage ?: ""),
-            "Expected Date of Harvest" to dateFormatContainer(indemnity.expectedDateOfHarvest.toString()),
+            "Expected Date of Harvest" to dateFormatContainer(indemnity.expectedDateOfHarvest),
             "North" to (indemnity.north ?: ""),
             "South" to (indemnity.south ?: ""),
             "East" to (indemnity.east ?: ""),
@@ -77,63 +84,47 @@ fun IndemnityDetailsUI(
             "Ibapa Halaga" to (indemnity.ibapaHalaga ?: ""),
             "Kabuuan Bilang" to (indemnity.kabuuanBilang ?: ""),
             "Kabuuan Halaga" to (indemnity.kabuuanHalaga ?: ""),
-            "Status" to (indemnity.status ?: "Pending"),
         ).associate { (label, value) -> label to mutableStateOf(value) }
     }
 
     val scrollState = rememberScrollState()
-
-    Column(
+    Scaffold(
         modifier = Modifier
-            .fillMaxSize()
             .background(Color.White)
-            .verticalScroll(scrollState)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.padding(top = 50.dp))
-        Text(
-            text = title,
-            fontFamily = FontFamily.SansSerif,
-            fontSize = 24.sp,
-            color = Color.Black,
-            modifier = Modifier
-                .padding(bottom = 3.dp, top = 7.dp)
-        )
-
-        if (currentUser.isFarmers && (status.value == "pending" || status.value == "rejected")) {
-            Button(
-                onClick = {
-                    onClickEdit()
-                }
-            ) {
-                Text("Edit")
-            }
-        } else if (currentUser.isTechnician && (status.value == "pending" || status.value == "rejected")) {
-            Button(
-                onClick = {
-                    status.value = "approved"
-                    onClickLike(true)
-                }
-            ) {
-                Text("Like")
-            }
-            if (status.value == "pending") {
-                Button(
-                    onClick = {
-                        status.value = "rejected"
-                        onClickLike(false)
-                    }
-                ) {
-                    Text("Dislike")
-                }
-            }
+            .fillMaxSize(),
+        floatingActionButton = {
+            FloatingIndemnityInsuranceIcon(
+                onClickEdit = onClickEdit,
+                onClickLike = onClickLike,
+                currentUser = currentUser,
+                status = status
+            )
         }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(padding)
+                .verticalScroll(scrollState)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.padding(top = 50.dp))
+            Text(
+                text = title,
+                fontFamily = FontFamily.SansSerif,
+                fontSize = 24.sp,
+                color = Color.Black,
+                modifier = Modifier
+                    .padding(bottom = 3.dp, top = 7.dp)
+            )
 
-        ViewData(statesValue)
+            ViewData(statesValue)
 
-        Spacer(modifier = Modifier.padding(bottom = 50.dp))
+            Spacer(modifier = Modifier.padding(bottom = 80.dp))
+        }
     }
 }
 
@@ -208,5 +199,75 @@ fun dateFormatContainer(dateString: String): String {
         displayFormat.format(dates)
     } catch (e: Exception) {
         "Select Date"
+    }
+}
+
+@Composable
+fun FloatingIndemnityInsuranceIcon(
+    onClickEdit: () -> Unit = {},
+    onClickLike: (isLike: Boolean) -> Unit = {},
+    currentUser: UserDto,
+    status: MutableState<String>
+) {
+    val showEditButton = currentUser.isFarmers && (status.value == "pending" || status.value == "rejected")
+    val showLikeButton = currentUser.isTechnician && (status.value == "pending" || status.value == "rejected")
+    val showDislikeButton = currentUser.isTechnician && status.value == "pending"
+
+    Column(
+        modifier = Modifier
+            .background(Color.Transparent),
+        horizontalAlignment = Alignment.End
+    ) {
+
+        if (showEditButton) {
+            FloatingActionButton(
+                onClick = onClickEdit,
+                containerColor = Color(0xFF136204),
+                contentColor = Color.White,
+                shape = CircleShape,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(75.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "Edit"
+                )
+            }
+        }
+        if (showLikeButton) {
+            FloatingActionButton(
+                onClick = {
+                    onClickLike(true)
+                },
+                containerColor = Color(0xFF136204),
+                contentColor = Color.White,
+                shape = CircleShape,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(75.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.thumb),
+                    contentDescription = "Like"
+                )
+            }
+        }
+        if (showDislikeButton) {
+            FloatingActionButton(
+                onClick = { onClickLike(false) },
+                containerColor = Color.Red,
+                contentColor = Color.White,
+                shape = CircleShape,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(75.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.thumb_down),
+                    contentDescription = "Dislike"
+                )
+            }
+        }
     }
 }
