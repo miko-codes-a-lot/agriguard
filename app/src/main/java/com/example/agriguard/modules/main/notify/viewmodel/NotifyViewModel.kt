@@ -14,4 +14,8 @@ class NotifyViewModel @Inject constructor(
     fun fetchAllNotify(): List<NotifyDto> {
         return notifyService.fetchAll()
     }
+
+    suspend fun markAsRead(notifyDto: NotifyDto): Result<NotifyDto> {
+        return notifyService.markAsRead(notifyDto)
+    }
 }
