@@ -1,5 +1,6 @@
 package com.example.agriguard
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,11 +17,11 @@ import com.example.agriguard.modules.intro.login.viewmodel.UserState
 import com.example.agriguard.modules.intro.login.viewmodel.UserStateViewModel
 import com.example.agriguard.modules.main.MainNav
 import com.example.agriguard.modules.main.mainGraph
-import com.example.agriguard.modules.main.user.service.UserService
-import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
 import com.example.agriguard.ui.theme.AgriguardTheme
 import dagger.hilt.android.AndroidEntryPoint
-import io.realm.kotlin.Realm
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

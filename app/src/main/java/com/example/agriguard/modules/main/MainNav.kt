@@ -32,9 +32,6 @@ object MainNav {
     object Dashboard
 
     @Serializable
-    data class ComplainForm(val userId: String)
-
-    @Serializable
     object Message
 
     @Serializable
@@ -50,10 +47,16 @@ object MainNav {
     object Setting
 
     @Serializable
-    data class RiceInsuranceForm(val userId: String)
+    object RiceCreate
 
     @Serializable
-    data class RiceInsuranceList(val userId: String)
+    object RiceInsuranceList
+
+    @Serializable
+    data class RiceInsuranceDetails(val id: String)
+
+    @Serializable
+    data class RiceInsuranceEdit(val id: String)
 
     @Serializable
     data class IndemnityDetails(val id: String)
@@ -68,10 +71,29 @@ object MainNav {
     object IndemnityList
 
     @Serializable
-    data class OnionInsuranceForm(val userId: String)
+    object OnionCreate
 
     @Serializable
-    data class OnionInsuranceList(val userId: String)
+    object OnionInsuranceList
+
+    @Serializable
+    object ComplainCreate
+
+    @Serializable
+    data class ComplainEdit(val id: String)
+
+    @Serializable
+    object ComplaintList
+
+    @Serializable
+    data class ComplaintDetails(val id: String)
+
+    @Serializable
+    data class OnionEdit(val id: String)
+
+    @Serializable
+    data class OnionDetails(val id: String)
+
 
     @Serializable
     object RiceDisease
@@ -90,9 +112,6 @@ object MainNav {
 
     @Serializable
     object RiceWeed
-
-    @Serializable
-    data class ComplaintReportList(val userId: String)
 
     @Serializable
     object Registration
