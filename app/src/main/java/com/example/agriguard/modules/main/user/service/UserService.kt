@@ -1,11 +1,7 @@
 package com.example.agriguard.modules.main.user.service
 
-import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
-import com.example.agriguard.modules.main.indemnity.model.entity.Indemnity
 import com.example.agriguard.modules.main.user.model.entity.User
-import com.example.agriguard.modules.main.indemnity.model.mapper.toDTO
-import com.example.agriguard.modules.main.indemnity.model.mapper.toEntity
 import com.example.agriguard.modules.main.user.model.mapper.toDTO
 import com.example.agriguard.modules.main.user.model.mapper.toEntity
 import io.realm.kotlin.Realm
@@ -90,23 +86,5 @@ class UserService  @Inject constructor(private val realm: Realm)  {
         } catch (error: Exception) {
             Result.failure(error)
         }
-    }
-
-    suspend fun upsertIndemnity(data: IndemnityDto): Result<IndemnityDto> {
-        return try {
-            realm.write {
-                val userIndemnity = copyToRealm(data.toEntity(), updatePolicy = UpdatePolicy.ALL)
-                Result.success(userIndemnity.toDTO())
-            }
-        } catch (error: Exception) {
-            Result.failure(error)
-        }
-    }
-
-    fun fetchOneIndemnity(indemnityId: String): IndemnityDto? {
-        return realm.query<Indemnity>("_id == $0", ObjectId(indemnityId))
-            .find()
-            .firstOrNull()
-            ?.toDTO()
     }
 }
