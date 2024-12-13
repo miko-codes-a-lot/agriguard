@@ -3,7 +3,7 @@ package com.example.agriguard.modules.main.indemnity.model.dto
 data class IndemnityDto(
     var id: String? = null,
     var userId: String = "",
-    var fillupdate: String = "",
+    var fillUpdate: String = "",
     var dateOfBirth: String = "",
     var regular: Boolean = false,
     var punla: Boolean = false,

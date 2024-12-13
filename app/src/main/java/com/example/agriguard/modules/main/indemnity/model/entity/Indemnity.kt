@@ -9,7 +9,7 @@ class Indemnity: RealmObject {
     @PrimaryKey
     var _id: ObjectId = ObjectId()
     var userId: String = ""
-    var fillupdate: RealmInstant = RealmInstant.now()
+    var fillUpDate: RealmInstant = RealmInstant.now()
     var regular: Boolean = false
     var punla: Boolean = false
     var cooperativeRice: Boolean = false

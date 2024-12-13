@@ -47,6 +47,7 @@ data class OnionInsuranceDto (
     var status: String? = "pending",
     var createdById: String? = null,
     var createdAt: String? = null,
+    var reviewById: String? = null,
     var lastUpdatedById: String? = null,
     var lastUpdatedAt: String? = null,
     var deletedById: String? = null,

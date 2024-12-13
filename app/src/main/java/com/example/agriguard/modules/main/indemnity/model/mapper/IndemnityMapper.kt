@@ -12,7 +12,7 @@ fun Indemnity.toDTO(): IndemnityDto {
     return IndemnityDto(
         id = _id.toHexString(),
         userId = userId,
-        fillupdate = fillupdate.toInstantString(),
+        fillUpdate = fillUpDate.toInstantString(),
         regular = regular,
         punla = punla,
         cooperativeRice = cooperativeRice,
@@ -60,7 +60,7 @@ fun IndemnityDto.toEntity(): Indemnity {
     return Indemnity().apply {
         _id = indemnityDto.id.toObjectId()
         userId = indemnityDto.userId
-        fillupdate = indemnityDto.fillupdate.toRealmInstant()
+        fillUpDate = indemnityDto.fillUpdate.toRealmInstant()
         regular = indemnityDto.regular
         punla = indemnityDto.punla
         cooperativeRice = indemnityDto.cooperativeRice

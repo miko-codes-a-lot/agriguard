@@ -70,6 +70,7 @@ fun RiceInsurance.toDTO(): RiceInsuranceDto {
         to = to,
         status = status,
         createdById = createdById?.toHexString(),
+        reviewById =  reviewById?.toHexString(),
         createdAt = createdAt.toInstantString(),
         lastUpdatedById = lastUpdatedById?.toHexString(),
         lastUpdatedAt = lastUpdatedAt.toInstantString(),
@@ -142,6 +143,7 @@ fun RiceInsuranceDto.toEntity(): RiceInsurance {
         to = riceInsuranceDto.to
         status = riceInsuranceDto.status
         createdById = riceInsuranceDto.createdById?.toObjectId()
+        reviewById = riceInsuranceDto.reviewById?.toObjectId()
         createdAt = riceInsuranceDto.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
         lastUpdatedById = riceInsuranceDto.lastUpdatedById?.toObjectId()
         lastUpdatedAt = riceInsuranceDto.lastUpdatedAt.toRealmInstantNullable() ?: RealmInstant.now()

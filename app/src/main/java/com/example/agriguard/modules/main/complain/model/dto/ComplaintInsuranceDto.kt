@@ -14,6 +14,7 @@ data class ComplaintInsuranceDto (
     var createdById: String? = null,
     var status: String? = "pending",
     var createdAt: String? = null,
+    var reviewById: String? = null,
     var lastUpdatedById: String? = null,
     var lastUpdatedAt: String? = null,
     var deletedById: String? = null,

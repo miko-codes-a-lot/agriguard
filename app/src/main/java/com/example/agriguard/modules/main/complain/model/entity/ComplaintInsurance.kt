@@ -17,6 +17,7 @@ class ComplaintInsurance: RealmObject {
     var status: String? = "pending"
     var createdById: ObjectId? = null
     var createdAt: RealmInstant = RealmInstant.now()
+    var reviewById: ObjectId? = null
     var lastUpdatedById: ObjectId? = null
     var lastUpdatedAt: RealmInstant = RealmInstant.now()
     var deletedById: ObjectId? = null
