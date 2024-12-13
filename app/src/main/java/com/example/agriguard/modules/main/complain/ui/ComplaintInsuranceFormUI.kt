@@ -412,14 +412,9 @@ fun ComplaintInsuranceFormUI(
                 }
             }
             ComplainTextField(
-                "Sanhi ng Pinsala",
+                "Tinatayang porsyento ng pinsala",
                 formState.treatment
             ) { value -> viewModel.updateField { it.copy(treatment = value) } }
-
-            ComplainTextField(
-                "Paunang Lunas",
-                formState.causeOfDamage
-            ) { value -> viewModel.updateField { it.copy(causeOfDamage = value) } }
 
             Button(
                 onClick = {
@@ -464,7 +459,7 @@ fun ComplainTextField(label: String, value: String?, onChange: (String) -> Unit)
         modifier = Modifier
             .background(Color.White)
             .fillMaxWidth()
-            .heightIn(max = 165.dp)
+            .heightIn(max = 230.dp)
             .border(1.dp, Color(0xFF136204), RoundedCornerShape(8.dp))
     ) {
         Box(
