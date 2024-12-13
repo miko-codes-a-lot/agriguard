@@ -50,6 +50,7 @@ class OnionInsurance:RealmObject {
     var west: String? = ""
     var status: String? = "pending"
     var createdById: ObjectId? = null
+    var reviewById: ObjectId? = null
     var createdAt: RealmInstant = RealmInstant.now()
     var lastUpdatedById: ObjectId? = null
     var lastUpdatedAt: RealmInstant = RealmInstant.now()

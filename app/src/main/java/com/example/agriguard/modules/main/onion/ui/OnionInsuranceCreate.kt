@@ -56,7 +56,7 @@ import java.util.Locale
 import java.util.TimeZone
 
 @Composable
-fun OnionInsuranceFormUI(
+fun OnionInsuranceCreate(
     navController: NavController,
     currentUser: UserDto,
     viewModel: OnionInsuranceViewmodel,

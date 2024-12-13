@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
-import com.example.agriguard.modules.main.onion.model.dto.OnionInsuranceDto
+import com.example.agriguard.modules.main.onion.model.dto.OnionWithUserDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -49,7 +49,7 @@ import java.util.TimeZone
 @Composable
 fun OnionInsuranceListUI(
     navController: NavController,
-    onionInsuranceList: List<OnionInsuranceDto>,
+    onionWithUsers: List<OnionWithUserDto>,
     currentUser: UserDto,
 ) {
     Scaffold(
@@ -58,7 +58,7 @@ fun OnionInsuranceListUI(
             .background(Color(0xFFFFFFFF)),
         floatingActionButton = {
             if(currentUser.isFarmers){
-                FloatingRecordsOnionInsurance(currentUser, navController)
+                FloatingRecordsOnionInsurance(navController)
             }
         }
     ) { padding ->
@@ -107,8 +107,8 @@ fun OnionInsuranceListUI(
             Spacer(modifier = Modifier.height(10.dp))
             OnionInsuranceList(
                 navController = navController,
-                onionInsuranceList = onionInsuranceList,
-                currentUser = currentUser
+                onionWithUsers = onionWithUsers,
+                currentUser = currentUser,
             )
         }
     }
@@ -117,21 +117,20 @@ fun OnionInsuranceListUI(
 @Composable
 fun OnionInsuranceList(
     navController: NavController,
-    onionInsuranceList: List<OnionInsuranceDto>,
-    currentUser: UserDto
+    onionWithUsers: List<OnionWithUserDto>,
+    currentUser: UserDto,
 ) {
-
     LazyColumn(
         modifier = Modifier
             .padding(bottom = 50.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        itemsIndexed(items = onionInsuranceList) { _, OnionInsuranceDto ->
+        itemsIndexed(items = onionWithUsers) { _, onionWithUser ->
             OnionInsuranceButton(
-                onionInsurance = OnionInsuranceDto,
+                onionWithUser = onionWithUser,
                 navController = navController,
-                currentUser = currentUser
+                currentUser = currentUser,
             )
         }
     }
@@ -139,10 +138,12 @@ fun OnionInsuranceList(
 
 @Composable
 private fun OnionInsuranceButton(
-    onionInsurance: OnionInsuranceDto,
+    onionWithUser: OnionWithUserDto,
     navController: NavController,
-    currentUser: UserDto
+    currentUser: UserDto,
 ) {
+    val onionInsurance = onionWithUser.onion
+    val user = onionWithUser.user
 
     val formattedDate = if (onionInsurance.fillUpDate.isNotEmpty()) {
         try {
@@ -161,9 +162,7 @@ private fun OnionInsuranceButton(
 
     ElevatedButton(
         onClick = {
-            if (!currentUser.isFarmers) {
-                navController.navigate(MainNav.OnionInsuranceForm(userId = onionInsurance.id!!))
-            }
+            navController.navigate(MainNav.OnionDetails(onionInsurance.id!!))
         },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
@@ -183,8 +182,11 @@ private fun OnionInsuranceButton(
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val text = if (currentUser.isFarmers) formattedDate
+            else "${user.firstName} ${user.lastName} - $formattedDate"
+
             Text(
-                text = "Successfully Submitted",
+                text = text,
                 fontSize = 17.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
@@ -192,11 +194,12 @@ private fun OnionInsuranceButton(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = formattedDate,
-                fontSize = 15.sp,
+                text = "${onionInsurance.status}",
+                fontSize = 17.sp,
                 textAlign = TextAlign.End,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.SansSerif,
+                color = if(onionInsurance.status == "approved") Color(0xFF136204) else if (onionInsurance.status == "rejected") Color.Red else Color.Red
             )
         }
     }
@@ -204,7 +207,6 @@ private fun OnionInsuranceButton(
 
 @Composable
 fun FloatingRecordsOnionInsurance(
-    currentUser: UserDto,
     navController: NavController,
 ) {
     Column(
@@ -214,7 +216,7 @@ fun FloatingRecordsOnionInsurance(
     ) {
         FloatingActionButton(
             onClick = {
-                navController.navigate(MainNav.OnionInsuranceForm(currentUser.id!!))
+                navController.navigate(MainNav.OnionCreate)
             },
             containerColor = Color(0xFF136204),
             contentColor = Color(0xFFFFFFFF),
