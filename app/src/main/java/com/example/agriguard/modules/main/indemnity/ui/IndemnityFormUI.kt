@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -38,6 +39,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -166,20 +168,6 @@ fun IndemnityFormUI(
             value = currentUser.address,
             onChange = { }
         )
-        Row(
-            modifier = Modifier
-                .padding(top = 15.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Program",
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif
-            )
-        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -282,15 +270,45 @@ fun IndemnityFormUI(
         }
         TextFieldIndemnityStatus(
             context = context,
+            label = "Crops",
+            value = formState.crops,
+            onChange = { value -> viewModel.updateField { it.copy(crops = value) } }
+        )
+        TextFieldIndemnityStatus(
+            context = context,
+            label = "Insured Area",
+            value = formState.insuredArea,
+            onChange = { value -> viewModel.updateField { it.copy(insuredArea = value) } }
+        )
+        TextFieldIndemnityStatus(
+            context = context,
             label = "Cause Of Damage",
             value = formState.causeOfDamage,
             onChange = { value -> viewModel.updateField { it.copy(causeOfDamage = value) } }
         )
         IndemnityDatePicker(
             context = context,
+            "Cause Of Loss",
+            value = formState.causeOfLoss,
+            onChange = { value -> viewModel.updateField { it.copy(causeOfLoss = value) } }
+        )
+        IndemnityDatePicker(
+            context = context,
             "Date Of Loss",
             value = formState.dateOfLoss,
             onChange = { value -> viewModel.updateField { it.copy(dateOfLoss = value) } }
+        )
+        TextFieldIndemnityStatus(
+            context = context,
+            label = "Variety Planted",
+            value = formState.variety,
+            onChange = { value -> viewModel.updateField { it.copy(variety = value) } }
+        )
+        IndemnityDatePicker(
+            context = context,
+            "Actual Date Of Planting",
+            value = formState.dateOfPlanting,
+            onChange = { value -> viewModel.updateField { it.copy(dateOfPlanting = value) } }
         )
         TextFieldIndemnityStatus(
             context = context,
@@ -865,5 +883,57 @@ fun TextFieldIndeminity(label: String, value: String?, onChange: (String) -> Uni
             shape = RectangleShape,
             singleLine = true
         )
+    }
+}
+
+@Composable
+fun CropsRiceInfo(label: String, value: String) {
+    Column{
+        Row(
+            modifier = Modifier
+                .widthIn(min = 220.dp, max = 260.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = label,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+
+            Text(" : ", fontWeight = FontWeight.Bold)
+
+            Spacer(modifier = Modifier.width(13.dp))
+            Box(
+                modifier = Modifier
+                    .heightIn(min = 50.dp, max = 50.dp)
+                    .fillMaxWidth()
+                    .drawBehind {
+                        val strokeWidth = 1.dp.toPx()
+                        val y = size.height - strokeWidth / 2
+                        drawLine(
+                            color = Color.Gray,
+                            start = Offset(0f, y),
+                            end = Offset(size.width, y),
+                            strokeWidth = strokeWidth
+                        )
+                    }
+            ) {
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = {},
+                    textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily.SansSerif),
+                    modifier = Modifier
+                        .heightIn(min = 50.dp, max = 50.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black
+                    )
+                )
+            }
+        }
     }
 }
