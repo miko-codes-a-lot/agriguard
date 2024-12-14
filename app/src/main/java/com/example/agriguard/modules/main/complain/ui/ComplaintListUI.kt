@@ -42,8 +42,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
+import com.example.agriguard.modules.main.complain.model.dto.ComplainWithUserDto
 import com.example.agriguard.modules.main.complain.model.dto.ComplaintInsuranceDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -51,26 +56,33 @@ import java.util.TimeZone
 @Preview(showSystemUi = true)
 @Composable
 fun ReportListUIPreview() {
-    ComplaintReportListUI(
+    ComplaintListUI(
         rememberNavController(),
-        complaintInsuranceList = listOf(),
-        currentUser = UserDto()
+        complaintWithUser = listOf(),
+        currentUser = UserDto(),
     )
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun ComplaintReportListUI(
+fun ComplaintListUI(
     navController: NavController,
-    complaintInsuranceList: List<ComplaintInsuranceDto>,
+    complaintWithUser: List<ComplainWithUserDto>,
     currentUser: UserDto
 ) {
+    val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFFFFFF)),
         floatingActionButton = {
             if(currentUser.isFarmers){
-                FloatingComplaint(currentUser, navController)
+                FloatingComplaint(
+                    currentUser = currentUser,
+                    navController = navController,
+                    cameraPermissionState = cameraPermissionState,
+                )
             }
         }
     ) { padding ->
@@ -102,7 +114,7 @@ fun ComplaintReportListUI(
             ) {
                 Column {
                     Text(
-                        text = "Complaint Report List",
+                        text = "Complaints List",
                         fontSize = 25.sp,
                         color = Color(0xFF136204),
                         fontWeight = FontWeight.W800,
@@ -119,7 +131,7 @@ fun ComplaintReportListUI(
             Spacer(modifier = Modifier.height(10.dp))
             ReportList(
                 navController = navController,
-                complaintInsuranceList = complaintInsuranceList,
+                complaintWithUser = complaintWithUser,
                 currentUser = currentUser
             )
         }
@@ -129,7 +141,7 @@ fun ComplaintReportListUI(
 @Composable
 fun ReportList(
     navController: NavController,
-    complaintInsuranceList: List<ComplaintInsuranceDto>,
+    complaintWithUser: List<ComplainWithUserDto>,
     currentUser: UserDto
 ) {
     LazyColumn(
@@ -138,9 +150,9 @@ fun ReportList(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        itemsIndexed(items = complaintInsuranceList) { _, Complaints ->
+        itemsIndexed(items = complaintWithUser) { _, complaint ->
             ReportButton(
-                complaintInsurance = Complaints,
+                complaintInsurance = complaint,
                 navController = navController,
                 currentUser = currentUser
             )
@@ -150,10 +162,12 @@ fun ReportList(
 
 @Composable
 private fun ReportButton(
-    complaintInsurance: ComplaintInsuranceDto,
+    complaintInsurance: ComplainWithUserDto,
     navController: NavController,
-    currentUser: UserDto
+    currentUser: UserDto,
 ) {
+    val complaint = complaintInsurance.complaint
+    val user = complaintInsurance.user
     fun formatIsoDateToDisplay(dateString: String?): String {
         if (dateString.isNullOrEmpty()) return "Date not available"
         return try {
@@ -169,11 +183,11 @@ private fun ReportButton(
             "Invalid Date"
         }
     }
-    val formattedDate = formatIsoDateToDisplay(complaintInsurance.createdAt)
+    val formattedDate = formatIsoDateToDisplay(complaintInsurance.complaint.createdAt)
 
     ElevatedButton(
         onClick = {
-            navController.navigate(MainNav.ComplainCreate)
+            navController.navigate(MainNav.ComplaintDetails(complaint.id!!))
         },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
@@ -188,13 +202,15 @@ private fun ReportButton(
         ),
         shape = RectangleShape
     ) {
+        val text = if (currentUser.isFarmers) formattedDate
+        else "${user.firstName} ${user.lastName} - $formattedDate"
         Row(
             modifier = Modifier
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Successfully Submitted",
+                text = text,
                 fontSize = 17.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
@@ -202,20 +218,24 @@ private fun ReportButton(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = formattedDate,
-                fontSize = 15.sp,
+                text = "${complaint.status}",
+                fontSize = 17.sp,
                 textAlign = TextAlign.End,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.SansSerif,
+                color = if(complaint.status == "approved") Color(0xFF136204) else if (complaint.status == "rejected") Color.Red else Color.Red
+
             )
         }
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun FloatingComplaint(
     currentUser: UserDto,
     navController: NavController,
+    cameraPermissionState: PermissionState,
 ) {
     Column(
         modifier = Modifier
@@ -224,7 +244,11 @@ fun FloatingComplaint(
     ) {
         FloatingActionButton(
             onClick = {
-                navController.navigate(MainNav.ComplainCreate)
+                if (!cameraPermissionState.status.isGranted) {
+                    cameraPermissionState.launchPermissionRequest()
+                } else {
+                    navController.navigate(MainNav.ComplainCreate)
+                }
             },
             containerColor = Color(0xFF136204),
             contentColor = Color(0xFFFFFFFF),
