@@ -10,8 +10,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import com.example.agriguard.modules.main.complain.ui.ComplaintInsuranceFormUI
-import com.example.agriguard.modules.main.complain.ui.ComplaintReportListUI
+import com.example.agriguard.modules.main.complain.ui.ComplaintDetailsUI
+import com.example.agriguard.modules.main.complain.ui.ComplaintFormUI
+import com.example.agriguard.modules.main.complain.ui.ComplaintListUI
 import com.example.agriguard.modules.main.complain.viewmodel.ComplaintViewModel
 import com.example.agriguard.modules.main.dashboard.ui.DashboardUI
 import com.example.agriguard.modules.main.farmer.AddressesUI
@@ -65,23 +66,6 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         composable<MainNav.Dashboard> {
             Guard(navController = navController) { currentUser ->
                 DashboardUI(navController, currentUser)
-            }
-        }
-        composable<MainNav.ComplainCreate> {
-            val viewModel: ComplaintViewModel = hiltViewModel()
-            val scope = rememberCoroutineScope()
-            Guard(navController = navController) { currentUser ->
-                ComplaintInsuranceFormUI(
-                    navController = navController,
-                    currentUser = currentUser,
-                    viewModel = viewModel,
-                    onSubmit = { updatedDto ->
-                        scope.launch {
-                            viewModel.upsert(updatedDto, currentUser)
-                            navController.popBackStack()
-                        }
-                    }
-                )
             }
         }
         composable<MainNav.Users> {
@@ -188,6 +172,74 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             Guard(navController = navController) { currentUser ->
                 val userService: UserService = hiltViewModel<UserViewModel>().userService
                 SettingsUI(navController, currentUser = currentUser, userService = userService)
+            }
+        }
+        composable<MainNav.ComplainCreate> {
+            val viewModel: ComplaintViewModel = hiltViewModel()
+            val scope = rememberCoroutineScope()
+            Guard(navController = navController) { currentUser ->
+                ComplaintFormUI(
+                    navController = navController,
+                    currentUser = currentUser,
+                    viewModel = viewModel,
+                    onSubmit = { updatedDto ->
+                        scope.launch {
+                            viewModel.upsert(updatedDto, currentUser)
+                            navController.popBackStack()
+                        }
+                    }
+                )
+            }
+        }
+        composable<MainNav.ComplainEdit> {
+            val args = it.toRoute<MainNav.RiceInsuranceEdit>()
+            val viewModel: ComplaintViewModel = hiltViewModel()
+            val riceInsuranceDto = viewModel.fetchOne(args.id)
+            viewModel.setFormState(riceInsuranceDto)
+
+            val scope = rememberCoroutineScope()
+            Guard(navController = navController) { currentUser ->
+                ComplaintFormUI(
+                    navController = navController,
+                    currentUser = currentUser,
+                    viewModel = viewModel,
+                    onSubmit = { data ->
+                        scope.launch {
+                            viewModel.upsert(data, currentUser)
+                            navController.popBackStack()
+                        }
+                    }
+                )
+            }
+        }
+        composable<MainNav.ComplaintDetails> {
+            val args = it.toRoute<MainNav.ComplaintDetails>()
+            val viewModel: ComplaintViewModel = hiltViewModel()
+            val scope = rememberCoroutineScope()
+
+            Guard(navController = navController) { currentUser ->
+                val complaintDto = viewModel.fetchOne(args.id)
+                val status = rememberSaveable { mutableStateOf(complaintDto.status ?: "pending") }
+                ComplaintDetailsUI(
+                    title = "Complaints Details",
+                    currentUser = currentUser,
+                    complaintInsurance = complaintDto,
+                    status = status,
+                    onClickEdit = {
+                        navController.navigate(MainNav.ComplainEdit(args.id))
+                    },
+                    onClickLike = { isLike ->
+                        scope.launch {
+                            status.value = if (isLike) "approved" else "rejected"
+                            val result = viewModel.upsert(complaintDto, currentUser)
+                            if (result.isSuccess) {
+                                Log.d("micool", "good: $result")
+                            } else {
+                                Log.e("micool", "fail: $result")
+                            }
+                        }
+                    }
+                )
             }
         }
         composable<MainNav.RiceCreate> {
@@ -498,12 +550,13 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             }
         }
         composable<MainNav.ComplaintList> {
-            val complaintViewModel: ComplaintViewModel = hiltViewModel()
+            val viewModel: ComplaintViewModel = hiltViewModel()
+
             Guard(navController = navController) { currentUser ->
-            val complaintInsurance = complaintViewModel.fetchList(currentUser)
-                ComplaintReportListUI(
+            val complaintWithUser = viewModel.fetchList(currentUser)
+                ComplaintListUI(
                     navController = navController,
-                    complaintInsuranceList = complaintInsurance,
+                    complaintWithUser = complaintWithUser,
                     currentUser = currentUser
                 )
             }
