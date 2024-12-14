@@ -9,6 +9,7 @@ class Indemnity: RealmObject {
     @PrimaryKey
     var _id: ObjectId = ObjectId()
     var userId: String = ""
+    var crops: String? = ""
     var fillUpDate: RealmInstant = RealmInstant.now()
     var regular: Boolean = false
     var punla: Boolean = false
@@ -42,6 +43,10 @@ class Indemnity: RealmObject {
     var kabuuanBilang: String? = ""
     var kabuuanHalaga: String? = ""
     var status: String? = "pending"
+    var variety: String? = ""
+    var causeOfLoss: String? = ""
+    var insuredArea: String? = ""
+    var dateOfPlanting: RealmInstant = RealmInstant.now()
     var createdById: ObjectId? = null
     var createdAt: RealmInstant = RealmInstant.now()
     var reviewById: ObjectId? = null

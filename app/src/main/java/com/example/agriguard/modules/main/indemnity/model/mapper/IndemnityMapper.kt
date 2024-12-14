@@ -12,6 +12,7 @@ fun Indemnity.toDTO(): IndemnityDto {
     return IndemnityDto(
         id = _id.toHexString(),
         userId = userId,
+        crops = crops,
         fillUpdate = fillUpDate.toInstantString(),
         regular = regular,
         punla = punla,
@@ -45,6 +46,10 @@ fun Indemnity.toDTO(): IndemnityDto {
         kabuuanBilang = kabuuanBilang,
         kabuuanHalaga = kabuuanHalaga,
         status = status,
+        variety = variety,
+        causeOfLoss = causeOfLoss,
+        insuredArea = insuredArea,
+        dateOfPlanting = dateOfPlanting.toInstantString(),
         createdById = createdById?.toHexString(),
         createdAt = createdAt.toInstantString(),
         reviewById = reviewById?.toHexString(),
@@ -60,6 +65,7 @@ fun IndemnityDto.toEntity(): Indemnity {
     return Indemnity().apply {
         _id = indemnityDto.id.toObjectId()
         userId = indemnityDto.userId
+        crops = indemnityDto.crops
         fillUpDate = indemnityDto.fillUpdate.toRealmInstant()
         regular = indemnityDto.regular
         punla = indemnityDto.punla
@@ -93,6 +99,10 @@ fun IndemnityDto.toEntity(): Indemnity {
         kabuuanBilang = indemnityDto.kabuuanBilang
         kabuuanHalaga = indemnityDto.kabuuanHalaga
         status = indemnityDto.status
+        variety = indemnityDto.variety
+        causeOfLoss = indemnityDto.causeOfLoss
+        insuredArea = indemnityDto.insuredArea
+        dateOfPlanting = indemnityDto.dateOfPlanting.toRealmInstant()
         createdById = indemnityDto.createdById?.toObjectId()
         createdAt = indemnityDto.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
         reviewById = indemnityDto.reviewById?.toObjectId()

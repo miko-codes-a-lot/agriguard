@@ -3,6 +3,7 @@ package com.example.agriguard.modules.main.indemnity.model.dto
 data class IndemnityDto(
     var id: String? = null,
     var userId: String = "",
+    var crops: String? = null,
     var fillUpdate: String = "",
     var dateOfBirth: String = "",
     var regular: Boolean = false,
@@ -37,6 +38,10 @@ data class IndemnityDto(
     var kabuuanBilang: String? = null,
     var kabuuanHalaga: String? = null,
     var status: String? = "pending",
+    var variety: String? = null,
+    var causeOfLoss: String? = null,
+    var insuredArea: String? = null,
+    var dateOfPlanting: String = "",
     var createdById: String? = null,
     var createdAt: String? = null,
     var reviewById: String? = null,
