@@ -100,6 +100,7 @@ dependencies {
     implementation(libs.android.hilt)
     kapt(libs.android.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    implementation (libs.accompanist.permissions)
 }
 
 kapt {
