@@ -9,7 +9,6 @@ data class ComplaintInsuranceDto (
     var rice: Boolean = false,
     var onion: Boolean = false,
     var causeOfDamage: String? = null,
-    var treatment: String? = null,
     var imageBase64: String? = null,
     var createdById: String? = null,
     var status: String? = "pending",

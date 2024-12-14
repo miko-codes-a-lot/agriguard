@@ -15,7 +15,6 @@ fun ComplaintInsurance.toDTO(): ComplaintInsuranceDto {
         rice = rice,
         onion = onion,
         causeOfDamage = causeOfDamage,
-        treatment = treatment,
         imageBase64 = imageBase64,
         status = status,
         createdById = createdById?.toHexString(),
@@ -34,7 +33,6 @@ fun ComplaintInsuranceDto.toEntity(): ComplaintInsurance {
         rice = complaint.rice
         onion = complaint.onion
         causeOfDamage = complaint.causeOfDamage
-        treatment = complaint.treatment
         imageBase64 = complaint.imageBase64
         status = complaint.status
         createdAt = complaint.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
