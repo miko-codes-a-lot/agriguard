@@ -54,8 +54,8 @@ fun RiceInsuranceFormDetails(
         listOf(
             "Status" to (riceInsurance.status ?: "Pending"),
             "Insurance ID" to (riceInsurance.insuranceId ?: ""),
-            "Lender" to (riceInsurance.lender ?: ""),
             "Fill Up Date" to dateFormatContainer(riceInsurance.fillUpDate),
+            "Lender" to (riceInsurance.lender ?: ""),
             "New" to if (riceInsurance.new) "Yes" else "No",
             "Renewal" to if (riceInsurance.renewal) "Yes" else "No",
             "Self Financed" to if (riceInsurance.selfFinanced) "Yes" else "No",
