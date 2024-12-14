@@ -1,9 +1,9 @@
 package com.example.agriguard.modules.main.complain.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.example.agriguard.modules.main.complain.model.dto.ComplainWithUserDto
 import com.example.agriguard.modules.main.complain.model.dto.ComplaintInsuranceDto
 import com.example.agriguard.modules.main.complain.service.ComplaintService
-import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,8 +33,8 @@ class ComplaintViewModel @Inject constructor (
         return service.upsertComplaint(complaintDto, currentUser)
     }
 
-    fun fetchList(userDto: UserDto): List<ComplaintInsuranceDto> {
-        return service.fetchList(userDto = userDto)
+    fun fetchList(userDto: UserDto): List<ComplainWithUserDto> {
+        return service.fetchAll(userDto = userDto)
     }
 
 }
