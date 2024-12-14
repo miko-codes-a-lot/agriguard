@@ -160,8 +160,13 @@ private fun NotificationButton(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
+            val displayMessage = if (notifyDto.message.length > 15) {
+                notifyDto.message.take(15) + "..."
+            } else {
+                notifyDto.message
+            }
             Text(
-                text = notifyDto.message,
+                text = displayMessage,
                 fontSize = 15.sp,
                 textAlign = TextAlign.End,
                 fontWeight = FontWeight.Bold,
