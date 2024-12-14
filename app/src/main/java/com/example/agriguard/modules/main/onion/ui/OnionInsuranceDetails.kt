@@ -114,6 +114,7 @@ fun OnionInsuranceDetails(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .padding(padding)
             .padding(16.dp)
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.Center,

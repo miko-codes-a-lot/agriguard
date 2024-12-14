@@ -2,6 +2,7 @@ package com.example.agriguard.modules.main
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -223,19 +224,25 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 ComplaintDetailsUI(
                     title = "Complaints Details",
                     currentUser = currentUser,
-                    complaintInsurance = complaintDto,
+                    complaintInsurance = complaintDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
                         navController.navigate(MainNav.ComplainEdit(args.id))
                     },
                     onClickLike = { isLike ->
                         scope.launch {
-                            status.value = if (isLike) "approved" else "rejected"
-                            val result = viewModel.upsert(complaintDto, currentUser)
-                            if (result.isSuccess) {
-                                Log.d("micool", "good: $result")
-                            } else {
-                                Log.e("micool", "fail: $result")
+                            val newStatus = if (isLike) "approved" else "rejected"
+                            status.value = newStatus
+                            scope.launch {
+                                complaintDto.status = newStatus
+                                val result = viewModel.upsert(complaintDto, currentUser)
+
+                                if (result.isSuccess) {
+                                    Log.d("micool", "Update succeeded: $result")
+                                } else {
+                                    status.value = complaintDto.status ?: "pending"
+                                    Log.e("micool", "Update failed: $result")
+                                }
                             }
                         }
                     }
@@ -296,19 +303,23 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 RiceInsuranceFormDetails(
                     title = "RiceInsurance Details",
                     currentUser = currentUser,
-                    riceInsurance = riceInsuranceDto,
+                    riceInsurance = riceInsuranceDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
                         navController.navigate(MainNav.RiceInsuranceEdit(args.id))
                     },
                     onClickLike = { isLike ->
+                        val newStatus = if (isLike) "approved" else "rejected"
+                        status.value = newStatus
                         scope.launch {
-                            status.value = if (isLike) "approved" else "rejected"
+                            riceInsuranceDto.status = newStatus
                             val result = viewModel.upsert(riceInsuranceDto, currentUser)
+
                             if (result.isSuccess) {
-                                Log.d("micool", "good: $result")
+                                Log.d("micool", "Update succeeded: $result")
                             } else {
-                                Log.e("micool", "fail: $result")
+                                status.value = riceInsuranceDto.status ?: "pending"
+                                Log.e("micool", "Update failed: $result")
                             }
                         }
                     }
@@ -338,19 +349,23 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 IndemnityDetailsUI(
                     title = "Indemnity Details",
                     currentUser = currentUser,
-                    indemnity = indemnityDto,
+                    indemnity = indemnityDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
                         navController.navigate(MainNav.IndemnityEdit(args.id))
                     },
                     onClickLike = { isLike ->
+                        val newStatus = if (isLike) "approved" else "rejected"
+                        status.value = newStatus
                         scope.launch {
-                            status.value = if (isLike) "approved" else "rejected"
+                            indemnityDto.status = newStatus
                             val result = viewModel.upsert(indemnityDto, currentUser)
+
                             if (result.isSuccess) {
-                                Log.d("micool", "good: $result")
+                                Log.d("micool", "Update succeeded: $result")
                             } else {
-                                Log.e("micool", "fail: $result")
+                                status.value = indemnityDto.status ?: "pending"
+                                Log.e("micool", "Update failed: $result")
                             }
                         }
                     }
@@ -448,19 +463,25 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 OnionInsuranceDetails(
                     title = "Onion Details",
                     currentUser = currentUser,
-                    onionInsurance = onionInsuranceDto,
+                    onionInsurance = onionInsuranceDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
                         navController.navigate(MainNav.OnionEdit(args.id))
                     },
                     onClickLike = { isLike ->
                         scope.launch {
-                            status.value = if (isLike) "approved" else "rejected"
-                            val result = viewModel.upsert(onionInsuranceDto, currentUser)
-                            if (result.isSuccess) {
-                                Log.d("micool", "good: $result")
-                            } else {
-                                Log.e("micool", "fail: $result")
+                            val newStatus = if (isLike) "approved" else "rejected"
+                            status.value = newStatus
+                            scope.launch {
+                                onionInsuranceDto.status = newStatus
+                                val result = viewModel.upsert(onionInsuranceDto, currentUser)
+
+                                if (result.isSuccess) {
+                                    Log.d("micool", "Update succeeded: $result")
+                                } else {
+                                    status.value = onionInsuranceDto.status ?: "pending"
+                                    Log.e("micool", "Update failed: $result")
+                                }
                             }
                         }
                     }
