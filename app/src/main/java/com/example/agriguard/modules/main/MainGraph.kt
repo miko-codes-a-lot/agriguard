@@ -46,6 +46,7 @@ import com.example.agriguard.modules.main.rice.ui.RiceInsuranceFormDetails
 import com.example.agriguard.modules.main.rice.ui.RiceInsuranceFormUI
 import com.example.agriguard.modules.main.rice.ui.RiceInsuranceListUI
 import com.example.agriguard.modules.main.rice.viewmodel.RiceInsuranceViewModel
+import com.example.agriguard.modules.main.setting.EditSettingsUI
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.AddressDto
 import com.example.agriguard.modules.main.user.service.UserService
@@ -597,6 +598,12 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             Guard(navController = navController) { currentUser ->
                 val userService: UserService = hiltViewModel<UserViewModel>().userService
                 CreateUploadId(currentUser = currentUser, userService = userService)
+            }
+        }
+        composable("${MainNav.EditSettings}/{settingType}") { backStackEntry ->
+            val settingType = backStackEntry.arguments?.getString("settingType") ?: ""
+            Guard(navController = navController) { currentUser ->
+                EditSettingsUI(navController, settingType, currentUser)
             }
         }
     }

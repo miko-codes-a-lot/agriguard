@@ -121,4 +121,7 @@ object MainNav {
 
     @Serializable
     object CreateUpload
+
+    @Serializable
+    object EditSettings
 }
