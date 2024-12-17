@@ -3,7 +3,9 @@ package com.example.agriguard.modules.intro.login.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.agriguard.modules.intro.IntroNav
 import com.example.agriguard.modules.intro.login.model.dto.LoginDto
@@ -11,6 +13,7 @@ import com.example.agriguard.modules.intro.login.service.AuthService
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.service.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -70,4 +73,20 @@ class LoginViewModel @Inject constructor(
             launchSingleTop = true
         }
     }
+
+//    fun sendPasswordResetToken(email: String, callback: (Boolean, String?) -> Unit) {
+//        viewModelScope.launch {
+//            try {
+//                val success = authService.requestPasswordReset(email)
+//                if (success) {
+//                    callback(true, null)
+//                } else {
+//                    Log.e("ForgotPassword", "Failed to send password reset token for email: $email")
+//                    callback(false, "Failed to send password reset token.")
+//                }
+//            } catch (e: Exception) {
+//                callback(false, "Error: ${e.message}")
+//            }
+//        }
+//    }
 }

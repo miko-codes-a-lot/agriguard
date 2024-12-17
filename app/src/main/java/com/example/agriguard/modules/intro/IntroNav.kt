@@ -10,4 +10,7 @@ object IntroNav {
 
     @Serializable
     object Login
+
+    @Serializable
+    object ForgotPassword
 }
