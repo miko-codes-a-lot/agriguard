@@ -146,8 +146,8 @@ fun SettingsUI(
 //                ) {
 //                    Icon(
 //                        painter = painterResource(id = R.drawable.user_id),
-//                        contentDescription = "Logout",
-//                        tint = Color.Red,
+//                        contentDescription = "Upload",
+//                        tint = Color(0xFF136204),
 //                        modifier = Modifier.size(35.dp)
 //                    )
 //                }
