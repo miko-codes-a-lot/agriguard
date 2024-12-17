@@ -68,6 +68,9 @@ fun ComplaintDetailsUI(
             "Status" to (complaintInsurance.status ?: "Pending"),
             "Rice" to if (complaintInsurance.rice) "Yes" else "No",
             "Onion" to if (complaintInsurance.onion) "Yes" else "No",
+            "Variety" to (complaintInsurance.variety ?: "N/A"),
+            "Area Damage" to (complaintInsurance.areaDamage ?: "N/A"),
+            "Degree of Damage" to (complaintInsurance.degreeOfDamage ?: "N/A"),
             "Cause of Damage" to (complaintInsurance.causeOfDamage ?: "N/A"),
         ).associate { (label, value) -> label to mutableStateOf(value) }
     }
@@ -260,9 +263,15 @@ fun resizeBitmap(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
 
 @Composable
 fun ViewData(stateValues: Map<String, MutableState<String>>) {
+    val riceState = stateValues["Rice"]?.value ?: "No"
+    val onionState = stateValues["Onion"]?.value ?: "No"
+
     Column {
-        stateValues.forEach { (label, states) ->
-            TextContainer(textLabel = label, textValue = states.value)
+        stateValues.forEach { (label, state) ->
+            if (label == "Rice" && onionState == "Yes") return@forEach
+            if (label == "Onion" && riceState == "Yes") return@forEach
+
+            TextContainer(textLabel = label, textValue = state.value)
         }
     }
 }
@@ -308,7 +317,6 @@ fun TextContainer(textLabel: String, textValue: String) {
                     )
                 }
             ) {
-                if (textLabel == "Cause of Damage") {
                     Text(
                         text = textValue,
                         color = Color.Black,
@@ -322,17 +330,6 @@ fun TextContainer(textLabel: String, textValue: String) {
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis
                     )
-                } else {
-                    Text(
-                        text = textValue,
-                        color = Color.Black,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 12.dp),
-                        fontSize = 17.sp,
-                        fontFamily = FontFamily.SansSerif,
-                    )
-                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.agriguard.modules.main.complain.ui
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -42,6 +43,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -75,6 +77,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.complain.model.dto.ComplaintInsuranceDto
 import com.example.agriguard.modules.main.complain.viewmodel.ComplaintViewModel
+import com.example.agriguard.modules.main.indemnity.ui.TextFieldIndemnityStatus
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.io.File
 import java.io.FileInputStream
@@ -387,10 +390,34 @@ fun ComplaintFormUI(
                     }
                 }
             }
-            ComplainTextField(
-                "Tinatayang porsyento ng pinsala",
-                formState.causeOfDamage
-            ) { value -> viewModel.updateField { it.copy(causeOfDamage = value) } }
+
+            TextFieldComplain(
+                context = context,
+                label = "Variety",
+                value = formState.variety,
+                onChange = { value -> viewModel.updateField { it.copy(variety = value) } }
+            )
+
+            TextFieldComplain(
+                context = context,
+                label = "Area Damage",
+                value = formState.areaDamage,
+                onChange = { value -> viewModel.updateField { it.copy(areaDamage = value) } }
+            )
+
+            TextFieldComplain(
+                context = context,
+                label = "Degree Of Damage",
+                value = formState.degreeOfDamage,
+                onChange = { value -> viewModel.updateField { it.copy(degreeOfDamage = value) } }
+            )
+
+            TextFieldComplain(
+                context = context,
+                label = "Cause Of Damage",
+                value = formState.causeOfDamage,
+                onChange = { value -> viewModel.updateField { it.copy(causeOfDamage = value) } }
+            )
 
             Button(
                 onClick = {
@@ -424,53 +451,6 @@ private fun fileToBase64(file: File): String {
     }
 }
 
-@Composable
-fun ComplainTextField(label: String, value: String?, onChange: (String) -> Unit) {
-    var text by rememberSaveable { mutableStateOf(value.orEmpty()) }
-
-    OutlinedCard(
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
-        ),
-        modifier = Modifier
-            .background(Color.White)
-            .fillMaxWidth()
-            .heightIn(max = 230.dp)
-            .border(1.dp, Color(0xFF136204), RoundedCornerShape(8.dp))
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(top = 10.dp, bottom = 8.dp)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            androidx.compose.material3.TextField(
-                value = text,
-                onValueChange = {
-                    text = it
-                    onChange(it)
-                },
-                modifier = Modifier.fillMaxSize(),
-                placeholder = {
-                    Text(
-                        text = label,
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily.SansSerif,
-                        color = Color.Gray,
-                    )
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedBorderColor = Color.White,
-                    focusedTextColor = Color(0xFF136204),
-                    unfocusedBorderColor = Color.White
-                )
-            )
-        }
-    }
-}
-
 fun fileToResizedBitmap(file: File, maxWidth: Int, maxHeight: Int): Bitmap? {
     return try {
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -493,4 +473,62 @@ fun bitmapToBase64(bitmap: Bitmap): String {
     bitmap.compress(Bitmap.CompressFormat.JPEG, 85, byteArrayOutputStream)
     val byteArray = byteArrayOutputStream.toByteArray()
     return Base64.encodeToString(byteArray, Base64.DEFAULT)
+}
+
+@Composable
+fun TextFieldComplain(
+    context: Context,
+    label: String,
+    value: String?,
+    onChange: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = label,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            modifier =  Modifier
+                .padding(top = 5.dp)
+        )
+        Text(
+            text = " : ",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            color = Color.Black,
+            modifier =  Modifier
+                .padding(top = 5.dp, start = 5.dp, end = 5.dp)
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .drawBehind {
+                    val strokeWidth = 1.dp.toPx()
+                    val y = size.height - strokeWidth / 2
+                    drawLine(
+                        color = Color.Gray,
+                        start = Offset(0f, y),
+                        end = Offset(size.width, y),
+                        strokeWidth = strokeWidth
+                    )
+                }
+        ) {
+            OutlinedTextField(
+                value = value ?: "",
+                onValueChange = onChange,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
+                )
+            )
+        }
+    }
 }
