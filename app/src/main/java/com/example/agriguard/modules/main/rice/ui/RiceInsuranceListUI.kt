@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -175,29 +176,41 @@ private fun RiceInsuranceButton(
         ),
         shape = RectangleShape
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize(),
+        LazyRow(
+            modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val text = if (currentUser.isFarmers) formattedDate
-            else "${user.firstName} ${user.lastName} - $formattedDate"
-            Text(
-                text = text,
-                fontSize = 17.sp,
-                textAlign = TextAlign.Start,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = "${riceInsurance.status}",
-                fontSize = 17.sp,
-                textAlign = TextAlign.End,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-                color = if(riceInsurance.status == "approved") Color(0xFF136204) else if (riceInsurance.status == "rejected") Color.Red else Color.Red
-            )
+            item {
+                val text = if (currentUser.isFarmers) formattedDate
+                else "${user.firstName} ${user.lastName} - $formattedDate"
+                Text(
+                    text = text,
+                    fontSize = 17.sp,
+                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.SansSerif,
+                    modifier = Modifier.padding(end = 5.dp)
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            item {
+                Text(
+                    text = "${riceInsurance.status}",
+                    fontSize = 17.sp,
+                    textAlign = TextAlign.End,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.SansSerif,
+                    color = when (riceInsurance.status) {
+                        "approved" -> Color(0xFF136204)
+                        "rejected" -> Color.Red
+                        else -> Color.Red
+                    }
+                )
+            }
         }
     }
 }
