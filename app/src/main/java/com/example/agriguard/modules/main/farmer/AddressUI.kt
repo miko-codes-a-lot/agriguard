@@ -31,10 +31,12 @@ import com.example.agriguard.modules.main.MainNav
 import com.example.agriguard.modules.main.farmer.enum.FarmerStatus
 import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
 import com.example.agriguard.modules.main.user.model.dto.AddressDto
+import com.example.agriguard.modules.main.user.model.dto.UserDto
 
 @Composable
 fun AddressesUI(
-    navController: NavController
+    navController: NavController,
+    currentUser: UserDto
 ) {
     Column(
         modifier = Modifier
@@ -65,6 +67,7 @@ fun AddressesUI(
             Spacer(modifier = Modifier.height(10.dp))
             ListAddress(
                 navController,
+                currentUser
             )
 
         }
@@ -74,16 +77,23 @@ fun AddressesUI(
 @Composable
 fun ListAddress(
     navController: NavController,
+    currentUser: UserDto
 ) {
     val farmersViewModel: FarmersViewModel = hiltViewModel()
     val addresses = farmersViewModel.fetchAddresses()
+
+    val filteredAddresses = if (currentUser.isTechnician) {
+        addresses.filter { it.name == currentUser.address }
+    } else {
+        addresses
+    }
     LazyColumn(
         modifier = Modifier
             .padding(bottom = 45.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
-        items(addresses) { address ->
+        items(filteredAddresses) { address ->
             ListButton(
                 addressDto = address,
                 onClick = {

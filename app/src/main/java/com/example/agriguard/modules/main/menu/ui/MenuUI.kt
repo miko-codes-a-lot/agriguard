@@ -83,7 +83,7 @@ fun MenuUI(
         ) {
             when (routeName) {
                 "HomeDashboard" -> DashboardUI(navController, currentUser)
-                "AddressList" -> AddressesUI(navController)
+                "AddressList" -> AddressesUI(navController, currentUser)
                 "MessageList" -> MessageListUI(navController)
                 "Report" -> ReportDashboardUI()
                 "Message" -> MessageUI(navController)

@@ -92,7 +92,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         }
         composable<MainNav.Addresses> {
             Guard(navController = navController) { currentUser ->
-                AddressesUI(navController)
+                AddressesUI(navController, currentUser)
             }
         }
         composable<MainNav.CreateUser> {

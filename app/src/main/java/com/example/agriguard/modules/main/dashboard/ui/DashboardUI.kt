@@ -289,12 +289,11 @@ fun CropsCategory(
             )
         } else if (currentUser.isTechnician){
             listOf(
-                Triple("INFO HUB", R.drawable.crop_monitor, onCropsMonitoringClick),
                 Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintList) },
                 Triple("RICE INSURANCE", R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList) },
                 Triple("ONION INSURANCE", R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList) },
                 Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.IndemnityList) },
-                Triple("MESSAGES", R.drawable.messageicon) { navController.navigate(MainNav.Message) }
+                Triple("MESSAGES", R.drawable.messageicon) { navController.navigate(MainNav.Message) },
             )
         } else {
             listOf(
