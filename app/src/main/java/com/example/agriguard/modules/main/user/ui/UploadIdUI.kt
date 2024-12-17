@@ -44,10 +44,50 @@ fun UploadIdUI(
     var selectedImgUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
 
+//    LaunchedEffect(currentUserId) {
+//        val userDto = userService.fetchOne(currentUserId)
+//        if (!userDto.validId.isNullOrEmpty()) {
+//            val byteArray = android.util.Base64.decode(userDto.validId, android.util.Base64.DEFAULT)
+//            val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+//            selectedImgUri = saveBitmapToUri(context, bitmap)
+//        } else {
+//            Log.e("UserImageUI", "Image Base64 is null or empty for user: $currentUserId")
+//        }
+//    }
+
     val stroke = Stroke(
         width = 4f,
         pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
     )
+
+//    val photoPickerLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.PickVisualMedia(),
+//        onResult = { uri ->
+//            if (uri != null) {
+//                selectedImgUri = uri
+//                onImageSelected(uri)
+//                coroutineScope.launch {
+//                    val byteArray = getBytesFromUri(context, uri)
+//                    if (byteArray != null) {
+//                        val result = userService.saveValidId(currentUserId, byteArray)
+//                        if (result.isSuccess) {
+//                            delay(500)
+//                            val userDto = userService.fetchOne(currentUserId)
+//                            if (userDto.validId.isNullOrEmpty()) {
+//                            } else {
+//                                val byteArray = android.util.Base64.decode(userDto.validId, android.util.Base64.DEFAULT)
+//                                val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+//                                selectedImgUri = saveBitmapToUri(context, bitmap)
+//                            }
+//                        } else {
+//                            Log.e("UserImageUI", "Failed to save profile picture")
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    )
+
     Box(
         Modifier
             .height(140.dp)

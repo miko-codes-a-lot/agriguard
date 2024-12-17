@@ -99,8 +99,10 @@ fun UserFormUI(
                     "Middle Name" -> userDto?.middleName?.trim() ?: ""
                     "Last Name" -> userDto?.lastName?.trim() ?: ""
                     "Date Of Birth" -> userDto?.dateOfBirth ?: ""
-                    "Address" -> userDto?.address?.trim() ?: addressDto?.name ?: ""
-                    "Mobile Number" -> userDto?.mobileNumber?.trim() ?: ""
+                    "Address" -> {
+                        if (currentUser.isTechnician) currentUser.address ?: ""
+                        else userDto?.address?.trim() ?: addressDto?.name ?: ""
+                    }                    "Mobile Number" -> userDto?.mobileNumber?.trim() ?: ""
                     "Email" -> userDto?.email?.trim() ?: ""
                     "Password" -> userDto?.password ?: ""
                     else -> ""
@@ -170,9 +172,13 @@ fun UserFormUI(
             )
         }
 
-        item {
-            UploadIdUI()
-        }
+//        item {
+//            UploadIdUI(
+//                currentUserId = "",
+//                onImageSelected = { uri -> selectedProfileImageUri = uri },
+//                userService = userService
+//            )
+//        }
 
         item {
             ButtonSubmitData(
@@ -194,7 +200,8 @@ fun UserFormUI(
                     }
                 },
                 errors = errors,
-                isEnableSubmit = isButtonEnabled
+                isEnableSubmit = isButtonEnabled,
+                currentUser = currentUser
             )
         }
 
@@ -273,122 +280,123 @@ fun ContainerLabelValue(
             dateOfBirth?.value = newValue
         }
     )
+    if(!currentUser.isTechnician) {
+        Spacer(modifier = Modifier.height(5.dp))
+        var expanded by remember { mutableStateOf(false) }
+        var selectItem by remember { mutableStateOf(statesValue["Address"]?.value ?: "") }
+        var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
-    Spacer(modifier = Modifier.height(5.dp))
-    var expanded by remember { mutableStateOf(false) }
-    var selectItem by remember { mutableStateOf(statesValue["Address"]?.value ?: "") }
-    var textFieldSize by remember { mutableStateOf(Size.Zero) }
+        val icon = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
 
-    val icon = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
-
-    Row(
-        modifier = Modifier
-            .padding(start = 4.dp, end = 4.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Address",
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            fontFamily = FontFamily.SansSerif,
-            fontSize = 17.sp
-        )
-
-        Text(text = " : ")
-
-        Box(
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .clickable { expanded = !expanded }
-
+                .padding(start = 4.dp, end = 4.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (selectItem.isEmpty()) {
-                Column {
-                    Row(
+            Text(
+                text = "Address",
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                fontFamily = FontFamily.SansSerif,
+                fontSize = 17.sp
+            )
+
+            Text(text = " : ")
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .clickable { expanded = !expanded }
+
+            ) {
+                if (selectItem.isEmpty()) {
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 10.dp)
+                                .fillMaxWidth()
+                                .onGloballyPositioned { coordinates ->
+                                    textFieldSize = coordinates.size.toSize()
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Select Address",
+                                color = Color.Black,
+                                fontSize = 16.sp,
+                                fontFamily = FontFamily.SansSerif
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+                            Icon(icon, "Dropdown Icon")
+
+                        }
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .height(1.dp)
+                                .fillMaxWidth(),
+                            color = Color.Black
+                        )
+                    }
+                } else {
+                    TextField(
+                        value = selectItem,
+                        onValueChange = { newValue ->
+                            selectItem = newValue
+                            statesValue["Address"]?.value = newValue
+                        },
                         modifier = Modifier
-                            .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 10.dp)
                             .fillMaxWidth()
+                            .background(color = Color.White)
                             .onGloballyPositioned { coordinates ->
                                 textFieldSize = coordinates.size.toSize()
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Select Address",
+                            }
+                            .clickable { expanded = !expanded },
+                        trailingIcon = {
+                            Icon(icon, "Dropdown Icon",
+                                modifier = Modifier
+                                    .clickable { expanded = !expanded }
+                            )
+                        },
+                        readOnly = true,
+                        textStyle = TextStyle(
                             color = Color.Black,
                             fontSize = 16.sp,
                             fontFamily = FontFamily.SansSerif
+                        ),
+                        colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
                         )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Icon(icon, "Dropdown Icon")
-
-                    }
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillMaxWidth(),
-                        color = Color.Black
                     )
                 }
-            } else {
-                TextField(
-                    value = selectItem,
-                    onValueChange = { newValue ->
-                        selectItem = newValue
-                        statesValue["Address"]?.value = newValue
-                    },
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .width(275.dp)
                         .background(color = Color.White)
-                        .onGloballyPositioned { coordinates ->
-                            textFieldSize = coordinates.size.toSize()
-                        }
-                        .clickable { expanded = !expanded },
-                    trailingIcon = {
-                        Icon(icon, "Dropdown Icon",
-                            modifier = Modifier
-                                .clickable { expanded = !expanded }
-                        )
-                    },
-                    readOnly = true,
-                    textStyle = TextStyle(
-                        color = Color.Black,
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily.SansSerif
-                    ),
-                    colors =
-                    OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                    )
-                )
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .width(275.dp)
-                    .background(color = Color.White)
-                    .heightIn(max = 200.dp)
-                    .offset(y = 8.dp)
-            ) {
-                addressList.forEach { address ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = address.name,
-                                color = Color.Black,
-                                fontFamily = FontFamily.SansSerif,
-                                fontSize = 16.sp
-                            )
-                        }, onClick = {
-                            selectItem = address.name
-                            statesValue["Address"]?.value = address.name
-                            expanded = false
-                        })
+                        .heightIn(max = 200.dp)
+                        .offset(y = 8.dp)
+                ) {
+                    addressList.forEach { address ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = address.name,
+                                    color = Color.Black,
+                                    fontFamily = FontFamily.SansSerif,
+                                    fontSize = 16.sp
+                                )
+                            }, onClick = {
+                                selectItem = address.name
+                                statesValue["Address"]?.value = address.name
+                                expanded = false
+                            })
+                    }
                 }
             }
         }
@@ -739,17 +747,23 @@ fun ButtonSubmitData(
     onSubmit: (UserDto) -> Unit,
     errors: Map<String, MutableState<String>>,
     isEnableSubmit: Boolean,
+    currentUser: UserDto
 ) {
     Button(
         onClick = {
 //            val hasError = validateForm(errors, statesValue)
 //            if (!hasError) {
+            val address = if (currentUser.isTechnician && selectedOption == "Farmers") {
+                currentUser.address ?: ""
+            } else {
+                statesValue["Address"]?.value ?: ""
+            }
                 val userDto = UserDto(
                     id =  targetUserDto?.id,
                     firstName = statesValue["First Name"]?.value ?: "",
                     middleName = statesValue["Middle Name"]?.value ?: "",
                     lastName = statesValue["Last Name"]?.value ?: "",
-                    address = statesValue["Address"]?.value ?: "",
+                    address = address,
                     mobileNumber = statesValue["Mobile Number"]?.value ?: "",
                     dateOfBirth = statesValue["Date Of Birth"]?.value ?: "",
                     email = statesValue["Email"]?.value ?: "",
