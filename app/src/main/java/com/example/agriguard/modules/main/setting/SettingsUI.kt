@@ -43,6 +43,7 @@ import androidx.navigation.NavController
 import com.example.agriguard.R
 import com.example.agriguard.modules.intro.login.viewmodel.LoginViewModel
 import com.example.agriguard.modules.intro.login.viewmodel.UserState
+import com.example.agriguard.modules.main.MainNav
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.service.UserService
 import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
@@ -123,6 +124,33 @@ fun SettingsUI(
                     color = Color(0xFF136204),
                 )
                 Spacer(modifier = Modifier.width(5.dp))
+            }
+        }
+        if(currentUser.isTechnician) {
+            Row(
+                modifier = Modifier
+                    .padding(top = 10.dp)
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(
+                    onClick = {
+                        navController.navigate(MainNav.CreateUpload)
+                    },
+                    modifier = Modifier,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF136204)
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.user_id),
+                        contentDescription = "Logout",
+                        tint = Color.Red,
+                        modifier = Modifier.size(35.dp)
+                    )
+                }
             }
         }
         Profile(navController = navController, currentUser = currentUser, userService = userService)

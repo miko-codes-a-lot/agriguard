@@ -119,4 +119,6 @@ object MainNav {
     @Serializable
     object ReportDashboard
 
+    @Serializable
+    object CreateUpload
 }

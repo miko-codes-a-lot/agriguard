@@ -49,6 +49,7 @@ import com.example.agriguard.modules.main.rice.viewmodel.RiceInsuranceViewModel
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.AddressDto
 import com.example.agriguard.modules.main.user.service.UserService
+import com.example.agriguard.modules.main.user.ui.CreateUploadId
 import com.example.agriguard.modules.main.user.ui.UserCreateUI
 import com.example.agriguard.modules.main.user.ui.UserEditUI
 import com.example.agriguard.modules.main.user.ui.UsersUI
@@ -590,6 +591,12 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         composable<MainNav.ReportDashboard> {
             Guard(navController = navController) { currentUser ->
                 ReportDashboardUI()
+            }
+        }
+        composable<MainNav.CreateUpload> {
+            Guard(navController = navController) { currentUser ->
+                val userService: UserService = hiltViewModel<UserViewModel>().userService
+                CreateUploadId(currentUser = currentUser, userService = userService)
             }
         }
     }

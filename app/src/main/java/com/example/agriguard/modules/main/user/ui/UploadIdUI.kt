@@ -2,7 +2,12 @@ package com.example.agriguard.modules.main.user.ui
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,63 +40,71 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.agriguard.modules.main.user.service.UserService
+import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
 fun UploadIdUI(
+    onImageSelected: (Uri) -> Unit = {},
+    currentUserId: String,
+    userService: UserService = hiltViewModel<UserViewModel>().userService
 ){
     val coroutineScope = rememberCoroutineScope()
     var selectedImgUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
 
-//    LaunchedEffect(currentUserId) {
-//        val userDto = userService.fetchOne(currentUserId)
-//        if (!userDto.validId.isNullOrEmpty()) {
-//            val byteArray = android.util.Base64.decode(userDto.validId, android.util.Base64.DEFAULT)
-//            val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-//            selectedImgUri = saveBitmapToUri(context, bitmap)
-//        } else {
-//            Log.e("UserImageUI", "Image Base64 is null or empty for user: $currentUserId")
-//        }
-//    }
+    LaunchedEffect(currentUserId) {
+        val userDto = userService.fetchOne(currentUserId)
+        if (!userDto.validId.isNullOrEmpty()) {
+            val byteArray = android.util.Base64.decode(userDto.validId, android.util.Base64.DEFAULT)
+            val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+            selectedImgUri = saveBitmapToUri(context, bitmap)
+        } else {
+            Log.e("UserImageUI", "Image Base64 is null or empty for user: $currentUserId")
+        }
+    }
 
     val stroke = Stroke(
         width = 4f,
         pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
     )
 
-//    val photoPickerLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.PickVisualMedia(),
-//        onResult = { uri ->
-//            if (uri != null) {
-//                selectedImgUri = uri
-//                onImageSelected(uri)
-//                coroutineScope.launch {
-//                    val byteArray = getBytesFromUri(context, uri)
-//                    if (byteArray != null) {
-//                        val result = userService.saveValidId(currentUserId, byteArray)
-//                        if (result.isSuccess) {
-//                            delay(500)
-//                            val userDto = userService.fetchOne(currentUserId)
-//                            if (userDto.validId.isNullOrEmpty()) {
-//                            } else {
-//                                val byteArray = android.util.Base64.decode(userDto.validId, android.util.Base64.DEFAULT)
-//                                val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-//                                selectedImgUri = saveBitmapToUri(context, bitmap)
-//                            }
-//                        } else {
-//                            Log.e("UserImageUI", "Failed to save profile picture")
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    )
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                selectedImgUri = uri
+                onImageSelected(uri)
+                coroutineScope.launch {
+                    val byteArray = getBytesFromUri(context, uri)
+                    if (byteArray != null) {
+                        val result = userService.saveValidId(currentUserId, byteArray)
+                        if (result.isSuccess) {
+                            delay(500)
+                            val userDto = userService.fetchOne(currentUserId)
+                            if (userDto.validId.isNullOrEmpty()) {
+                            } else {
+                                val byteArray = android.util.Base64.decode(userDto.validId, android.util.Base64.DEFAULT)
+                                val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+                                selectedImgUri = saveBitmapToUri(context, bitmap)
+                            }
+                        } else {
+                            Log.e("UserImageUI", "Failed to save profile picture")
+                        }
+                    }
+                }
+            }
+        }
+    )
 
     Box(
         Modifier
-            .height(140.dp)
+            .height(600.dp)
             .fillMaxWidth()
     ) {
         Box(
@@ -131,9 +145,9 @@ fun UploadIdUI(
         }
         IconButton(
             onClick = {
-//                photoPickerLauncher.launch(
-//                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-//                )
+                photoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
             },
             modifier = Modifier
                 .size(120.dp)
