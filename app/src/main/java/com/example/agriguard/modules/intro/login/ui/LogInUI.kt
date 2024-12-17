@@ -1,4 +1,4 @@
-package com.example.agriguard.modules.intro.login
+package com.example.agriguard.modules.intro.login.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -58,7 +58,6 @@ import com.example.agriguard.modules.intro.login.viewmodel.LoginViewModel
 import com.example.agriguard.modules.intro.login.viewmodel.UserState
 import com.example.agriguard.modules.main.MainNav
 import com.example.agriguard.modules.main.user.model.dto.UserDto
-import com.example.agriguard.modules.main.user.viewmodel.UserViewModel
 import com.example.agriguard.modules.shared.ext.AlertLoginUI
 import kotlinx.coroutines.launch
 
@@ -124,7 +123,9 @@ fun LogInUI(
                 statesValue = statesValue
             )
 
-            ForgetPassword()
+            ForgetPassword(
+                navController = navController
+            )
 
             Spacer(modifier = Modifier.height(100.dp))
         }
@@ -299,7 +300,9 @@ fun UserLog(
 }
 
 @Composable
-fun ForgetPassword() {
+fun ForgetPassword(
+    navController: NavController
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
