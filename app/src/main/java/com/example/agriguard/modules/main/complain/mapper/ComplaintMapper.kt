@@ -13,6 +13,9 @@ fun ComplaintInsurance.toDTO(): ComplaintInsuranceDto {
         userId = userId,
         rice = rice,
         onion = onion,
+        variety = variety,
+        areaDamage = areaDamage,
+        degreeOfDamage = degreeOfDamage,
         causeOfDamage = causeOfDamage,
         imageBase64 = imageBase64,
         status = status,
@@ -32,6 +35,9 @@ fun ComplaintInsuranceDto.toEntity(): ComplaintInsurance {
         userId = complaint.userId
         rice = complaint.rice
         onion = complaint.onion
+        variety = complaint.variety
+        areaDamage = complaint.areaDamage
+        degreeOfDamage = complaint.degreeOfDamage
         causeOfDamage = complaint.causeOfDamage
         imageBase64 = complaint.imageBase64
         status = complaint.status

@@ -11,6 +11,9 @@ class ComplaintInsurance: RealmObject {
     var userId: String = ""
     var rice: Boolean = false
     var onion: Boolean = false
+    var variety: String? = ""
+    var areaDamage: String? = ""
+    var degreeOfDamage: String? = ""
     var causeOfDamage: String? = ""
     var imageBase64: String? = null
     var status: String? = "pending"
