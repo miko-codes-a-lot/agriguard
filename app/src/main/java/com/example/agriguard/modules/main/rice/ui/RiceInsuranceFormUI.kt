@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.agriguard.modules.main.onion.ui.TextFieldOnionStatus
 import com.example.agriguard.modules.main.rice.model.dto.RiceInsuranceDto
 import com.example.agriguard.modules.main.rice.viewmodel.RiceInsuranceViewModel
 import com.example.agriguard.modules.main.user.model.dto.UserDto
@@ -171,6 +172,55 @@ fun RiceInsuranceFormUI(
                 }
             }
         }
+        TextFieldRiceStatus(
+            context = context,
+            label = "FirstName",
+            value = currentUser.firstName,
+            onChange = { }
+        )
+        TextFieldRiceStatus(
+            context = context,
+            label = "MiddleName",
+            value = currentUser.middleName,
+            onChange = { }
+        )
+        TextFieldRiceStatus(
+            context = context,
+            label = "LastName",
+            value = currentUser.lastName,
+            onChange = { }
+        )
+        val saveDateFormat =
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }
+
+        val displayDateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+
+        val formattedDate = try {
+            val parsedDate = saveDateFormat.parse(currentUser.dateOfBirth)
+            displayDateFormat.format(parsedDate)
+        } catch (e: ParseException) {
+        }
+
+        TextFieldRiceStatus(
+            context = context,
+            label = "Date Of Birth",
+            value = formattedDate.toString(),
+            onChange = { }
+        )
+        TextFieldRiceStatus(
+            context = context,
+            label = "Mobile Number",
+            value = currentUser.mobileNumber,
+            onChange = { }
+        )
+        TextFieldRiceStatus(
+            context = context,
+            label = "Address",
+            value = currentUser.address,
+            onChange = { }
+        )
         TextFieldRiceStatus(
             context = context,
             label = "IP Tribe",
