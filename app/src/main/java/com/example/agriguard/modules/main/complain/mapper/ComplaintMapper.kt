@@ -2,7 +2,6 @@ package com.example.agriguard.modules.main.complain.mapper
 
 import com.example.agriguard.modules.main.complain.model.dto.ComplaintInsuranceDto
 import com.example.agriguard.modules.main.complain.model.entity.ComplaintInsurance
-import com.example.agriguard.modules.main.onion.model.entity.OnionInsurance
 import com.example.agriguard.modules.shared.ext.toInstantString
 import com.example.agriguard.modules.shared.ext.toObjectId
 import com.example.agriguard.modules.shared.ext.toRealmInstantNullable
@@ -18,6 +17,7 @@ fun ComplaintInsurance.toDTO(): ComplaintInsuranceDto {
         imageBase64 = imageBase64,
         status = status,
         createdById = createdById?.toHexString(),
+        reviewById = reviewById?.toHexString(),
         createdAt = createdAt.toInstantString(),
         lastUpdatedById = lastUpdatedById?.toHexString(),
         lastUpdatedAt = lastUpdatedAt.toInstantString(),
@@ -37,6 +37,7 @@ fun ComplaintInsuranceDto.toEntity(): ComplaintInsurance {
         status = complaint.status
         createdAt = complaint.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
         createdById = complaint.createdById?.toObjectId()
+        reviewById = complaint.reviewById?.toObjectId()
         lastUpdatedById = complaint.lastUpdatedById?.toObjectId()
         lastUpdatedAt = complaint.lastUpdatedAt.toRealmInstantNullable() ?: RealmInstant.now()
         deletedById = complaint.deletedById?.toObjectId()
