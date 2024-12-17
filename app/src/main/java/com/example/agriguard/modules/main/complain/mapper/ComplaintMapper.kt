@@ -36,6 +36,7 @@ fun ComplaintInsuranceDto.toEntity(): ComplaintInsurance {
         imageBase64 = complaint.imageBase64
         status = complaint.status
         createdAt = complaint.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
+        createdById = complaint.createdById?.toObjectId()
         lastUpdatedById = complaint.lastUpdatedById?.toObjectId()
         lastUpdatedAt = complaint.lastUpdatedAt.toRealmInstantNullable() ?: RealmInstant.now()
         deletedById = complaint.deletedById?.toObjectId()

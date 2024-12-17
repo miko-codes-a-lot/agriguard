@@ -10,6 +10,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -126,20 +127,11 @@ fun UploadIdUI(
             if (selectedImgUri != null) {
                 AsyncImage(
                     modifier = Modifier
-                        .size(355.dp)
+                        .fillMaxSize()
                         .clip(RectangleShape),
                     model = selectedImgUri,
                     contentDescription = null,
                     contentScale = ContentScale.Crop
-                )
-            } else {
-                Text(
-                    text = "Upload ID",
-                    fontSize = 20.sp,
-                    color = Color.Gray,
-                    fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight.Bold,
-
                 )
             }
         }
@@ -161,7 +153,6 @@ fun UploadIdUI(
                 color = Color.Gray,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold,
-
             )
         }
     }

@@ -142,7 +142,7 @@ private fun NotificationButton(
                 .padding(3.dp)
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Start
         ) {
             if (!notifyDto.read) {
                 Box(
@@ -160,10 +160,10 @@ private fun NotificationButton(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            val displayMessage = if (notifyDto.message.length > 15) {
-                notifyDto.message.take(15) + "..."
-            } else {
-                notifyDto.message
+            val displayMessage = when {
+                notifyDto.message.isEmpty() -> "No message available"
+                notifyDto.message.length > 15 -> notifyDto.message.take(15) + "..."
+                else -> notifyDto.message
             }
             Text(
                 text = displayMessage,
