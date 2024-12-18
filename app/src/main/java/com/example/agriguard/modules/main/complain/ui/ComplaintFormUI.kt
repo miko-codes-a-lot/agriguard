@@ -342,10 +342,10 @@ fun ComplaintFormUI(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = if (formState.rice) "Rice" else "Onion",
+                        text = if (formState.rice) "Rice" else if (formState.onion) "Onion" else "Select",
                         modifier = Modifier
                             .padding(start = 17.dp),
-                        fontSize = 25.sp,
+                        fontSize = 21.sp,
                         color = Color(0xFF136204),
                         fontWeight = FontWeight.W800,
                         fontFamily = FontFamily.SansSerif,
