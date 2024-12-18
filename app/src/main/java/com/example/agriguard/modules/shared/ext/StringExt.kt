@@ -5,12 +5,21 @@ import org.mindrot.jbcrypt.BCrypt
 import org.mongodb.kbson.BsonObjectId
 import org.mongodb.kbson.ObjectId
 import java.time.Instant
+import java.time.format.DateTimeParseException
 
 fun String?.toObjectId(): ObjectId {
     return if (!this.isNullOrEmpty()) {
         ObjectId(this)
     } else {
         ObjectId()
+    }
+}
+
+fun String.toInstant(): Instant? {
+    return try {
+        Instant.parse(this)
+    } catch (e: DateTimeParseException) {
+        null
     }
 }
 
