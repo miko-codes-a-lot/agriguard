@@ -102,7 +102,8 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation (libs.accompanist.permissions)
     implementation(libs.kotlinx.datetime)
-
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
 }
 
 kapt {
