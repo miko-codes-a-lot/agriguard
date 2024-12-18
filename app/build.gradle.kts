@@ -101,6 +101,8 @@ dependencies {
     kapt(libs.android.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
     implementation (libs.accompanist.permissions)
+    implementation(libs.kotlinx.datetime)
+
 }
 
 kapt {
