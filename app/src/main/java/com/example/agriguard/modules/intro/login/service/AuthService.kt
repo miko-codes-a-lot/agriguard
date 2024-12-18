@@ -37,12 +37,12 @@ class AuthService @Inject constructor(
         return user.toDTO()
     }
 
-//    suspend fun requestPasswordReset(email: String): Boolean {
-//        return emailService.requestPasswordResetToken(email)
-//    }
-//
-//    suspend fun verifyToken(email: String, token: String): Boolean {
-//        return emailService.verifyResetToken(email, token)
-//    }
+    suspend fun requestPasswordReset(email: String): Boolean {
+        return emailService.requestPasswordResetToken(email)
+    }
+
+    suspend fun verifyToken(email: String, token: String): Boolean {
+        return emailService.verifyResetToken(email, token)
+    }
 }
 
