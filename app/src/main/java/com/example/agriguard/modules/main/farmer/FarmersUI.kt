@@ -1,6 +1,7 @@
 package com.example.agriguard.modules.main.farmer
 
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -51,8 +55,11 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.MainNav
+import com.example.agriguard.modules.main.chat.ui.PlaceholderImage
+import com.example.agriguard.modules.main.chat.ui.decodeBase64ToBitmap
 import com.example.agriguard.modules.main.farmer.enum.FarmerStatus
 import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
+import com.example.agriguard.modules.main.setting.resizeBitmap
 import com.example.agriguard.modules.main.user.model.dto.AddressDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.shared.ext.toObjectId
@@ -192,22 +199,27 @@ fun FarmersListContainer(
     userDto: UserDto,
     navController: NavController
 ) {
-    Column(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(58.dp),
-        verticalArrangement = Arrangement.Center
+            .padding(top = 5.dp, bottom = 5.dp),
+        colors = CardDefaults.cardColors(
+            contentColor = Color.Black,
+            containerColor = Color.White,
+        )
     ) {
         Row(
             modifier = Modifier
+                .padding(8.dp)
                 .fillMaxWidth()
                 .clickable {
                     navController.navigate(MainNav.FarmersPreview(userDto.id!!))
                 },
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.width(10.dp))
-            FarmersImageContainer()
+            FarmersImageContainer(userDto.userProfile)
+            Spacer(modifier = Modifier.width(8.dp))
+
             Text(
                 text = "${userDto.firstName} ${userDto.middleName} ${userDto.lastName}",
                 fontSize = 18.sp,
@@ -227,35 +239,40 @@ fun FarmersListContainer(
 }
 
 @Composable
-fun FarmersImageContainer(imageUri: Uri? = null) {
+fun FarmersImageContainer(imageBase64: String? = null) {
     Box(
         Modifier
-            .height(45.dp)
+            .height(55.dp)
     ){
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(51.dp)
                 .clip(CircleShape)
                 .background(Color(0xFF136204))
-                .border(3.dp, Color(0xFF136204), CircleShape),
+                .border(1.dp, Color(0xFF136204), CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            if (imageUri != null) {
-                AsyncImage(
-                    model = imageUri,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(35.dp)
-                        .clip(CircleShape)
-                )
+            if (imageBase64 != null && imageBase64.isNotBlank()) {
+                val resizedBitmap = remember(imageBase64) {
+                    decodeBase64ToBitmap(imageBase64)?.let { bitmap ->
+                        resizeBitmap(bitmap, maxWidth = 500, maxHeight = 500)
+                    }
+                }
+
+                if (resizedBitmap != null) {
+                    Image(
+                        bitmap = resizedBitmap.asImageBitmap(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(51.dp)
+                            .clip(CircleShape)
+                    )
+                } else {
+                    PlaceholderImage()
+                }
             } else {
-                Icon(
-                    painter = painterResource(id = R.drawable.person),
-                    contentDescription = "Default placeholder",
-                    modifier = Modifier.size(30.dp),
-                    tint = Color.White
-                )
+                PlaceholderImage()
             }
         }
     }
