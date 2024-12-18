@@ -1,6 +1,8 @@
 package com.example.agriguard.modules
 
 import com.example.agriguard.BuildConfig
+import com.example.agriguard.modules.main.chat.model.entity.Chat
+import com.example.agriguard.modules.main.chat.model.entity.Message
 import com.example.agriguard.modules.main.complain.model.entity.ComplaintInsurance
 import com.example.agriguard.modules.main.notify.model.entity.Notify
 import com.example.agriguard.modules.main.onion.model.entity.OnionInsurance
@@ -34,6 +36,8 @@ object AppModule {
             val setOfEntities = setOf(
                 User::class,
                 Address::class,
+                Chat::class,
+                Message::class,
                 Indemnity::class,
                 RiceInsurance::class,
                 OnionInsurance::class,
@@ -54,6 +58,14 @@ object AppModule {
                     add(
                         realm.query<Address>("_id <> $0", null),
                         name = "Addresses"
+                    )
+                    add(
+                        realm.query<Chat>("_id <> $0", null),
+                        name = "Chats"
+                    )
+                    add(
+                        realm.query<Message>("_id <> $0", null),
+                        name = "Messages"
                     )
                     add(
                         realm.query<Indemnity>("_id <> $0", null),
