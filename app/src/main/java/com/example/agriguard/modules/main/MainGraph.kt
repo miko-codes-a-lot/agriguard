@@ -1,16 +1,22 @@
 package com.example.agriguard.modules.main
 
 import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.example.agriguard.modules.main.chat.model.viewmodel.ChatViewModel
+import com.example.agriguard.modules.main.chat.ui.ChatDirectUI
+import com.example.agriguard.modules.main.chat.ui.ChatLobbyUI
 import com.example.agriguard.modules.main.complain.ui.ComplaintDetailsUI
 import com.example.agriguard.modules.main.complain.ui.ComplaintFormUI
 import com.example.agriguard.modules.main.complain.ui.ComplaintListUI
@@ -95,6 +101,52 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         composable<MainNav.Addresses> {
             Guard(navController = navController) { currentUser ->
                 AddressesUI(navController, currentUser)
+            }
+        }
+        composable<MainNav.ChatDirect> {
+            val args = it.toRoute<MainNav.ChatDirect>()
+            Guard(navController = navController) { currentUser ->
+                val chatViewModel: ChatViewModel = hiltViewModel()
+                val isChatReady = remember { mutableStateOf(false) }
+                val userViewModel: UserViewModel = hiltViewModel()
+
+                val receiver = userViewModel.fetchUser(args.userId)
+
+                LaunchedEffect(key1 = "message") {
+                    Log.d("ChatDirect", "Creating or fetching chat...")
+
+                    Log.d("micool", "I have to run this before I run the code below...")
+                    chatViewModel.findOneChatOrCreate(currentUser, receiver).also {
+                        Log.d("ChatDirect", "Creating or fetching chat...")
+                    }
+                    isChatReady.value = true
+                }
+
+                val messages = if (isChatReady.value) {
+                    chatViewModel.fetchDirectMessages(currentUser, receiver)
+                        .collectAsStateWithLifecycle(
+                            initialValue = emptyList()
+                        ).value
+                } else {
+                    emptyList()
+                }
+
+                ChatDirectUI(
+                    messages = messages,
+                    currentUserId = currentUser.id!!,
+                    onSendMessage = { message ->
+                        chatViewModel.sendMessage(currentUser, receiver, message)
+                    }
+                )
+            }
+        }
+        composable<MainNav.ChatLobby> {
+            Guard(navController = navController) { currentUser ->
+                val chatViewModel: ChatViewModel = hiltViewModel()
+                val usersChat by chatViewModel.fetchUsers(currentUser.id.toObjectId()).collectAsStateWithLifecycle(
+                    initialValue = listOf()
+                )
+                ChatLobbyUI(navController = navController, data = usersChat)
             }
         }
         composable<MainNav.CreateUser> {

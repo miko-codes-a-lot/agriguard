@@ -23,6 +23,12 @@ object MainNav {
     object Addresses
 
     @Serializable
+    object ChatLobby
+
+    @Serializable
+    data class ChatDirect(val userId: String)
+
+    @Serializable
     data class CreateUser(val addressId: String?)
 
     @Serializable
