@@ -4,6 +4,7 @@ import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.model.entity.User
 import com.example.agriguard.modules.main.user.model.mapper.toDTO
 import com.example.agriguard.modules.main.user.model.mapper.toEntity
+import com.example.agriguard.modules.shared.ext.hashPassword
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -86,5 +87,27 @@ class UserService  @Inject constructor(private val realm: Realm)  {
         } catch (error: Exception) {
             Result.failure(error)
         }
+    }
+
+    suspend fun saveNewPassword(email: String, token: String, newPassword: String): Boolean {
+        val hashedPassword = newPassword.hashPassword()
+        return realm.write {
+            val user = fetchEmailAndToken(email, token)
+            if (user != null) {
+                user.password = hashedPassword
+                copyToRealm(user.toEntity(), updatePolicy = UpdatePolicy.ALL)
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun fetchEmailAndToken(email: String, token: String): UserDto? {
+        val user = realm.query<User>("email == $0 AND resetPasswordToken == $1", email, token).find().firstOrNull()
+        if (user != null) {
+            return user.toDTO()
+        }
+        return null
     }
 }

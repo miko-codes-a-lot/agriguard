@@ -1,5 +1,6 @@
 package com.example.agriguard.modules.intro.login.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -31,30 +30,30 @@ import androidx.navigation.NavController
 import com.example.agriguard.modules.intro.IntroNav
 import com.example.agriguard.modules.intro.login.viewmodel.LoginViewModel
 
+
 @Composable
-fun ForgotPasswordUI (
+fun TokenVerificationUI(
+    email: String,
     navController: NavController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    var email by remember { mutableStateOf("") }
+    var token by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
+    Log.d("TokenVerificationUIF", "User Email: $email")
 
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .background(Color.White)
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Enter your email to reset password", fontSize = 17.sp, fontFamily = FontFamily.SansSerif)
+        Text("Enter the token sent to your email", fontSize = 17.sp, fontFamily = FontFamily.SansSerif)
         Spacer(modifier = Modifier.height(10.dp))
-
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email", color = Color.Black, fontSize = 15.sp, fontFamily = FontFamily.SansSerif) },
+            value = token,
+            onValueChange = { token = it },
+            label = { Text("Token", color = Color.Black, fontSize = 15.sp, fontFamily = FontFamily.SansSerif) },
             modifier = Modifier
                 .fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
@@ -63,21 +62,18 @@ fun ForgotPasswordUI (
                 focusedTextColor = Color.Black,
             )
         )
-
         Spacer(modifier = Modifier.height(10.dp))
 
         Button(
             onClick = {
-//                if (email.isNotBlank()) {
-//                    isLoading = true
-//                    viewModel.sendPasswordResetToken(email) { success, errorMessage ->
-//                        isLoading = false
-//                        if (success) {
-//                            navController.navigate(IntroNav.TokenVerification(email))
-//                        }
+//                viewModel.verifyToken(email, token) { success, errorMessage ->
+//                    if (success) {
+//                        Log.d("TokenVerificationUIF", "Success User Email: $email, Token: $token")
+//                        navController.navigate(IntroNav.ResetPassword(email, token))
+//                    } else {
+//                        Log.d("TokenVerificationUIF", "Error User Email: $email, Token: $token")
+//                        message = errorMessage ?: "Token verification failed"
 //                    }
-//                } else {
-//                    message = "Email cannot be blank."
 //                }
             },
             modifier = Modifier
@@ -86,32 +82,20 @@ fun ForgotPasswordUI (
                 .height(55.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF6650a4),
-                contentColor = Color(0xFFFFFFFF),
+                contentColor = Color(0xFFFFFFFF)
             ),
         ) {
-
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = Color.White
-                )
-            } else {
-                Text(
-                    "Send Reset Token",
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily.SansSerif,
-                    color = Color.White
-                )
-            }
-
-        }
-        message?.let {
             Text(
-                it,
-                color = if (it.contains("success")) Color.Green else Color.Red,
-                fontSize = 15.sp,
-                modifier = Modifier.padding(top = 10.dp)
+                "Verify Token",
+                fontSize = 16.sp,
+                fontFamily = FontFamily.SansSerif,
+                color = Color.White
             )
+        }
+
+        message?.let {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(it, color = Color.Red, fontSize = 15.sp, fontFamily = FontFamily.SansSerif)
         }
     }
 }

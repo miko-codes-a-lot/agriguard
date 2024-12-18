@@ -74,19 +74,53 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-//    fun sendPasswordResetToken(email: String, callback: (Boolean, String?) -> Unit) {
-//        viewModelScope.launch {
-//            try {
-//                val success = authService.requestPasswordReset(email)
-//                if (success) {
-//                    callback(true, null)
-//                } else {
-//                    Log.e("ForgotPassword", "Failed to send password reset token for email: $email")
-//                    callback(false, "Failed to send password reset token.")
-//                }
-//            } catch (e: Exception) {
-//                callback(false, "Error: ${e.message}")
-//            }
-//        }
-//    }
+    fun sendPasswordResetToken(email: String, callback: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val success = authService.requestPasswordReset(email)
+                if (success) {
+                    callback(true, null)
+                } else {
+                    Log.e("ForgotPassword", "Failed to send password reset token for email: $email")
+                    callback(false, "Failed to send password reset token.")
+                }
+            } catch (e: Exception) {
+                callback(false, "Error: ${e.message}")
+            }
+        }
+    }
+
+    fun verifyToken(email: String, token: String, callback: (Boolean, String?) -> Unit) {
+        if (email.isBlank() || token.isBlank()) {
+            callback(false, "Email and token cannot be blank.")
+            return
+        }
+        viewModelScope.launch {
+            try {
+                val success = authService.verifyToken(email, token)
+                if (success) {
+                    callback(true, null)
+                } else {
+                    callback(false, "Token verification failed.")
+                }
+            } catch (e: Exception) {
+                callback(false, "Failed to verify token: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun resetPassword(email: String, token: String, newPassword: String, callback: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val success = userService.saveNewPassword(email, token, newPassword)
+                if (success) {
+                    callback(true, null)
+                } else {
+                    callback(false, "Failed to reset password. Invalid token or email.")
+                }
+            } catch (e: Exception) {
+                callback(false, "Error resetting password: ${e.localizedMessage}")
+            }
+        }
+    }
 }
