@@ -202,7 +202,7 @@ fun FarmersListContainer(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    navController.navigate(MainNav.FarmersPreview)
+                    navController.navigate(MainNav.FarmersPreview(userDto.id!!))
                 },
             verticalAlignment = Alignment.CenterVertically
         ) {

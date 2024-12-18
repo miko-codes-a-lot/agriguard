@@ -26,7 +26,7 @@ object MainNav {
     data class CreateUser(val addressId: String?)
 
     @Serializable
-    object FarmersPreview
+    data class FarmersPreview(val userId: String)
 
     @Serializable
     object Dashboard

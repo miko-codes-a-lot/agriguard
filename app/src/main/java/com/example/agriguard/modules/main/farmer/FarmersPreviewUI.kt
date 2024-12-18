@@ -4,15 +4,22 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,31 +34,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.agriguard.modules.main.MainNav
 import com.example.agriguard.modules.main.user.model.dto.UserDto
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FarmersPreviewUI(
     navController: NavController,
-    currentUser: UserDto
+    currentUser: UserDto,
+    user: UserDto
 ) {
-    val statesValue = remember(currentUser) {
+    val statesValue = remember(user) {
         listOf(
-            "FirstName" to currentUser.firstName,
-            "MiddleName" to (currentUser.middleName ?: ""),
-            "LastName" to currentUser.lastName,
-            "Address" to (currentUser.address ?: ""),
-            "Mobile Number" to (currentUser.mobileNumber ?: ""),
-            "Date Of Birth" to currentUser.dateOfBirth,
-            "Email" to currentUser.email,
+            "FirstName" to user.firstName,
+            "MiddleName" to (user.middleName ?: ""),
+            "LastName" to user.lastName,
+            "Address" to (user.address ?: ""),
+            "Mobile Number" to (user.mobileNumber ?: ""),
+            "Date Of Birth" to farmerDateFormat(user.dateOfBirth),
+            "Email" to user.email,
         ).associate { (label, value) -> label to mutableStateOf(value) }
     }
     Scaffold(
-//        floatingActionButton = {
-//            if (currentUser.isAdmin) {
-//                FloatingIconPreview(navController, userDto)
-//            }
-//        }
+        floatingActionButton = {
+            if (currentUser.isTechnician) {
+                FloatingIconPreview(navController, user)
+            }
+        }
     ) {
         Column(
             modifier = Modifier
@@ -77,7 +88,6 @@ fun FarmersPreviewUI(
 @Composable
 fun FarmersData(
     stateValues: Map<String, MutableState<String>>,
-//    currentUser: UserDto,
 ) {
     Column {
         stateValues.forEach { (label, state) ->
@@ -144,33 +154,44 @@ fun TextFieldContain(
     }
 }
 
-//@Composable
-//fun FloatingIconPreview(
-//    navController: NavController,
-//    userDto: UserDto
-//) {
-//    Column(
-//        modifier = Modifier
-//            .background(Color.Transparent),
-//        horizontalAlignment = Alignment.End
-//    ) {
-//        FloatingActionButton(
-//            onClick = {
-////                navController.navigate(MainNav.EditUser(userDto.id!!))
-//            },
-//            containerColor = Color(0xFF6650a4),
-//            contentColor = Color(0xFFFFFFFF),
-//            shape = CircleShape,
-//            modifier = Modifier
-//                .size(72.dp)
-//                .offset(x = (-7).dp, y = (5).dp)
-//        ) {
-//            Icon(
-//                imageVector = Icons.Filled.Edit,
-//                contentDescription = "Navigate",
-//                modifier = Modifier
-//                    .size(30.dp)
-//            )
-//        }
-//    }
-//}
+@Composable
+fun FloatingIconPreview(
+    navController: NavController,
+    user: UserDto
+) {
+    Column(
+        modifier = Modifier
+            .background(Color.Transparent),
+        horizontalAlignment = Alignment.End
+    ) {
+        FloatingActionButton(
+            onClick = {
+                navController.navigate(MainNav.EditUser(user.id!!))
+            },
+            containerColor = Color(0xFF136204),
+            contentColor = Color(0xFFFFFFFF),
+            shape = CircleShape,
+            modifier = Modifier
+                .size(72.dp)
+                .offset(x = (-7).dp, y = (5).dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Edit,
+                contentDescription = "Navigate",
+                modifier = Modifier
+                    .size(30.dp)
+            )
+        }
+    }
+}
+
+fun farmerDateFormat(dateString: String): String {
+    return try {
+        val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        val displayFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val dates = isoFormat.parse(dateString)
+        displayFormat.format(dates)
+    } catch (e: Exception) {
+        "Select Date"
+    }
+}

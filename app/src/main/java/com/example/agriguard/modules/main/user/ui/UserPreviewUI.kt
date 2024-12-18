@@ -56,7 +56,6 @@ fun UserPreviewUI(
             "Email" to user.email,
             ).associate { (label, value) -> label to mutableStateOf(value) }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -132,8 +132,12 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             }
         }
         composable<MainNav.FarmersPreview> {
+            val args = it.toRoute<MainNav.FarmersPreview>()
+            val userViewModel: UserViewModel = hiltViewModel()
             Guard(navController = navController) { currentUser ->
-                FarmersPreviewUI(navController, currentUser)
+                val userDto = userViewModel.fetchUser(args.userId)
+                Log.d("userDto","$userDto")
+                FarmersPreviewUI(navController = navController, currentUser = currentUser, user = userDto)
             }
         }
         composable<MainNav.Message> {
