@@ -286,7 +286,7 @@ fun IndemnityFormUI(
             value = formState.causeOfDamage,
             onChange = { value -> viewModel.updateField { it.copy(causeOfDamage = value) } }
         )
-        IndemnityDatePicker(
+        TextFieldIndemnityStatus(
             context = context,
             "Cause Of Loss",
             value = formState.causeOfLoss,
