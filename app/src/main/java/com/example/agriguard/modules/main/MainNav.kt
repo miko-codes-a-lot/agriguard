@@ -59,13 +59,13 @@ object MainNav {
     object RiceInsuranceList
 
     @Serializable
-    data class RiceInsuranceDetails(val id: String)
+    data class RiceInsuranceDetails(val id: String, val userId: String)
 
     @Serializable
     data class RiceInsuranceEdit(val id: String)
 
     @Serializable
-    data class IndemnityDetails(val id: String)
+    data class IndemnityDetails(val id: String, val userId: String)
 
     @Serializable
     object IndemnityCreate
@@ -92,14 +92,13 @@ object MainNav {
     object ComplaintList
 
     @Serializable
-    data class ComplaintDetails(val id: String)
+    data class ComplaintDetails(val id: String, val userId: String)
 
     @Serializable
     data class OnionEdit(val id: String)
 
     @Serializable
-    data class OnionDetails(val id: String)
-
+    data class OnionDetails(val id: String, val userId: String)
 
     @Serializable
     object RiceDisease
@@ -126,7 +125,7 @@ object MainNav {
     object ReportDashboard
 
     @Serializable
-    object CreateUpload
+    data class UserValidId (val userId: String)
 
     @Serializable
     object EditSettings
