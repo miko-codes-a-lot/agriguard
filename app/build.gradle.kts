@@ -104,6 +104,7 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
+    implementation (libs.itextpdf)
 }
 
 kapt {
