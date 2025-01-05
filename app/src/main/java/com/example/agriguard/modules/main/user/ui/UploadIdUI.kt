@@ -6,19 +6,10 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,10 +28,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.agriguard.modules.main.user.service.UserService
@@ -51,7 +39,6 @@ import java.io.File
 
 @Composable
 fun UploadIdUI(
-    onImageSelected: (Uri) -> Unit = {},
     currentUserId: String,
     userService: UserService = hiltViewModel<UserViewModel>().userService
 ){
@@ -80,7 +67,7 @@ fun UploadIdUI(
         onResult = { uri ->
             if (uri != null) {
                 selectedImgUri = uri
-                onImageSelected(uri)
+//                onImageSelected(uri)
                 coroutineScope.launch {
                     val byteArray = getBytesFromUri(context, uri)
                     if (byteArray != null) {
@@ -104,66 +91,28 @@ fun UploadIdUI(
     )
 
     Box(
-        Modifier
-            .height(600.dp)
-            .fillMaxWidth()
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(top = 10.dp, end = 5.dp)
-                .size(355.dp)
-                .fillMaxWidth()
-                .clip(RectangleShape)
-                .background(Color.White)
-                .drawBehind {
-                    drawRoundRect(
-                        color = Color(0xFF136204),
-                        style = stroke,
-                        cornerRadius = CornerRadius(10.dp.toPx())
-                    )
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            if (selectedImgUri != null) {
-                AsyncImage(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RectangleShape),
-                    model = selectedImgUri,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
-            }
-        }
-        IconButton(
-            onClick = {
-                photoPickerLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+        modifier = Modifier
+            .height(400.dp)
+            .clip(RectangleShape)
+            .drawBehind {
+                drawRoundRect(
+                    color = Color(0xFF136204),
+                    style = stroke,
+                    cornerRadius = CornerRadius(10.dp.toPx())
                 )
             },
-            modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
-                .align(Alignment.Center),
-            colors = IconButtonDefaults.iconButtonColors(Color.White),
-        ) {
-            Text(
-                text = "Upload ID",
-                fontSize = 20.sp,
-                color = Color.Gray,
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight.Bold,
+        contentAlignment = Alignment.Center
+    ) {
+        if (selectedImgUri != null) {
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RectangleShape),
+                model = selectedImgUri,
+                contentDescription = null,
+                contentScale = ContentScale.Fit
             )
         }
-    }
-}
-
-fun getBytesFromUri(context: Context, uri: Uri): ByteArray? {
-    return try {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        inputStream?.buffered()?.use { it.readBytes() }
-    } catch (e: Exception) {
-        null
     }
 }
 
