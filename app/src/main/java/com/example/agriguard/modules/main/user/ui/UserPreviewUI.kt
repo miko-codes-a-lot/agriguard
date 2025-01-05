@@ -1,5 +1,6 @@
 package com.example.agriguard.modules.main.user.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -23,12 +26,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.agriguard.modules.main.chat.ui.decodeBase64ToBitmap
+import com.example.agriguard.modules.main.complain.ui.decodeBase64ToBitmap
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -43,8 +52,12 @@ fun UserPreviewUI(
     onSave: suspend (UserDto) -> Unit,
     onCancel: () -> Unit
 ) {
+    val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val isSaving = remember { mutableStateOf(false) }
+    val imageBitmap = remember(user.validId) {
+        user.validId?.let { decodeBase64ToBitmap(it, maxWidth = 500, maxHeight = 500) }
+    }
     val statesValue = remember(user) {
         listOf(
             "First Name" to user.firstName,
@@ -58,12 +71,14 @@ fun UserPreviewUI(
     }
     Column(
         modifier = Modifier
+            .verticalScroll(scrollState)
             .fillMaxSize()
             .background(Color.White)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(50.dp))
         Text(text = title,
             fontFamily = FontFamily.Serif,
             fontSize = 24.sp,
@@ -71,6 +86,25 @@ fun UserPreviewUI(
                 .padding(bottom = 3.dp, top = 7.dp)
         )
         ViewUserDetails(statesValues = statesValue)
+
+        Spacer(modifier = Modifier.padding(top = 9.dp))
+        if (imageBitmap != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+                    .clip(RectangleShape)
+                    .background(Color.White),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    bitmap = imageBitmap.asImageBitmap(),
+                    contentDescription = "Valid ID Preview",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+            }
+        }
         ButtonPreview(user, coroutineScope, onSave, isSaving)
         Spacer(modifier = Modifier.padding(top = 9.dp))
 
@@ -81,6 +115,8 @@ fun UserPreviewUI(
                 fontFamily = FontFamily.SansSerif
             )
         }
+        Spacer(modifier = Modifier.padding(bottom = 50.dp))
+
     }
 }
 
