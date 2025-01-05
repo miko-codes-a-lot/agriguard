@@ -559,7 +559,7 @@ fun OnionInsuranceCreate(
                 )
             }
             Text(
-                text = "Name and Signature of Supervising PT",
+                text = "",
                 fontSize = 16.sp,
                 fontFamily = FontFamily.SansSerif,
                 color = Color.Black,
