@@ -161,7 +161,7 @@ private fun IndemnityButton(
 
     ElevatedButton(
         onClick = {
-            val route = MainNav.IndemnityDetails(indemnity.id!!)
+            val route = MainNav.IndemnityDetails(indemnity.id!!, currentUser.id!!)
             navController.navigate(route)
         },
         colors = ButtonDefaults.elevatedButtonColors(
