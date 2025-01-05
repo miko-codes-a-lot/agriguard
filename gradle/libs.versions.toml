@@ -24,6 +24,7 @@ android-dagger-hilt = "2.49"
 hilt-navigation-compose = "1.2.0"
 kotlinxDatetime = "0.6.1"
 converterGson = "2.9.0"
+itextpdf = "5.5.13.1"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -62,6 +63,7 @@ hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-com
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "converterGson" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+itextpdf = { module = "com.itextpdf:itextpdf", version.ref = "itextpdf" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
