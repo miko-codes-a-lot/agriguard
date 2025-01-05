@@ -1,5 +1,8 @@
 package com.example.agriguard.modules.main.indemnity.ui
 
+import android.content.Context
+import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,13 +33,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.agriguard.MainActivity
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.indemnity.viewmodel.IndemnityViewModel
+import com.example.agriguard.modules.main.onion.ui.openFile
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -44,66 +53,98 @@ import java.util.Locale
 fun IndemnityDetailsUI(
     title: String,
     currentUser: UserDto,
+    userDto: UserDto,
     indemnity: IndemnityDto,
     status: MutableState<String> = rememberSaveable { mutableStateOf("pending") },
     onClickEdit: () -> Unit = {},
-    onClickLike: (isLike: Boolean) -> Unit = {},
+    onClickLike: (isLike: Boolean) -> Unit = {}
 ) {
-    val statesValue = remember(indemnity) {
-        listOf(
-            "Status" to (indemnity.status ?: "Pending"),
-            "Fill Up Date" to dateFormatContainer(indemnity.fillUpdate),
-            "Crops" to (indemnity.crops ?: ""),
-            "Regular" to if (indemnity.regular) "Yes" else "No",
-            "Punla" to if (indemnity.punla) "Yes" else "No",
-            "Cooperative Rice" to if (indemnity.cooperativeRice) "Yes" else "No",
-            "RSBSA" to if (indemnity.rsbsa) "Yes" else "No",
-            "Sikat" to if (indemnity.sikat) "Yes" else "No",
-            "APCPC" to if (indemnity.apcpc) "Yes" else "No",
-            "Others" to (indemnity.others ?: ""),
-            "Variety Planted" to (indemnity.variety ?: ""),
-            "Actual Date Of Planting" to dateFormatContainer(indemnity.dateOfPlanting),
-            "Cause of Damage" to (indemnity.causeOfDamage ?: ""),
-            "Cause Of Loss" to (indemnity.causeOfLoss ?: ""),
-            "Date of Loss" to dateFormatContainer(indemnity.dateOfLoss),
-            "Insured Area" to (indemnity.insuredArea ?: ""),
-            "Age of Cultivation" to (indemnity.ageCultivation ?: ""),
-            "Area Damaged" to (indemnity.areaDamaged ?: ""),
-            "Degree of Damage" to (indemnity.degreeOfDamage ?: ""),
-            "Expected Date of Harvest" to dateFormatContainer(indemnity.expectedDateOfHarvest),
-            "North" to (indemnity.north ?: ""),
-            "South" to (indemnity.south ?: ""),
-            "East" to (indemnity.east ?: ""),
-            "West" to (indemnity.west ?: ""),
-            "Upa Sa Gawa Bilang" to (indemnity.upaSaGawaBilang ?: ""),
-            "Upa Sa Gawa Halaga" to (indemnity.upaSaGawaHalaga ?: ""),
-            "Binhi Bilang" to (indemnity.binhiBilang ?: ""),
-            "Binhi Halaga" to (indemnity.binhiHalaga ?: ""),
-            "Abono Bilang" to (indemnity.abonoBilang ?: ""),
-            "Abono Halaga" to (indemnity.abonoHalaga ?: ""),
-            "Kemikal Bilang" to (indemnity.kemikalBilang ?: ""),
-            "Kemikal Halaga" to (indemnity.kemikalHalaga ?: ""),
-            "Patubig Bilang" to (indemnity.patubigBilang ?: ""),
-            "Patubig Halaga" to (indemnity.patubigHalaga ?: ""),
-            "Ibapa Bilang" to (indemnity.ibapaBilang ?: ""),
-            "Ibapa Halaga" to (indemnity.ibapaHalaga ?: ""),
-            "Kabuuan Bilang" to (indemnity.kabuuanBilang ?: ""),
-            "Kabuuan Halaga" to (indemnity.kabuuanHalaga ?: ""),
-        ).associate { (label, value) -> label to mutableStateOf(value) }
+    val indemnityViewModel: IndemnityViewModel = hiltViewModel()
+    val specialCondition = remember(indemnity) {
+        when {
+            indemnity.regular -> "Regular"
+            indemnity.punla -> "Punla"
+            indemnity.cooperativeRice -> "Cooperative Rice"
+            indemnity.rsbsa -> "RSBSA"
+            indemnity.sikat -> "Sikat"
+            indemnity.apcpc -> "APCPC"
+            else -> null
+        }
     }
-
+    val statesValue = listOfNotNull(
+        "Status" to (indemnity.status ?: "Pending"),
+        "Fill Up Date" to dateFormatContainer(indemnity.fillUpdate),
+        "Crops" to (indemnity.crops ?: ""),
+        specialCondition?.let { "Special Condition" to it },
+        "Others" to (indemnity.others ?: ""),
+        "Variety Planted" to (indemnity.variety ?: ""),
+        "Actual Date Of Planting" to dateFormatContainer(indemnity.dateOfPlanting),
+        "Cause of Damage" to (indemnity.causeOfDamage ?: ""),
+        "Cause Of Loss" to (indemnity.causeOfLoss ?: ""),
+        "Date of Loss" to dateFormatContainer(indemnity.dateOfLoss),
+        "Insured Area" to (indemnity.insuredArea ?: ""),
+        "Age of Cultivation" to (indemnity.ageCultivation ?: ""),
+        "Area Damaged" to (indemnity.areaDamaged ?: ""),
+        "Degree of Damage" to (indemnity.degreeOfDamage ?: ""),
+        "Expected Date of Harvest" to dateFormatContainer(indemnity.expectedDateOfHarvest),
+        "North" to (indemnity.north ?: ""),
+        "South" to (indemnity.south ?: ""),
+        "East" to (indemnity.east ?: ""),
+        "West" to (indemnity.west ?: ""),
+        "Upa Sa Gawa Bilang" to (indemnity.upaSaGawaBilang ?: ""),
+        "Upa Sa Gawa Halaga" to (indemnity.upaSaGawaHalaga ?: ""),
+        "Binhi Bilang" to (indemnity.binhiBilang ?: ""),
+        "Binhi Halaga" to (indemnity.binhiHalaga ?: ""),
+        "Abono Bilang" to (indemnity.abonoBilang ?: ""),
+        "Abono Halaga" to (indemnity.abonoHalaga ?: ""),
+        "Kemikal Bilang" to (indemnity.kemikalBilang ?: ""),
+        "Kemikal Halaga" to (indemnity.kemikalHalaga ?: ""),
+        "Patubig Bilang" to (indemnity.patubigBilang ?: ""),
+        "Patubig Halaga" to (indemnity.patubigHalaga ?: ""),
+        "Ibapa Bilang" to (indemnity.ibapaBilang ?: ""),
+        "Ibapa Halaga" to (indemnity.ibapaHalaga ?: ""),
+        "Kabuuan Bilang" to (indemnity.kabuuanBilang ?: ""),
+        "Kabuuan Halaga" to (indemnity.kabuuanHalaga ?: "")
+    ).associate { (label, value) -> label to mutableStateOf(value) }
+//    val fetchResidencesReportDetails = indemnityViewModel.fetchFarmerWithIndemnity(userDto.id!!, indemnityId = indemnity.id!!)
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     Scaffold(
         modifier = Modifier
             .background(Color.White)
             .fillMaxSize(),
         floatingActionButton = {
-            FloatingIndemnityInsuranceIcon(
-                onClickEdit = onClickEdit,
-                onClickLike = onClickLike,
-                currentUser = currentUser,
-                status = status
-            )
+            if(currentUser.isAdmin){
+                IndemnityInsurancePrintIcon(
+                    fetchIndemnityDetails = indemnity,
+                    onExportToPDF= { data ->
+                        exportOnionDetails(
+                            context = context,
+        //                            user = userDto,
+                            data = data,
+                            onFinish = { file ->
+                                openFile(context, file)
+                            },
+                            onError = { e ->
+                                Toast.makeText(
+                                    context,
+                                    "Error creating PDF: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        )
+
+                    },
+                    context = context
+                )
+            } else {
+                FloatingIndemnityInsuranceIcon(
+                    onClickEdit = onClickEdit,
+                    onClickLike = onClickLike,
+                    currentUser = currentUser,
+                    status = status
+                )
+            }
         }
     ) { padding ->
         Column(
@@ -273,6 +314,42 @@ fun FloatingIndemnityInsuranceIcon(
                     contentDescription = "Dislike"
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun IndemnityInsurancePrintIcon (
+    fetchIndemnityDetails: IndemnityDto,
+    onExportToPDF: (IndemnityDto) -> Unit,
+    context: Context
+) {
+    val activity = context as? MainActivity
+    Column(
+        modifier = Modifier
+            .background(Color.Transparent),
+        horizontalAlignment = Alignment.End
+    ) {
+        FloatingActionButton(
+            onClick = {
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && activity != null) {
+                    activity.requestStoragePermission()
+                }
+                onExportToPDF(fetchIndemnityDetails)
+            },
+            containerColor = Color(0xFF136204),
+            contentColor = Color(0xFFFFFFFF),
+            shape = CircleShape,
+            modifier = Modifier
+                .size(75.dp)
+                .offset(x = (-5).dp, y = (-7).dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.printer),
+                contentDescription = "Export",
+                modifier = Modifier.size(30.dp),
+                tint = Color.White
+            )
         }
     }
 }

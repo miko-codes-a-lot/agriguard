@@ -1,8 +1,11 @@
 package com.example.agriguard.modules.main.complain.ui
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Base64
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,25 +43,26 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.agriguard.MainActivity
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.complain.model.dto.ComplaintInsuranceDto
-import com.example.agriguard.modules.main.rice.ui.FloatingRiceInsuranceIcon
+import com.example.agriguard.modules.main.onion.ui.openFile
 import com.example.agriguard.modules.main.setting.resizeBitmap
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.io.ByteArrayOutputStream
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun ComplaintDetailsUI(
     title: String,
     currentUser: UserDto,
+    userDto: UserDto,
     complaintInsurance: ComplaintInsuranceDto,
     status: MutableState<String> = rememberSaveable { mutableStateOf("pending") },
     onClickEdit: () -> Unit = {},
@@ -76,18 +81,43 @@ fun ComplaintDetailsUI(
     }
 
     val scrollState = rememberScrollState()
-
+    val context = LocalContext.current
     Scaffold(
         modifier = Modifier
             .background(Color.White)
             .fillMaxSize(),
         floatingActionButton = {
-            FloatingComplaintsInsuranceIcon(
-                onClickEdit = onClickEdit,
-                onClickLike = onClickLike,
-                currentUser = currentUser,
-                status = status
-            )
+            if(currentUser.isAdmin){
+                ComplaintInsurancePrintIcon (
+                    fetchComplaintDetails = complaintInsurance,
+                    onExportToPDF= { data ->
+                        exportComplaintDetails(
+                            context = context,
+                            user = userDto,
+                            data = data,
+                            onFinish = { file ->
+                                openFile(context, file)
+                            },
+                            onError = { e ->
+                                Toast.makeText(
+                                    context,
+                                    "Error creating PDF: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        )
+
+                    },
+                    context = context
+                )
+            } else {
+                FloatingComplaintsInsuranceIcon(
+                    onClickEdit = onClickEdit,
+                    onClickLike = onClickLike,
+                    currentUser = currentUser,
+                    status = status
+                )
+            }
         }
     ) { padding ->
         Column(
@@ -331,6 +361,42 @@ fun TextContainer(textLabel: String, textValue: String) {
                         overflow = TextOverflow.Ellipsis
                     )
             }
+        }
+    }
+}
+
+@Composable
+fun ComplaintInsurancePrintIcon (
+    fetchComplaintDetails: ComplaintInsuranceDto,
+    onExportToPDF: (ComplaintInsuranceDto) -> Unit,
+    context: Context
+) {
+    val activity = context as? MainActivity
+    Column(
+        modifier = Modifier
+            .background(Color.Transparent),
+        horizontalAlignment = Alignment.End
+    ) {
+        FloatingActionButton(
+            onClick = {
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && activity != null) {
+                    activity.requestStoragePermission()
+                }
+                onExportToPDF(fetchComplaintDetails)
+            },
+            containerColor = Color(0xFF136204),
+            contentColor = Color(0xFFFFFFFF),
+            shape = CircleShape,
+            modifier = Modifier
+                .size(75.dp)
+                .offset(x = (-5).dp, y = (-7).dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.printer),
+                contentDescription = "Export",
+                modifier = Modifier.size(30.dp),
+                tint = Color.White
+            )
         }
     }
 }

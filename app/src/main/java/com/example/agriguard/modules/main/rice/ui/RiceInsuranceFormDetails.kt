@@ -1,5 +1,8 @@
 package com.example.agriguard.modules.main.rice.ui
 
+import android.content.Context
+import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,12 +33,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.agriguard.MainActivity
 import com.example.agriguard.R
+import com.example.agriguard.modules.main.onion.model.dto.OnionInsuranceDto
+import com.example.agriguard.modules.main.onion.ui.OnionInsurancePrintIcon
+import com.example.agriguard.modules.main.onion.ui.exportOnionDetails
+import com.example.agriguard.modules.main.onion.ui.openFile
 import com.example.agriguard.modules.main.rice.model.dto.RiceInsuranceDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
@@ -44,12 +54,12 @@ import java.util.Locale
 fun RiceInsuranceFormDetails(
     title: String,
     currentUser: UserDto,
+    userDto: UserDto,
     riceInsurance: RiceInsuranceDto,
     status: MutableState<String> = rememberSaveable { mutableStateOf("pending") },
     onClickEdit: () -> Unit = {},
     onClickLike: (isLike: Boolean) -> Unit = {},
 ) {
-
     val statesValue = remember(riceInsurance) {
         listOf(
             "Status" to (riceInsurance.status ?: "Pending"),
@@ -107,18 +117,43 @@ fun RiceInsuranceFormDetails(
         ).associate { (label, value) -> label to mutableStateOf(value) }
     }
     val scrollState = rememberScrollState()
-
+    val context = LocalContext.current
     Scaffold(
         modifier = Modifier
             .background(Color.White)
             .fillMaxSize(),
         floatingActionButton = {
-            FloatingRiceInsuranceIcon(
-                onClickEdit = onClickEdit,
-                onClickLike = onClickLike,
-                currentUser = currentUser,
-                status = status
-            )
+            if(currentUser.isAdmin){
+                RiceInsurancePrintIcon(
+                    fetchRiceDetails = riceInsurance,
+                    onExportToPDF= { data ->
+                        exportRiceDetails(
+                            context = context,
+                            user = userDto,
+                            data = data,
+                            onFinish = { file ->
+                                openFile(context, file)
+                            },
+                            onError = { e ->
+                                Toast.makeText(
+                                    context,
+                                    "Error creating PDF: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        )
+
+                    },
+                    context = context
+                )
+            } else {
+                FloatingRiceInsuranceIcon(
+                    onClickEdit = onClickEdit,
+                    onClickLike = onClickLike,
+                    currentUser = currentUser,
+                    status = status
+                )
+            }
         }
     ) { padding ->
         Column(
@@ -286,5 +321,41 @@ fun dateFormatContainer(dateString: String): String {
         displayFormat.format(dates)
     } catch (e: Exception) {
         "Select Date"
+    }
+}
+
+@Composable
+fun RiceInsurancePrintIcon (
+    fetchRiceDetails: RiceInsuranceDto,
+    onExportToPDF: (RiceInsuranceDto) -> Unit,
+    context: Context
+) {
+    val activity = context as? MainActivity
+    Column(
+        modifier = Modifier
+            .background(Color.Transparent),
+        horizontalAlignment = Alignment.End
+    ) {
+        FloatingActionButton(
+            onClick = {
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && activity != null) {
+                    activity.requestStoragePermission()
+                }
+                onExportToPDF(fetchRiceDetails)
+            },
+            containerColor = Color(0xFF136204),
+            contentColor = Color(0xFFFFFFFF),
+            shape = CircleShape,
+            modifier = Modifier
+                .size(75.dp)
+                .offset(x = (-5).dp, y = (-7).dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.printer),
+                contentDescription = "Export",
+                modifier = Modifier.size(30.dp),
+                tint = Color.White
+            )
+        }
     }
 }
