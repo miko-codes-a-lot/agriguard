@@ -161,7 +161,7 @@ private fun RiceInsuranceButton(
 
     ElevatedButton(
         onClick = {
-            navController.navigate(MainNav.RiceInsuranceDetails(riceInsurance.id!!))
+            navController.navigate(MainNav.RiceInsuranceDetails(riceInsurance.id!!, currentUser.id!!))
         },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
