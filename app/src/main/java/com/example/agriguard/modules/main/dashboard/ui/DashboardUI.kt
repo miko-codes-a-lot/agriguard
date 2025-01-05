@@ -282,14 +282,14 @@ fun CropsCategory(
     ) {
         val actions = if (currentUser.isAdmin) {
             listOf(
-                Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintList) },
+                Triple("Application Status", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintList) },
                 Triple("RICE INSURANCE", R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList) },
                 Triple("ONION INSURANCE", R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList) },
                 Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.IndemnityList) },
             )
         } else if (currentUser.isTechnician){
             listOf(
-                Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintList) },
+                Triple("Application Status", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintList) },
                 Triple("RICE INSURANCE", R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList) },
                 Triple("ONION INSURANCE", R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList) },
                 Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.IndemnityList) },
@@ -298,7 +298,7 @@ fun CropsCategory(
         } else {
             listOf(
                 Triple("INFO HUB", R.drawable.crop_monitor, onCropsMonitoringClick),
-                Triple("COMPLAINTS", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintList) },
+                Triple("Application Status", R.drawable.submitted_report) { navController.navigate(MainNav.ComplaintList) },
                 Triple("RICE INSURANCE", R.drawable.ricein) { navController.navigate(MainNav.RiceInsuranceList) },
                 Triple("ONION INSURANCE", R.drawable.onionin) { navController.navigate(MainNav.OnionInsuranceList) },
                 Triple("INDEMNITY", R.drawable.inde) { navController.navigate(MainNav.IndemnityList) },
