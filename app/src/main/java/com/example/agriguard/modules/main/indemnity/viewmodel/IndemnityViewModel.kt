@@ -36,4 +36,9 @@ class IndemnityViewModel @Inject constructor(
     fun fetchAll(userDto: UserDto): List<IndemnityWithUserDto> {
         return service.fetchAll(userDto = userDto)
     }
+
+//    fun fetchFarmerWithIndemnity(farmerId: String, indemnityId: String): IndemnityWithUserDto? {
+//        return service.fetchFarmerWithIndemnity(farmerId, indemnityId)
+//    }
+
 }
