@@ -163,7 +163,7 @@ private fun OnionInsuranceButton(
 
     ElevatedButton(
         onClick = {
-            navController.navigate(MainNav.OnionDetails(onionInsurance.id!!))
+            navController.navigate(MainNav.OnionDetails(onionInsurance.id!!, currentUser.id!!))
         },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
