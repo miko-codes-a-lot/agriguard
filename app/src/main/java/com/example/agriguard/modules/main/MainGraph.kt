@@ -56,7 +56,7 @@ import com.example.agriguard.modules.main.setting.EditSettingsUI
 import com.example.agriguard.modules.main.setting.SettingsUI
 import com.example.agriguard.modules.main.user.model.dto.AddressDto
 import com.example.agriguard.modules.main.user.service.UserService
-import com.example.agriguard.modules.main.user.ui.CreateUploadId
+import com.example.agriguard.modules.main.user.ui.UserValidIdUI
 import com.example.agriguard.modules.main.user.ui.UserCreateUI
 import com.example.agriguard.modules.main.user.ui.UserEditUI
 import com.example.agriguard.modules.main.user.ui.UsersUI
@@ -216,7 +216,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                         }
 
                         if (notifyDto.documentType?.contains("indemnity", ignoreCase = true) == true) {
-                            navController.navigate(MainNav.IndemnityDetails(notifyDto.documentId!!))
+                            navController.navigate(MainNav.IndemnityDetails(notifyDto.documentId!!, currentUser.id!!))
                         }
                     }
                 )
@@ -275,13 +275,15 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             val args = it.toRoute<MainNav.ComplaintDetails>()
             val viewModel: ComplaintViewModel = hiltViewModel()
             val scope = rememberCoroutineScope()
-
+            val userViewModel: UserViewModel = hiltViewModel()
+            val userDto = userViewModel.fetchUser(args.userId)
             Guard(navController = navController) { currentUser ->
                 val complaintDto = viewModel.fetchOne(args.id)
                 val status = rememberSaveable { mutableStateOf(complaintDto.status ?: "pending") }
                 ComplaintDetailsUI(
                     title = "Complaints Details",
                     currentUser = currentUser,
+                    userDto = userDto,
                     complaintInsurance = complaintDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
@@ -352,6 +354,8 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             Guard(navController) { currentUser ->
                 val args = it.toRoute<MainNav.RiceInsuranceDetails>()
                 val viewModel: RiceInsuranceViewModel = hiltViewModel()
+                val userViewModel: UserViewModel = hiltViewModel()
+                val userDto = userViewModel.fetchUser(args.userId)
                 val riceInsuranceDto = viewModel.fetchOne(args.id)
 
                 val status = rememberSaveable { mutableStateOf(riceInsuranceDto.status ?: "pending") }
@@ -361,6 +365,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 RiceInsuranceFormDetails(
                     title = "RiceInsurance Details",
                     currentUser = currentUser,
+                    userDto = userDto,
                     riceInsurance = riceInsuranceDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
@@ -396,17 +401,18 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             }
         }
         composable<MainNav.IndemnityDetails> {
-            Guard(navController) { currentUser ->
                 val args = it.toRoute<MainNav.IndemnityDetails>()
                 val viewModel: IndemnityViewModel = hiltViewModel()
-                val indemnityDto = viewModel.fetchOne(args.id)
-
-                val status = rememberSaveable { mutableStateOf(indemnityDto.status ?: "pending") }
-
+                val userViewModel: UserViewModel = hiltViewModel()
+                val userDto = userViewModel.fetchUser(userId = args.userId)
                 val scope = rememberCoroutineScope()
+            Guard(navController) { currentUser ->
+                val indemnityDto = viewModel.fetchOne(args.id)
+                val status = rememberSaveable { mutableStateOf(indemnityDto.status ?: "pending") }
                 IndemnityDetailsUI(
                     title = "Indemnity Details",
                     currentUser = currentUser,
+                    userDto = userDto,
                     indemnity = indemnityDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
@@ -513,14 +519,17 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         composable<MainNav.OnionDetails> {
             Guard(navController) { currentUser ->
                 val args = it.toRoute<MainNav.OnionDetails>()
+                val userViewModel: UserViewModel = hiltViewModel()
+                val userDto = userViewModel.fetchUser(args.userId)
                 val viewModel: OnionInsuranceViewmodel = hiltViewModel()
                 val onionInsuranceDto = viewModel.fetchOne(args.id)
-                val status = rememberSaveable { mutableStateOf(onionInsuranceDto.status ?: "pending") }
 
+                val status = rememberSaveable { mutableStateOf(onionInsuranceDto.status ?: "pending") }
                 val scope = rememberCoroutineScope()
                 OnionInsuranceDetails(
                     title = "Onion Details",
                     currentUser = currentUser,
+                    userDto = userDto,
                     onionInsurance = onionInsuranceDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
@@ -542,7 +551,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                                 }
                             }
                         }
-                    }
+                    },
                 )
             }
         }
@@ -650,10 +659,12 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 ReportDashboardUI()
             }
         }
-        composable<MainNav.CreateUpload> {
+        composable<MainNav.UserValidId> {
+            val args = it.toRoute<MainNav.UserValidId>()
             Guard(navController = navController) { currentUser ->
                 val userService: UserService = hiltViewModel<UserViewModel>().userService
-                CreateUploadId(currentUser = currentUser, userService = userService)
+                val userDto = userService.fetchOne(args.userId)
+                UserValidIdUI(userDto = userDto, userService = userService)
             }
         }
         composable("${MainNav.EditSettings}/{settingType}") { backStackEntry ->
