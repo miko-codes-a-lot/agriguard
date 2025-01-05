@@ -79,4 +79,21 @@ class IndemnityInsuranceService @Inject constructor(
                 toDTO()
             }
     }
+
+    fun fetchFarmerWithIndemnity(farmerId: String, indemnityId: String): IndemnityWithUserDto? {
+        try {
+            val indemnity = realm.query<Indemnity>("_id == $0 AND userId == $1", ObjectId(indemnityId), farmerId)
+                .find()
+                .firstOrNull()
+                ?.toDTO()
+                ?: throw IllegalStateException("No indemnity found with ID: $indemnityId and Farmer ID: $farmerId")
+
+            val user = userService.fetchOne(indemnity.userId)
+            Log.d("QueryParameters", "indemnityId: $indemnityId, farmerId: $farmerId")
+            return IndemnityWithUserDto(indemnity, user)
+        } catch (e: Exception) {
+            Log.e("fetchFarmerWithIndemnity", "Error: ${e.message}", e)
+            return null
+        }
+    }
 }
