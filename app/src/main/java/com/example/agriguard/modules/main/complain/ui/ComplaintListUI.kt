@@ -188,7 +188,7 @@ private fun ReportButton(
 
     ElevatedButton(
         onClick = {
-            navController.navigate(MainNav.ComplaintDetails(complaint.id!!))
+            navController.navigate(MainNav.ComplaintDetails(complaint.id!!, currentUser.id!!))
         },
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = Color(0xFFFFFFFF),
