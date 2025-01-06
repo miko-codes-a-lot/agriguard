@@ -52,13 +52,13 @@ fun exportRiceDetails(
         table.widthPercentage = 100f
         table.setWidths(floatArrayOf(3f, 6f))
 
-//        val userDetails = listOfNotNull(
-//            "First Name" to user.firstName,
-//            user.middleName?.let { "Middle Name" to it },
-//            "Last Name" to user.lastName,
-//            user.mobileNumber?.let { "Mobile Number" to it },
-//            user.address?.let { "Address" to it }
-//        )
+        val userDetails = listOfNotNull(
+            "First Name" to user.firstName,
+            user.middleName?.let { "Middle Name" to it },
+            "Last Name" to user.lastName,
+            user.mobileNumber?.let { "Mobile Number" to it },
+            user.address?.let { "Address" to it }
+        )
 
         val insuranceDetails = listOf(
             "Status" to (data.status ?: "Pending"),
@@ -119,8 +119,7 @@ fun exportRiceDetails(
             "To" to (data.to ?: "")
         )
 
-//        val labels = userDetails + insuranceDetails
-        val labels = insuranceDetails
+        val labels = userDetails + insuranceDetails
 
         for ((label, value) in labels) {
             val labelCell = PdfPCell(Phrase("$label ", labelFont))

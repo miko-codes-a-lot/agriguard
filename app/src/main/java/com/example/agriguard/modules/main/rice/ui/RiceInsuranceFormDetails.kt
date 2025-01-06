@@ -46,6 +46,7 @@ import com.example.agriguard.modules.main.onion.ui.OnionInsurancePrintIcon
 import com.example.agriguard.modules.main.onion.ui.exportOnionDetails
 import com.example.agriguard.modules.main.onion.ui.openFile
 import com.example.agriguard.modules.main.rice.model.dto.RiceInsuranceDto
+import com.example.agriguard.modules.main.rice.model.dto.RiceWIthUserDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -53,8 +54,8 @@ import java.util.Locale
 @Composable
 fun RiceInsuranceFormDetails(
     title: String,
+    riceWIthUserDto: RiceWIthUserDto,
     currentUser: UserDto,
-    userDto: UserDto,
     riceInsurance: RiceInsuranceDto,
     status: MutableState<String> = rememberSaveable { mutableStateOf("pending") },
     onClickEdit: () -> Unit = {},
@@ -129,8 +130,8 @@ fun RiceInsuranceFormDetails(
                     onExportToPDF= { data ->
                         exportRiceDetails(
                             context = context,
-                            user = userDto,
-                            data = data,
+                            data = riceWIthUserDto.rice,
+                            user = riceWIthUserDto.user,
                             onFinish = { file ->
                                 openFile(context, file)
                             },
