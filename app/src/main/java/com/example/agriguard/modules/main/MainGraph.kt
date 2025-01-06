@@ -17,6 +17,7 @@ import androidx.navigation.toRoute
 import com.example.agriguard.modules.main.chat.model.viewmodel.ChatViewModel
 import com.example.agriguard.modules.main.chat.ui.ChatDirectUI
 import com.example.agriguard.modules.main.chat.ui.ChatLobbyUI
+import com.example.agriguard.modules.main.complain.model.dto.ComplainWithUserDto
 import com.example.agriguard.modules.main.complain.ui.ComplaintDetailsUI
 import com.example.agriguard.modules.main.complain.ui.ComplaintFormUI
 import com.example.agriguard.modules.main.complain.ui.ComplaintListUI
@@ -26,6 +27,7 @@ import com.example.agriguard.modules.main.farmer.AddressesUI
 import com.example.agriguard.modules.main.farmer.FarmersPreviewUI
 import com.example.agriguard.modules.main.farmer.FarmersUI
 import com.example.agriguard.modules.main.farmer.viewmodel.FarmersViewModel
+import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityWithUserDto
 import com.example.agriguard.modules.main.indemnity.ui.IndemnityDetailsUI
 import com.example.agriguard.modules.main.indemnity.ui.IndemnityListUI
 import com.example.agriguard.modules.main.indemnity.ui.IndemnityFormUI
@@ -41,6 +43,7 @@ import com.example.agriguard.modules.main.module.RicePetsModule
 import com.example.agriguard.modules.main.module.RiceWeedUI
 import com.example.agriguard.modules.main.notify.ui.NotificationListUI
 import com.example.agriguard.modules.main.notify.viewmodel.NotifyViewModel
+import com.example.agriguard.modules.main.onion.model.dto.OnionWithUserDto
 import com.example.agriguard.modules.main.onion.ui.OnionInsuranceCreate
 import com.example.agriguard.modules.main.onion.ui.OnionInsuranceDetails
 import com.example.agriguard.modules.main.onion.ui.OnionInsuranceListUI
@@ -48,6 +51,7 @@ import com.example.agriguard.modules.main.onion.viewmodel.OnionInsuranceViewmode
 import com.example.agriguard.modules.main.report.ui.RegistrationMenuUI
 import com.example.agriguard.modules.main.report.ui.ReportDashboardUI
 import com.example.agriguard.modules.main.report.ui.ReportFormValidationUI
+import com.example.agriguard.modules.main.rice.model.dto.RiceWIthUserDto
 import com.example.agriguard.modules.main.rice.ui.RiceInsuranceFormDetails
 import com.example.agriguard.modules.main.rice.ui.RiceInsuranceFormUI
 import com.example.agriguard.modules.main.rice.ui.RiceInsuranceListUI
@@ -276,14 +280,18 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             val viewModel: ComplaintViewModel = hiltViewModel()
             val scope = rememberCoroutineScope()
             val userViewModel: UserViewModel = hiltViewModel()
-            val userDto = userViewModel.fetchUser(args.userId)
             Guard(navController = navController) { currentUser ->
+                val complainWithUserDto = remember {
+                    val complaints = viewModel.fetchOne(args.id)
+                    val farmerUserDto = userViewModel.fetchUser(complaints.userId)
+                    ComplainWithUserDto(complaints, farmerUserDto)
+                }
                 val complaintDto = viewModel.fetchOne(args.id)
                 val status = rememberSaveable { mutableStateOf(complaintDto.status ?: "pending") }
                 ComplaintDetailsUI(
                     title = "Complaints Details",
+                    complainWithUserDto = complainWithUserDto,
                     currentUser = currentUser,
-                    userDto = userDto,
                     complaintInsurance = complaintDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
@@ -355,17 +363,18 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 val args = it.toRoute<MainNav.RiceInsuranceDetails>()
                 val viewModel: RiceInsuranceViewModel = hiltViewModel()
                 val userViewModel: UserViewModel = hiltViewModel()
-                val userDto = userViewModel.fetchUser(args.userId)
+                val riceWIthUserDto = remember {
+                    val riceInsurance = viewModel.fetchOne(args.id)
+                    val farmerUserDto = userViewModel.fetchUser(riceInsurance.userId)
+                    RiceWIthUserDto(riceInsurance, farmerUserDto)
+                }
                 val riceInsuranceDto = viewModel.fetchOne(args.id)
-
                 val status = rememberSaveable { mutableStateOf(riceInsuranceDto.status ?: "pending") }
-
                 val scope = rememberCoroutineScope()
-
                 RiceInsuranceFormDetails(
                     title = "RiceInsurance Details",
+                    riceWIthUserDto = riceWIthUserDto,
                     currentUser = currentUser,
-                    userDto = userDto,
                     riceInsurance = riceInsuranceDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
@@ -404,16 +413,21 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                 val args = it.toRoute<MainNav.IndemnityDetails>()
                 val viewModel: IndemnityViewModel = hiltViewModel()
                 val userViewModel: UserViewModel = hiltViewModel()
-                val userDto = userViewModel.fetchUser(userId = args.userId)
                 val scope = rememberCoroutineScope()
             Guard(navController) { currentUser ->
-                val indemnityDto = viewModel.fetchOne(args.id)
-                val status = rememberSaveable { mutableStateOf(indemnityDto.status ?: "pending") }
+                val indemnityWithUser = remember {
+                    val indemnityDto = viewModel.fetchOne(args.id)
+                    val farmerUserDto = userViewModel.fetchUser(indemnityDto.userId)
+                    IndemnityWithUserDto(indemnityDto, farmerUserDto)
+                }
+                val status = rememberSaveable { mutableStateOf(indemnityWithUser.indemnity.status ?: "pending") }
                 IndemnityDetailsUI(
                     title = "Indemnity Details",
+                    indemnityWithUser = indemnityWithUser.copy(
+                        indemnity = indemnityWithUser.indemnity.copy(status = status.value)
+                    ),
                     currentUser = currentUser,
-                    userDto = userDto,
-                    indemnity = indemnityDto.copy(status = status.value),
+                    indemnity = indemnityWithUser.indemnity.copy(status = status.value),
                     status = status,
                     onClickEdit = {
                         navController.navigate(MainNav.IndemnityEdit(args.id))
@@ -422,13 +436,13 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
                         val newStatus = if (isLike) "approved" else "rejected"
                         status.value = newStatus
                         scope.launch {
-                            indemnityDto.status = newStatus
-                            val result = viewModel.upsert(indemnityDto, currentUser)
+                            indemnityWithUser.indemnity.status = newStatus
+                            val result = viewModel.upsert(indemnityWithUser.indemnity, currentUser)
 
                             if (result.isSuccess) {
                                 Log.d("micool", "Update succeeded: $result")
                             } else {
-                                status.value = indemnityDto.status ?: "pending"
+                                status.value = indemnityWithUser.indemnity.status ?: "pending"
                                 Log.e("micool", "Update failed: $result")
                             }
                         }
@@ -520,16 +534,19 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
             Guard(navController) { currentUser ->
                 val args = it.toRoute<MainNav.OnionDetails>()
                 val userViewModel: UserViewModel = hiltViewModel()
-                val userDto = userViewModel.fetchUser(args.userId)
                 val viewModel: OnionInsuranceViewmodel = hiltViewModel()
+                val onionWithUserDto = remember {
+                    val complaints = viewModel.fetchOne(args.id)
+                    val farmerUserDto = userViewModel.fetchUser(complaints.userId)
+                    OnionWithUserDto(complaints, farmerUserDto)
+                }
                 val onionInsuranceDto = viewModel.fetchOne(args.id)
-
                 val status = rememberSaveable { mutableStateOf(onionInsuranceDto.status ?: "pending") }
                 val scope = rememberCoroutineScope()
                 OnionInsuranceDetails(
                     title = "Onion Details",
+                    onionWithUserDto = onionWithUserDto,
                     currentUser = currentUser,
-                    userDto = userDto,
                     onionInsurance = onionInsuranceDto.copy(status = status.value),
                     status = status,
                     onClickEdit = {
