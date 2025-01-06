@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.agriguard.MainActivity
 import com.example.agriguard.R
+import com.example.agriguard.modules.main.complain.model.dto.ComplainWithUserDto
 import com.example.agriguard.modules.main.complain.model.dto.ComplaintInsuranceDto
 import com.example.agriguard.modules.main.onion.ui.openFile
 import com.example.agriguard.modules.main.setting.resizeBitmap
@@ -61,8 +62,8 @@ import java.io.ByteArrayOutputStream
 @Composable
 fun ComplaintDetailsUI(
     title: String,
+    complainWithUserDto: ComplainWithUserDto,
     currentUser: UserDto,
-    userDto: UserDto,
     complaintInsurance: ComplaintInsuranceDto,
     status: MutableState<String> = rememberSaveable { mutableStateOf("pending") },
     onClickEdit: () -> Unit = {},
@@ -89,11 +90,11 @@ fun ComplaintDetailsUI(
         floatingActionButton = {
             if(currentUser.isAdmin){
                 ComplaintInsurancePrintIcon (
-                    fetchComplaintDetails = complaintInsurance,
+                    fetchComplaintDetails = complainWithUserDto.complaint,
                     onExportToPDF= { data ->
                         exportComplaintDetails(
                             context = context,
-                            user = userDto,
+                            user = complainWithUserDto.user,
                             data = data,
                             onFinish = { file ->
                                 openFile(context, file)

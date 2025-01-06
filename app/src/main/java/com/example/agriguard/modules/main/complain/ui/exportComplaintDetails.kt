@@ -69,13 +69,13 @@ fun exportComplaintDetails (
 
         addLineSpace(document, 2)
 
-//        val userDetails = listOfNotNull(
-//            "First Name" to user.firstName,
-//            user.middleName?.let { "Middle Name" to it },
-//            "Last Name" to user.lastName,
-//            user.mobileNumber?.let { "Mobile Number" to it },
-//            user.address?.let { "Address" to it }
-//        )
+        val userDetails = listOfNotNull(
+            "First Name" to user.firstName,
+            user.middleName?.let { "Middle Name" to it },
+            "Last Name" to user.lastName,
+            user.mobileNumber?.let { "Mobile Number" to it },
+            user.address?.let { "Address" to it }
+        )
 
         val complaintDetails = listOf(
             "Status" to (data.status ?: "Pending"),
@@ -87,8 +87,7 @@ fun exportComplaintDetails (
             "Cause of Damage" to (data.causeOfDamage ?: "N/A")
         )
 
-//        val labels = userDetails + complaintDetails
-        val labels = complaintDetails
+        val labels = userDetails + complaintDetails
 
         for ((label, value) in labels) {
             val labelCell = PdfPCell(Phrase("$label ", labelFont))
