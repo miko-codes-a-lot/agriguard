@@ -41,7 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.agriguard.MainActivity
 import com.example.agriguard.R
+import com.example.agriguard.modules.main.complain.model.dto.ComplainWithUserDto
 import com.example.agriguard.modules.main.onion.model.dto.OnionInsuranceDto
+import com.example.agriguard.modules.main.onion.model.dto.OnionWithUserDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -49,8 +51,8 @@ import java.util.Locale
 @Composable
 fun OnionInsuranceDetails(
     title: String,
+    onionWithUserDto: OnionWithUserDto,
     currentUser: UserDto,
-    userDto: UserDto,
     onionInsurance: OnionInsuranceDto,
     status: MutableState<String> = rememberSaveable { mutableStateOf("pending") },
     onClickEdit: () -> Unit = {},
@@ -112,8 +114,8 @@ fun OnionInsuranceDetails(
                     onExportToPDF= { data ->
                         exportOnionDetails(
                             context = context,
-                            user = userDto,
-                            data = data,
+                            data = onionWithUserDto.onion,
+                            user = onionWithUserDto.user,
                             onFinish = { file ->
                                 openFile(context, file)
                             },
