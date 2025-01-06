@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Environment
 import android.util.Log
 import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityWithUserDto
+import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.itextpdf.text.Chunk
 import com.itextpdf.text.Document
 import com.itextpdf.text.Element
@@ -22,7 +24,7 @@ import java.io.FileOutputStream
 fun exportOnionDetails(
     context: Context,
     data: IndemnityDto,
-//    user: UserDto,
+    user: UserDto,
     onFinish: (file: File) -> Unit,
     onError: (Exception) -> Unit
 ) {
@@ -46,13 +48,13 @@ fun exportOnionDetails(
         table.widthPercentage = 100f
         table.setWidths(floatArrayOf(3f, 6f))
 
-//        val userDetails = listOfNotNull(
-//            "First Name" to user.firstName,
-//            user.middleName?.let { "Middle Name" to it },
-//            "Last Name" to user.lastName,
-//            user.mobileNumber?.let { "Mobile Number" to it },
-//            user.address?.let { "Address" to it }
-//        )
+        val userDetails = listOfNotNull(
+            "First Name" to user.firstName,
+            user.middleName?.let { "Middle Name" to it },
+            "Last Name" to user.lastName,
+            user.mobileNumber?.let { "Mobile Number" to it },
+            user.address?.let { "Address" to it }
+        )
         val indemnityDetails = mutableListOf(
             "Status" to (data.status ?: ""),
             "Crops" to (data.crops ?: ""),
@@ -101,8 +103,8 @@ fun exportOnionDetails(
             )
         }
 
-//        val labels = userDetails + indemnityDetails
-        val labels = indemnityDetails
+        val labels = userDetails + indemnityDetails
+//        val labels = indemnityDetails
 
         for ((label, value) in labels) {
             val labelCell = PdfPCell(Phrase("$label ", labelFont))

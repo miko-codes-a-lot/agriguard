@@ -27,9 +27,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.agriguard.MainActivity
 import com.example.agriguard.R
 import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityDto
+import com.example.agriguard.modules.main.indemnity.model.dto.IndemnityWithUserDto
 import com.example.agriguard.modules.main.indemnity.viewmodel.IndemnityViewModel
 import com.example.agriguard.modules.main.onion.ui.openFile
 import com.example.agriguard.modules.main.user.model.dto.UserDto
@@ -52,14 +55,13 @@ import java.util.Locale
 @Composable
 fun IndemnityDetailsUI(
     title: String,
+    indemnityWithUser: IndemnityWithUserDto,
     currentUser: UserDto,
-    userDto: UserDto,
     indemnity: IndemnityDto,
     status: MutableState<String> = rememberSaveable { mutableStateOf("pending") },
     onClickEdit: () -> Unit = {},
     onClickLike: (isLike: Boolean) -> Unit = {}
 ) {
-    val indemnityViewModel: IndemnityViewModel = hiltViewModel()
     val specialCondition = remember(indemnity) {
         when {
             indemnity.regular -> "Regular"
@@ -106,7 +108,6 @@ fun IndemnityDetailsUI(
         "Kabuuan Bilang" to (indemnity.kabuuanBilang ?: ""),
         "Kabuuan Halaga" to (indemnity.kabuuanHalaga ?: "")
     ).associate { (label, value) -> label to mutableStateOf(value) }
-//    val fetchResidencesReportDetails = indemnityViewModel.fetchFarmerWithIndemnity(userDto.id!!, indemnityId = indemnity.id!!)
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     Scaffold(
@@ -116,12 +117,12 @@ fun IndemnityDetailsUI(
         floatingActionButton = {
             if(currentUser.isAdmin){
                 IndemnityInsurancePrintIcon(
-                    fetchIndemnityDetails = indemnity,
+                    fetchIndemnityDetails = indemnityWithUser.indemnity,
                     onExportToPDF= { data ->
                         exportOnionDetails(
                             context = context,
-        //                            user = userDto,
-                            data = data,
+                            data = indemnityWithUser.indemnity,
+                            user = indemnityWithUser.user,
                             onFinish = { file ->
                                 openFile(context, file)
                             },
