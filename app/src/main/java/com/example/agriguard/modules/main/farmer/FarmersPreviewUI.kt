@@ -1,6 +1,7 @@
 package com.example.agriguard.modules.main.farmer
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
@@ -28,13 +31,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.agriguard.modules.main.MainNav
+import com.example.agriguard.modules.main.complain.ui.decodeBase64ToBitmap
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -46,6 +54,10 @@ fun FarmersPreviewUI(
     currentUser: UserDto,
     user: UserDto
 ) {
+    val scrollState = rememberScrollState()
+    val imageBitmap = remember(user.validId) {
+        user.validId?.let { decodeBase64ToBitmap(it, maxWidth = 500, maxHeight = 500) }
+    }
     val statesValue = remember(user) {
         listOf(
             "FirstName" to user.firstName,
@@ -66,12 +78,14 @@ fun FarmersPreviewUI(
     ) {
         Column(
             modifier = Modifier
+                .verticalScroll(scrollState)
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(50.dp))
             Text(
                 text = "Profile",
                 fontFamily = FontFamily.Serif,
@@ -80,7 +94,26 @@ fun FarmersPreviewUI(
                     .padding(bottom = 3.dp, top = 7.dp)
             )
             FarmersData(stateValues = statesValue)
-            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.padding(top = 9.dp))
+            if (imageBitmap != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .clip(RectangleShape)
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        bitmap = imageBitmap.asImageBitmap(),
+                        contentDescription = "Valid ID Preview",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.padding(bottom = 50.dp))
         }
     }
 }
@@ -161,7 +194,7 @@ fun FloatingIconPreview(
 ) {
     Column(
         modifier = Modifier
-            .background(Color.Transparent),
+            .background(Color.White),
         horizontalAlignment = Alignment.End
     ) {
         FloatingActionButton(
