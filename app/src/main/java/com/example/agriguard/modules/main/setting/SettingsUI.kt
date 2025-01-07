@@ -128,7 +128,7 @@ fun SettingsUI(
             }
         }
 
-        if(currentUser.isTechnician) {
+        if(currentUser.isFarmers) {
             Row(
                 modifier = Modifier
                     .padding(top = 10.dp)
