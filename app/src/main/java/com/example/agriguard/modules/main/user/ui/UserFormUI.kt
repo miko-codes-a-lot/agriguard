@@ -185,7 +185,7 @@ fun UserFormUI(
             )
         }
 
-        if(currentUser.isAdmin) {
+        if(currentUser.isTechnician) {
             item {
                 UploadId(
                     validId = validIdState,
@@ -529,7 +529,7 @@ fun ContainerLabelValue(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 2.dp),
+            .padding(top = 5.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         if (currentUser.isAdmin) {
