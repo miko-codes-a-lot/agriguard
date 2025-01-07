@@ -55,9 +55,9 @@ fun UserPreviewUI(
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val isSaving = remember { mutableStateOf(false) }
-    val imageBitmap = remember(user.validId) {
-        user.validId?.let { decodeBase64ToBitmap(it, maxWidth = 500, maxHeight = 500) }
-    }
+//    val imageBitmap = remember(user.validId) {
+//        user.validId?.let { decodeBase64ToBitmap(it, maxWidth = 500, maxHeight = 500) }
+//    }
     val statesValue = remember(user) {
         listOf(
             "First Name" to user.firstName,
@@ -88,23 +88,23 @@ fun UserPreviewUI(
         ViewUserDetails(statesValues = statesValue)
 
         Spacer(modifier = Modifier.padding(top = 9.dp))
-        if (imageBitmap != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-                    .clip(RectangleShape)
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    bitmap = imageBitmap.asImageBitmap(),
-                    contentDescription = "Valid ID Preview",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Fit
-                )
-            }
-        }
+//        if (imageBitmap != null) {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(300.dp)
+//                    .clip(RectangleShape)
+//                    .background(Color.White),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Image(
+//                    bitmap = imageBitmap.asImageBitmap(),
+//                    contentDescription = "Valid ID Preview",
+//                    modifier = Modifier.fillMaxSize(),
+//                    contentScale = ContentScale.Fit
+//                )
+//            }
+//        }
         ButtonPreview(user, coroutineScope, onSave, isSaving)
         Spacer(modifier = Modifier.padding(top = 9.dp))
 
