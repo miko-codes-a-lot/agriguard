@@ -6,6 +6,7 @@ import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.FileProvider
+import com.example.agriguard.modules.main.complain.ui.decodeBase64ToPdfImage
 import com.example.agriguard.modules.main.onion.model.dto.OnionInsuranceDto
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.itextpdf.text.Chunk
@@ -13,6 +14,7 @@ import com.itextpdf.text.Document
 import com.itextpdf.text.Element
 import com.itextpdf.text.Font
 import com.itextpdf.text.FontFactory
+import com.itextpdf.text.Image
 import com.itextpdf.text.PageSize
 import com.itextpdf.text.Paragraph
 import com.itextpdf.text.Phrase
@@ -139,8 +141,26 @@ fun exportOnionDetails(
 
         document.add(signatureTable)
 
+        if (!user.validId.isNullOrEmpty()) {
+            document.newPage()
+            val validIdTitle = Paragraph("Valid ID", titleFont)
+            validIdTitle.alignment = Element.ALIGN_CENTER
+            document.add(validIdTitle)
+            addLineSpace(document, 2)
 
-        addPageNumbers(writer)
+            val validIdImage = decodeBase64ToPdfImage(user.validId!!)
+            if (validIdImage != null) {
+                validIdImage.scaleToFit(document.pageSize.width - 80f, document.pageSize.height - 200f)
+                validIdImage.alignment = Image.ALIGN_CENTER
+                document.add(validIdImage)
+            } else {
+                val noValidIdParagraph = Paragraph("No Valid ID Provided", valueFont)
+                noValidIdParagraph.alignment = Element.ALIGN_CENTER
+                document.add(noValidIdParagraph)
+            }
+        }
+
+//        addPageNumbers(writer)
         document.close()
         onFinish(file)
 
