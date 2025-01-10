@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
+import com.example.agriguard.modules.main.about.AboutUI
 import com.example.agriguard.modules.main.dashboard.ui.DashboardUI
 import com.example.agriguard.modules.main.farmer.AddressesUI
 import com.example.agriguard.modules.main.menu.model.NavItem
@@ -57,6 +58,7 @@ fun MenuUI(
             ) {
                 navItems.forEach { item ->
                     NavigationBarItem(
+
                         icon = {
                             Icon(painter = item.icon,
                                 contentDescription = null,
@@ -91,6 +93,7 @@ fun MenuUI(
                 "Setting" -> SettingsUI(navController, currentUser)
                 "UsersList" -> UsersUI(navController)
                 "RegistrationMenu" -> RegistrationMenuUI(navController)
+                "About" -> AboutUI(navController)
             }
         }
     }
@@ -108,6 +111,11 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
             NavItem(
                 icon = painterResource(id = R.drawable.setting),
                 routeName = "Setting",
+                navigation = navController,
+            ),
+            NavItem(
+                icon = painterResource(id = R.drawable.about),
+                routeName = "About",
                 navigation = navController,
             ),
         )

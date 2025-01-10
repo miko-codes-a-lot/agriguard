@@ -79,8 +79,8 @@ fun FarmersPreviewUI(
         Column(
             modifier = Modifier
                 .verticalScroll(scrollState)
-                .fillMaxSize()
                 .background(Color.White)
+                .fillMaxSize()
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -95,7 +95,6 @@ fun FarmersPreviewUI(
             )
             FarmersData(stateValues = statesValue)
 
-            Spacer(modifier = Modifier.padding(top = 9.dp))
             if (imageBitmap != null) {
                 Box(
                     modifier = Modifier
