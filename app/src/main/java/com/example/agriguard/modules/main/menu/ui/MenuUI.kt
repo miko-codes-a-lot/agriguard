@@ -87,7 +87,7 @@ fun MenuUI(
                 "HomeDashboard" -> DashboardUI(navController, currentUser)
                 "AddressList" -> AddressesUI(navController, currentUser)
                 "MessageList" -> MessageListUI(navController)
-                "Report" -> ReportDashboardUI()
+                "Report" -> ReportDashboardUI(currentUser)
                 "Message" -> MessageUI(navController)
                 "FormValidation" -> ReportFormValidationUI(navController)
                 "Setting" -> SettingsUI(navController, currentUser)
@@ -128,6 +128,11 @@ fun getNavItems(navController: NavController, userDto: UserDto): List<NavItem> {
             NavItem(
                 icon =  painterResource(id = R.drawable.farmer),
                 routeName = "AddressList",
+                navigation = navController,
+            ),
+            NavItem(
+                icon = painterResource(id = R.drawable.report_icon),
+                routeName = "Report",
                 navigation = navController,
             ),
             NavItem(

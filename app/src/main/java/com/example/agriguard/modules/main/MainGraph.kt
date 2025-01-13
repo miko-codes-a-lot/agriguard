@@ -673,7 +673,7 @@ fun NavGraphBuilder.mainGraph(navController: NavController) {
         }
         composable<MainNav.ReportDashboard> {
             Guard(navController = navController) { currentUser ->
-                ReportDashboardUI()
+                ReportDashboardUI(currentUser)
             }
         }
         composable<MainNav.UserValidId> {
