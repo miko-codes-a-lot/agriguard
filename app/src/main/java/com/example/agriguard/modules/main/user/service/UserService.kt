@@ -1,5 +1,8 @@
 package com.example.agriguard.modules.main.user.service
 
+import com.example.agriguard.modules.main.complain.mapper.toDTO
+import com.example.agriguard.modules.main.complain.model.dto.ComplaintInsuranceDto
+import com.example.agriguard.modules.main.complain.model.entity.ComplaintInsurance
 import com.example.agriguard.modules.main.user.model.dto.UserDto
 import com.example.agriguard.modules.main.user.model.entity.User
 import com.example.agriguard.modules.main.user.model.mapper.toDTO
@@ -11,6 +14,7 @@ import io.realm.kotlin.ext.query
 import org.mongodb.kbson.ObjectId
 import javax.inject.Inject
 
+data class PieChartData(var status: String?, var value: Float?)
 class UserService  @Inject constructor(private val realm: Realm)  {
     fun fetchOne(userId: String): UserDto {
         return realm.query<User>("_id == $0", ObjectId(userId))
@@ -109,5 +113,32 @@ class UserService  @Inject constructor(private val realm: Realm)  {
             return user.toDTO()
         }
         return null
+    }
+
+    fun fetchComplaintsByUsersAddress(address: String?): List<ComplaintInsuranceDto> {
+        if (address.isNullOrEmpty()) {
+            return emptyList()
+        }
+
+        val users = fetch(isFarmers = true, addressName = address)
+        if (users.isEmpty()) {
+            return emptyList()
+        }
+
+        val userIds = users.mapNotNull { it.id }
+
+        val complaintQuery = realm.query<ComplaintInsurance>("userId IN $0", userIds)
+        val complaintList = complaintQuery.find()
+        return complaintList.map { it.toDTO() }
+    }
+
+    fun fetchComplaintsByDate(userId: ObjectId?): List<ComplaintInsuranceDto> {
+        val complaintQuery = if (userId != null) {
+            realm.query<ComplaintInsurance>("createdById == $0", userId)
+        } else {
+            realm.query<ComplaintInsurance>()
+        }
+        val complaintList = complaintQuery.find()
+        return complaintList.map { it.toDTO() }
     }
 }
