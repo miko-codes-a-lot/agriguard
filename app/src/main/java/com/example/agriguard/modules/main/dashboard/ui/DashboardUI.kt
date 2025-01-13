@@ -1,5 +1,6 @@
 package com.example.agriguard.modules.main.dashboard.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,12 +23,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,113 +52,24 @@ fun DashboardUI(
     navController: NavController,
     currentUser: UserDto
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val listOfDate = listOf("January","February","March","April","May","June","July","August","September","October","November","December")
-
-    var selectedDate by remember { mutableStateOf("Select Dates") }
     var isSampleFormDialogVisible by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-//
-//        if(!currentUser.isFarmers && !currentUser.isTechnician) {
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(100.dp)
-//                    .padding(horizontal = 0.dp, vertical = 4.dp)
-//                    .drawBehind {
-//                        val strokeWidth = 1.dp.toPx()
-//                        val y = size.height - strokeWidth / 2
-//                        drawLine(
-//                            color = Color(0xFF136204),
-//                            start = Offset(0f, y),
-//                            end = Offset(size.width, y),
-//                            strokeWidth = strokeWidth
-//                        )
-//                    },
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Box(
-//                    modifier = Modifier
-//                        .size(70.dp)
-//                        .clip(CircleShape)
-//                        .background(Color(0xFF136204))
-//                        .border(3.dp, Color(0xFF136204), CircleShape),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Icon(
-//                        painter = painterResource(id = R.drawable.person),
-//                        contentDescription = "Default placeholder",
-//                        modifier = Modifier.size(50.dp),
-//                        tint = Color.White
-//                    )
-//                }
-//                Column(
-//                    modifier = Modifier
-//                        .padding(start = 10.dp)
-//                ) {
-//                    Text(
-//                        text = "Hello ${currentUser.firstName} ",
-//                        fontSize = 25.sp,
-//                        color = Color(0xFF136204),
-//                        fontWeight = FontWeight.W800,
-//                        fontFamily = FontFamily.SansSerif
-//                    )
-//                    Text(
-//                        text = "Magandang Araw!",
-//                        fontSize = 20.sp,
-//                        color = Color(0xFF136204),
-//                        fontFamily = FontFamily.SansSerif
-//                    )
-//                }
-//                Spacer(modifier = Modifier.weight(1f))
-//                Image(
-//                    painter = painterResource(id = R.drawable.logo),
-//                    contentDescription = "Logo Image",
-//                    modifier = Modifier.size(105.dp)
-//                )
-//            }
-//
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize(),
-//                verticalArrangement = Arrangement.Center
-//            ) {
-//                OutlinedButton(
-//                    onClick = { navController.navigate(MainNav.Addresses) },
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(70.dp)
-//                ) {
-//                    if (currentUser.isAdmin) {
-//                        Text(
-//                            text = "Create an account for an \n admin or technician",
-//                            fontSize = 18.sp,
-//                            fontFamily = FontFamily.SansSerif,
-//                            color = Color(0xFF136204),
-//                            textAlign = TextAlign.Center,
-//                            lineHeight = 24.sp,
-//                            modifier = Modifier.padding(5.dp)
-//                        )
-//                    }
-//                }
-//            }
-//
-//        }else{
-            DashboardCategory(
-                navController = navController,
-                isSampleFormDialogVisible = isSampleFormDialogVisible,
-                onDialogVisibilityChange = { isVisible ->
-                    isSampleFormDialogVisible = isVisible
-                },
-                currentUser = currentUser
-            )
-//        }
+        DashboardCategory(
+            navController = navController,
+            isSampleFormDialogVisible = isSampleFormDialogVisible,
+            onDialogVisibilityChange = { isVisible ->
+                isSampleFormDialogVisible = isVisible
+            },
+            currentUser = currentUser
+        )
     }
 }
 
@@ -170,99 +80,88 @@ fun DashboardCategory(
     onDialogVisibilityChange: (Boolean) -> Unit,
     currentUser: UserDto
 ) {
-    Surface(
+    Row(
         modifier = Modifier
-            .fillMaxSize(),
-        color = Color(0xFFFFFFFF)
-    ){
+            .fillMaxWidth()
+            .background(Color(0xFFFFFFFF))
+            .drawBehind {
+                val strokeWidth = 1.dp.toPx()
+                val y = size.height - strokeWidth / 2
+                drawLine(
+                    color = Color(0xFF136204),
+                    start = Offset(0f, y),
+                    end = Offset(size.width, y),
+                    strokeWidth = strokeWidth
+                )
+            }
+            .height(100.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(70.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF136204))
+                .border(3.dp, Color(0xFF136204), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.person),
+                contentDescription = "Default placeholder",
+                modifier = Modifier.size(50.dp),
+                tint = Color.White
+            )
+        }
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .padding(start = 10.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFFFFF))
-                    .drawBehind {
-                        val strokeWidth = 1.dp.toPx()
-                        val y = size.height - strokeWidth / 2
-                        drawLine(
-                            color = Color(0xFF136204),
-                            start = Offset(0f, y),
-                            end = Offset(size.width, y),
-                            strokeWidth = strokeWidth
-                        )
-                    }
-                    .height(100.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(70.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF136204))
-                        .border(3.dp, Color(0xFF136204), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.person),
-                        contentDescription = "Default placeholder",
-                        modifier = Modifier.size(50.dp),
-                        tint = Color.White
-                    )
-                }
-                Column(
-                    modifier = Modifier
-                        .padding(start = 10.dp)
-                ) {
-                    Text(
-                        text = "Hello ${currentUser.firstName} ",
-                        fontSize = 25.sp,
-                        color = Color(0xFF136204),
-                        fontWeight = FontWeight.W800,
-                        fontFamily = FontFamily.SansSerif
-                    )
-                    Text(
-                        text = "Magandang Araw!",
-                        fontSize = 20.sp,
-                        color = Color(0xFF136204),
-                        fontFamily = FontFamily.SansSerif
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Image(
-                    painter = painterResource(id = R.drawable.notification),
-                    contentDescription = "Notification",
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clickable { navController.navigate(MainNav.NotificationList) },
-                    colorFilter = ColorFilter.tint(Color(0xFF136204))
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .padding(top = 5.dp)
-                    .background(Color.White)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = Modifier.height(40.dp))
-                CropsCategory(
-                    navController,
-                    onCropsMonitoringClick = {
-                        onDialogVisibilityChange(true)
-                    },
-                    currentUser = currentUser
-                )
-                if (isSampleFormDialogVisible) {
-                    PlantsDialog(
-                        onDismiss = { onDialogVisibilityChange(false) },
-                        navController = navController
-                    )
-                }
-            }
+            Text(
+                text = "Hello ${currentUser.firstName} ",
+                fontSize = 25.sp,
+                color = Color(0xFF136204),
+                fontWeight = FontWeight.W800,
+                fontFamily = FontFamily.SansSerif
+            )
+            Text(
+                text = "Magandang Araw!",
+                fontSize = 20.sp,
+                color = Color(0xFF136204),
+                fontFamily = FontFamily.SansSerif
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Image(
+            painter = painterResource(id = R.drawable.notification),
+            contentDescription = "Notification",
+            modifier = Modifier
+                .size(60.dp)
+                .clickable { navController.navigate(MainNav.NotificationList) },
+            colorFilter = ColorFilter.tint(Color(0xFF136204))
+        )
+    }
+    Column(
+        modifier = Modifier
+            .padding(top = 5.dp)
+            .background(Color.White)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(40.dp))
+        CropsCategory(
+            navController,
+            onCropsMonitoringClick = {
+                onDialogVisibilityChange(true)
+            },
+            currentUser = currentUser
+        )
+        if (isSampleFormDialogVisible) {
+            PlantsDialog(
+                onDismiss = { onDialogVisibilityChange(false) },
+                navController = navController
+            )
         }
     }
 }
