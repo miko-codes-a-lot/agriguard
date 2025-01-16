@@ -1,6 +1,5 @@
 package com.example.agriguard.modules.main.dashboard.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,6 +39,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.agriguard.R
@@ -237,6 +237,7 @@ fun CropsCategory(
                         color = Color(0xFF136204),
                         fontWeight = FontWeight.W500,
                         fontFamily = FontFamily.SansSerif,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
