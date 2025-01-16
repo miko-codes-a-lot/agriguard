@@ -53,6 +53,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.agriguard.R
+import com.example.agriguard.modules.intro.IntroNav
 import com.example.agriguard.modules.intro.login.model.dto.LoginDto
 import com.example.agriguard.modules.intro.login.viewmodel.LoginViewModel
 import com.example.agriguard.modules.intro.login.viewmodel.UserState
@@ -306,7 +307,7 @@ fun ForgetPassword(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp)
+            .padding(start = 25.dp)
     ){
         Row(
             modifier = Modifier
@@ -315,11 +316,11 @@ fun ForgetPassword(
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(
-                text = "Forgot Password? "
+                text = "Forgot Password ? "
             )
 
             TextButton(
-                onClick = { /*TODO*/ },
+                onClick = { navController.navigate(IntroNav.ForgotPassword) },
                 modifier = Modifier
                     .offset(x = (-10).dp )
                 ) {
