@@ -11,4 +11,7 @@ interface ApiService {
 
     @POST("verify-token")
     suspend fun verifyToken(@Body requestBody: Map<String, String>): Response<Any>
+
+    @POST("reset-password")
+    suspend fun resetPassword(@Body requestBody: Map<String, String>): Response<Any>
 }
