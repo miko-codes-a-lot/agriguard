@@ -39,7 +39,6 @@ fun TokenVerificationUI(
 ) {
     var token by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
-    Log.d("TokenVerificationUIF", "User Email: $email")
 
     Column(
         modifier = Modifier
@@ -48,7 +47,7 @@ fun TokenVerificationUI(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Enter the token sent to your email", fontSize = 17.sp, fontFamily = FontFamily.SansSerif)
+        Text("Enter the token sent to your MobileNumber", fontSize = 17.sp, fontFamily = FontFamily.SansSerif)
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             value = token,
@@ -57,8 +56,8 @@ fun TokenVerificationUI(
             modifier = Modifier
                 .fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color(0xFF6650a4),
-                focusedBorderColor = Color(0xFF6650a4),
+                unfocusedBorderColor = Color(0xFF136204),
+                focusedBorderColor = Color(0xFF136204),
                 focusedTextColor = Color.Black,
             )
         )
@@ -66,22 +65,22 @@ fun TokenVerificationUI(
 
         Button(
             onClick = {
-//                viewModel.verifyToken(email, token) { success, errorMessage ->
-//                    if (success) {
-//                        Log.d("TokenVerificationUIF", "Success User Email: $email, Token: $token")
-//                        navController.navigate(IntroNav.ResetPassword(email, token))
-//                    } else {
-//                        Log.d("TokenVerificationUIF", "Error User Email: $email, Token: $token")
-//                        message = errorMessage ?: "Token verification failed"
-//                    }
-//                }
+                viewModel.verifyToken(email, token) { success, errorMessage ->
+                    if (success) {
+                        Log.d("TokenVerificationUIF", "Success User Email: $email, Token: $token")
+                        navController.navigate(IntroNav.ResetPassword(email, token))
+                    } else {
+                        Log.d("TokenVerificationUIF", "Error User Email: $email, Token: $token")
+                        message = errorMessage ?: "Token verification failed"
+                    }
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF6650a4))
+                .background(Color(0xFF136204))
                 .height(55.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF6650a4),
+                containerColor = Color(0xFF136204),
                 contentColor = Color(0xFFFFFFFF)
             ),
         ) {

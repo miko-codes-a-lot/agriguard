@@ -32,6 +32,9 @@ fun User.toDTO(): UserDto {
         lastUpdatedAt = lastUpdatedAt.toInstantStringNullable(),
         deletedById = deletedById?.toHexString(),
         deletedAt = deletedAt?.run { this.toInstantStringNullable() },
+        resetPasswordToken = resetPasswordToken,
+        resetTokenExpiration = resetTokenExpiration?.toInstantStringNullable(),
+        isVerified = isVerified
     )
 }
 
@@ -59,5 +62,8 @@ fun UserDto.toEntity(): User {
         lastUpdatedAt = userDto.createdAt.toRealmInstantNullable() ?: RealmInstant.now()
         deletedById = userDto.deletedById?.toObjectId()
         deletedAt = userDto.deletedAt.toRealmInstantNullable()
+        resetPasswordToken = userDto.resetPasswordToken
+        resetTokenExpiration = userDto.resetTokenExpiration?.toRealmInstantNullable()
+        isVerified = userDto.isVerified
     }
 }

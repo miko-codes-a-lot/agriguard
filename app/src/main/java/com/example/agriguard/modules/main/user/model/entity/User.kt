@@ -28,4 +28,7 @@ class User : RealmObject {
     var lastUpdatedAt: RealmInstant = RealmInstant.now()
     var deletedById: ObjectId? = null
     var deletedAt: RealmInstant? = null
+    var resetPasswordToken: String? = null
+    var resetTokenExpiration: RealmInstant? = null
+    var isVerified: Boolean = false
 }

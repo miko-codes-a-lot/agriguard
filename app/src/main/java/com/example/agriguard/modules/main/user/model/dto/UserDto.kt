@@ -22,4 +22,7 @@ data class UserDto(
     var lastUpdatedAt: String? = null,
     var deletedById: String? = null,
     var deletedAt: String? = null,
+    var resetPasswordToken: String? = null,
+    var resetTokenExpiration: String? = null,
+    var isVerified: Boolean = false,
 )
