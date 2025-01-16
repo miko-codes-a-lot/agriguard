@@ -123,4 +123,8 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    fun getUserByEmail(email: String): UserDto? {
+        return userService.fetchByEmail(email)
+    }
 }
