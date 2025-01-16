@@ -25,13 +25,13 @@ class UserViewModel @Inject constructor(
         return this.userService.fetchOne(userId)
     }
 
-    fun getComplaintsByAddress(address: String?): List<ComplaintInsuranceDto> {
-        return userService.fetchComplaintsByUsersAddress(address)
+    fun getComplaintsByAddress(address: String?, month: Int): List<ComplaintInsuranceDto> {
+        return userService.fetchComplaintsByUsersAddress(address, month)
     }
 
-    fun getComplaintsByDate(userId: ObjectId, isAdmin: Boolean = false): List<ComplaintInsuranceDto> {
+    fun getComplaintsByDate(userId: ObjectId, isAdmin: Boolean = false, month: Int? = null): List<ComplaintInsuranceDto> {
         val id = if (!isAdmin) userId else null
-        return userService.fetchComplaintsByDate(userId = id)
+        return userService.fetchComplaintsByDate(userId = id, month = month)
     }
 
     fun fetchUserByEmail(email: String): UserDto? {

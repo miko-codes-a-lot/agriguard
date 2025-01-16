@@ -59,19 +59,21 @@ fun ReportDashboardUI(
     currentUser : UserDto
 ) {
     val userViewModel: UserViewModel = hiltViewModel()
-    val complaints = remember(currentUser) {
+    var selectedDate by remember { mutableStateOf("January") }
+    val listOfDate = listOf("January","February","March","April","May","June","July","August","September","October","November","December")
+    val selectedMonth = listOfDate.indexOf(selectedDate) + 1
+    val complaints = remember(currentUser, selectedMonth) {
         if (currentUser.isAdmin) {
             userViewModel.getComplaintsByDate(
                 currentUser.id.toObjectId(),
-                currentUser.isAdmin
+                currentUser.isAdmin,
+                month = selectedMonth
             )
         } else {
-            userViewModel.getComplaintsByAddress(currentUser.address)
+            userViewModel.getComplaintsByAddress(currentUser.address, selectedMonth)
         }
     }
-    val listOfDate = listOf("January","February","March","April","May","June","July","August","September","October","November","December")
     var expanded by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf("January") }
     val filteredComplaints = complaints.filter { complaint ->
         complaint.createdAt?.let {
             try {
