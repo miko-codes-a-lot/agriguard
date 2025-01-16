@@ -58,8 +58,8 @@ fun ForgotPasswordUI (
             modifier = Modifier
                 .fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color(0xFF6650a4),
-                focusedBorderColor = Color(0xFF6650a4),
+                unfocusedBorderColor = Color(0xFF136204),
+                focusedBorderColor = Color(0xFF136204),
                 focusedTextColor = Color.Black,
             )
         )
@@ -68,24 +68,24 @@ fun ForgotPasswordUI (
 
         Button(
             onClick = {
-//                if (email.isNotBlank()) {
-//                    isLoading = true
-//                    viewModel.sendPasswordResetToken(email) { success, errorMessage ->
-//                        isLoading = false
-//                        if (success) {
-//                            navController.navigate(IntroNav.TokenVerification(email))
-//                        }
-//                    }
-//                } else {
-//                    message = "Email cannot be blank."
-//                }
+                if (email.isNotBlank()) {
+                    isLoading = true
+                    viewModel.sendPasswordResetToken(email) { success, errorMessage ->
+                        isLoading = false
+                        if (success) {
+                            navController.navigate(IntroNav.TokenVerification(email))
+                        }
+                    }
+                } else {
+                    message = "Email cannot be blank."
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF6650a4))
+                .background(Color(0xFF136204))
                 .height(55.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF6650a4),
+                containerColor = Color(0xFF136204),
                 contentColor = Color(0xFFFFFFFF),
             ),
         ) {
