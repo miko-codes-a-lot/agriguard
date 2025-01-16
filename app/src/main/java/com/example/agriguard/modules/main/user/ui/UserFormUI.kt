@@ -171,6 +171,7 @@ fun UserFormUI(
                       .offset(y = (-6).dp)
             )
         }
+        val radioErrorMessage = if (radioError) "Please select an option" else ""
 
         item {
             ContainerLabelValue(
@@ -181,7 +182,9 @@ fun UserFormUI(
                 },
                 includePassword = true,
                 currentUser = currentUser,
-                addressList = addressList
+                addressList = addressList,
+                errors = errors,
+                radioErrorMsg = radioErrorMessage,
             )
         }
 
@@ -203,7 +206,13 @@ fun UserFormUI(
                 targetUserDto = userDto,
                 selectedOption = selectedOption,
                 onSubmit = { updatedUserDto ->
-                    onSubmit(updatedUserDto.copy(validId = validIdState))
+                    isButtonEnabled = false
+                    val hasError = validateForm(errors, statesValue)
+                    if (hasError || radioError) {
+                        isButtonEnabled = true
+                    } else {
+                        onSubmit(updatedUserDto.copy(validId = validIdState))
+                    }
                 },
                 errors = errors,
                 isEnableSubmit = isButtonEnabled,
@@ -297,7 +306,9 @@ fun ContainerLabelValue(
     currentUser: UserDto,
     includePassword: Boolean,
     onSelect: (option: String) -> Unit,
-    addressList: List<AddressDto>
+    addressList: List<AddressDto>,
+    errors: Map<String, MutableState<String>>,
+    radioErrorMsg: String,
 ) {
     val firstNameKey = "First Name"
     val firstName = statesValue[firstNameKey]
@@ -309,7 +320,12 @@ fun ContainerLabelValue(
             color = Color.Black,
             fontSize = 17.sp,
             fontFamily = FontFamily.SansSerif
-        )
+        ),
+        onErrorChange = { hasError ->
+            errors[firstNameKey]?.value = if (hasError) "This field is required" else ""
+        },
+        errorMessage = errors[firstNameKey]?.value ?: "",
+        isError = errors[firstNameKey]?.value?.isNotEmpty() == true,
     )
 
     val middleNameKey = "Middle Name"
@@ -322,7 +338,12 @@ fun ContainerLabelValue(
             color = Color.Black,
             fontSize = 17.sp,
             fontFamily = FontFamily.SansSerif
-        )
+        ),
+        onErrorChange = { hasError ->
+            errors[middleNameKey]?.value = if (hasError) "This field is required" else ""
+        },
+        errorMessage = errors[middleNameKey]?.value ?: "",
+        isError = errors[middleNameKey]?.value?.isNotEmpty() == true,
     )
 
     val lastNameKey = "Last Name"
@@ -335,7 +356,12 @@ fun ContainerLabelValue(
             color = Color.Black,
             fontSize = 17.sp,
             fontFamily = FontFamily.SansSerif
-        )
+        ),
+        onErrorChange = { hasError ->
+            errors[lastNameKey]?.value = if (hasError) "This field is required" else ""
+        },
+        errorMessage = errors[lastNameKey]?.value ?: "",
+        isError = errors[lastNameKey]?.value?.isNotEmpty() == true,
     )
 
     val dateOfBirthKey = "Date Of Birth"
@@ -479,20 +505,30 @@ fun ContainerLabelValue(
             color = Color.Black,
             fontSize = 17.sp,
             fontFamily = FontFamily.SansSerif
-        )
+        ),
+        onErrorChange = { hasError ->
+            errors[mobileNumberKey]?.value = if (hasError) "This field is required" else ""
+        },
+        errorMessage = errors[mobileNumberKey]?.value ?: "",
+        isError = errors[mobileNumberKey]?.value?.isNotEmpty() == true,
     )
 
-    val userNameKey = "Email"
-    val userName = statesValue[userNameKey]
+    val userEmailKey = "Email"
+    val userEmail = statesValue[userEmailKey]
     TextFieldContainer(
-        textFieldLabel = userNameKey,
-        textFieldValue = userName?.value ?: "",
-        onValueChange = { newValue -> userName?.value = newValue },
+        textFieldLabel = userEmailKey,
+        textFieldValue = userEmail?.value ?: "",
+        onValueChange = { newValue -> userEmail?.value = newValue },
         textStyle = TextStyle(
             color = Color.Black,
             fontSize = 17.sp,
             fontFamily = FontFamily.SansSerif
-        )
+        ),
+        onErrorChange = { hasError ->
+            errors[userEmailKey]?.value = if (hasError) "This field is required" else ""
+        },
+        errorMessage = errors[userEmailKey]?.value ?: "",
+        isError = errors[userEmailKey]?.value?.isNotEmpty() == true,
     )
 
     if (includePassword) {
@@ -506,26 +542,31 @@ fun ContainerLabelValue(
                 color = Color.Black,
                 fontSize = 17.sp,
                 fontFamily = FontFamily.SansSerif
-            )
+            ),
+            onErrorChange = { hasError ->
+                errors[passwordKey]?.value = if (hasError) "This field is required" else ""
+            },
+            errorMessage = errors[passwordKey]?.value ?: "",
+            isError = errors[passwordKey]?.value?.isNotEmpty() == true,
         )
     }
 
-//    Column(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(vertical = 8.dp)
-//            .height(16.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
-//    ) {
-//        if (radioErrorMsg.isNotEmpty()) {
-//            Text(
-//                text = radioErrorMsg,
-//                color = Color.Red,
-//                fontSize = 11.sp,
-//            )
-//        }
-//    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .height(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        if (radioErrorMsg.isNotEmpty()) {
+            Text(
+                text = radioErrorMsg,
+                color = Color.Red,
+                fontSize = 11.sp,
+            )
+        }
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -620,21 +661,25 @@ fun TextFieldContainer(
     textFieldLabel: String,
     textFieldValue: String,
     onValueChange: (String) -> Unit,
-    textStyle: TextStyle
+    textStyle: TextStyle,
+    isDisable: Boolean = false,
+    errorMessage: String = "",
+    isError: Boolean,
+    onErrorChange: (Boolean) -> Unit,
 ) {
     val isPasswordField = textFieldLabel == "Password"
     var isPasswordVisible by remember { mutableStateOf(false) }
     val isPhoneNumberField = textFieldLabel == "Mobile Number"
 
-//    val colors = if (isError) {
-//        OutlinedTextFieldDefaults.colors(
-//            unfocusedContainerColor = Color.Red,
-//        )
-//    } else {
-//        OutlinedTextFieldDefaults.colors(
-//            unfocusedContainerColor = Color.Transparent
-//        )
-//    }
+    val colors = if (isError) {
+        OutlinedTextFieldDefaults.colors(
+            unfocusedContainerColor = Color.Red,
+        )
+    } else {
+        OutlinedTextFieldDefaults.colors(
+            unfocusedContainerColor = Color.Transparent
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -660,8 +705,34 @@ fun TextFieldContainer(
             TextField(
                 value = textFieldValue,
                 onValueChange = {
-                    onValueChange(it)
+                    if (!isDisable) {
+                        if (isPhoneNumberField) {
+                            if (it.all { char -> char.isDigit() }) {
+                                onValueChange(it)
+                                onErrorChange(false)
+                            } else {
+                                onErrorChange(true)
+                            }
+                        } else {
+                            onValueChange(it)
+                            onErrorChange(it.isEmpty())
+                        }
+                    }
                 },
+                placeholder =  if (!isError) {
+                    { Text("Enter value", color = Color.Black, fontSize = 16.sp, fontFamily = FontFamily.SansSerif) }
+                } else null,
+                label = if (isError) {
+                    {
+                        Text(
+                            text = errorMessage,
+                            color = Color.Red,
+                            fontFamily = FontFamily.SansSerif,
+                            fontSize = 12.sp,
+                            modifier = Modifier.offset(y = (-3).dp)
+                        )
+                    }
+                } else null,
                 textStyle = textStyle,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -817,37 +888,37 @@ fun ButtonSubmitData(
 ) {
     Button(
         onClick = {
-//            val hasError = validateForm(errors, statesValue)
-//            if (!hasError) {
-            val address = if (currentUser.isTechnician && selectedOption == "Farmers") {
-                currentUser.address ?: ""
-            } else {
-                statesValue["Address"]?.value ?: ""
-            }
-                val userDto = UserDto(
-                    id =  targetUserDto?.id,
-                    firstName = statesValue["First Name"]?.value ?: "",
-                    middleName = statesValue["Middle Name"]?.value ?: "",
-                    lastName = statesValue["Last Name"]?.value ?: "",
-                    address = address,
-                    mobileNumber = statesValue["Mobile Number"]?.value ?: "",
-                    dateOfBirth = statesValue["Date Of Birth"]?.value ?: "",
-                    email = statesValue["Email"]?.value ?: "",
-                    password = statesValue["Password"]?.value ?: targetUserDto?.password ?: "",
-                    isAdmin = selectedOption == "Admin",
-                    isTechnician = selectedOption == "Technician",
-                    isFarmers = selectedOption == "Farmers",
-                    validId = targetUserDto?.validId
-                )
-
-                if (targetUserDto?.id == null) {
-                    userDto.password = statesValue["Password"]?.value?.hashPassword() ?: "";
+            val hasError = validateForm(errors, statesValue)
+            if (!hasError) {
+                val address = if (currentUser.isTechnician && selectedOption == "Farmers") {
+                    currentUser.address ?: ""
                 } else {
-                    userDto.password = targetUserDto.password
+                    statesValue["Address"]?.value ?: ""
                 }
+                    val userDto = UserDto(
+                        id =  targetUserDto?.id,
+                        firstName = statesValue["First Name"]?.value ?: "",
+                        middleName = statesValue["Middle Name"]?.value ?: "",
+                        lastName = statesValue["Last Name"]?.value ?: "",
+                        address = address,
+                        mobileNumber = statesValue["Mobile Number"]?.value ?: "",
+                        dateOfBirth = statesValue["Date Of Birth"]?.value ?: "",
+                        email = statesValue["Email"]?.value ?: "",
+                        password = statesValue["Password"]?.value ?: targetUserDto?.password ?: "",
+                        isAdmin = selectedOption == "Admin",
+                        isTechnician = selectedOption == "Technician",
+                        isFarmers = selectedOption == "Farmers",
+                        validId = targetUserDto?.validId
+                    )
 
-                onSubmit(userDto)
-//            }
+                    if (targetUserDto?.id == null) {
+                        userDto.password = statesValue["Password"]?.value?.hashPassword() ?: "";
+                    } else {
+                        userDto.password = targetUserDto.password
+                    }
+
+                    onSubmit(userDto)
+            }
         },
         enabled = isEnableSubmit,
         modifier = Modifier
@@ -862,94 +933,93 @@ fun ButtonSubmitData(
         Text("Submit", fontSize = 18.sp)
     }
 }
+
 fun validateForm(
     errors: Map<String, MutableState<String>>,
     statesValue: Map<String, MutableState<String>>,
 ): Boolean {
-//    var hasError = false
-//    val emailPattern = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
-//    statesValue.forEach { (label, state) ->
-//        when (label) {
-//            "First Name", "Last Name" -> {
-//                val name = state.value
-//                if (name.isBlank()) {
-//                    errors[label]?.value = "Cannot be empty"
-//                    hasError = true
-//                } else if (name.any { it.isDigit() }) {
-//                    errors[label]?.value = "Cannot contain numbers"
-//                    hasError = true
-//                } else if (!name.first().isUpperCase()) {
-//                    errors[label]?.value = "First letter uppercase"
-//                    hasError = true
-//                } else {
-//                    errors[label]?.value = ""
-//                }
-//            }
-//
-//            "Email" -> {
-//                val email = state.value
-//                if (!emailPattern.matches(email)) {
-//                    errors[label]?.value = "Invalid email address"
-//                    hasError = true
-//                } else if (email != email.lowercase()) {
-//                    errors[label]?.value = "Email must be lowercase"
-//                    hasError = true
-//                } else {
-//                    errors[label]?.value = ""
-//                }
-//            }
-//
-//            "Address" -> {
-//                val address = state.value
-//                if (address.isBlank()) {
-//                    errors[label]?.value = "Cannot be empty"
-//                    hasError = true
-//                } else if (address.length < 5) {
-//                    errors[label]?.value = "Address is too short"
-//                    hasError = true
-//                } else if (!address.matches(Regex("^[a-zA-Z0-9,. ]+$"))) {
-//                    errors[label]?.value = "Invalid address"
-//                    hasError = true
-//                } else {
-//                    errors[label]?.value = ""
-//                }
-//            }
-//
-//            "Mobile Number" -> {
-//                if (state.value.length != 11) {
-//                    errors[label]?.value = "Must be 11 digits"
-//                    hasError = true
-//                } else if (!state.value.startsWith("09")) {
-//                    errors[label]?.value = "Must start with '09'"
-//                    hasError = true
-//                } else {
-//                    errors[label]?.value = ""
-//                }
-//            }
-//
-//            "Password" -> {
-//                if (state.value.length < 6) {
-//                    errors[label]?.value = "Must be at least 6 characters"
-//                    hasError = true
-//                } else if (state.value.contains(" ")) {
-//                    errors[label]?.value = "Cannot contain spaces"
-//                    hasError = true
-//                } else {
-//                    errors[label]?.value = ""
-//                }
-//            }
-//
-//            "Date Of Birth" -> {
-//                if (state.value.isEmpty()) {
-//                    errors[label]?.value = "Date of birth is required"
-//                    hasError = true
-//                } else {
-//                    errors[label]?.value = ""
-//                }
-//            }
-//        }
-//    }
-//    return hasError
+    var hasError = false
+    val emailPattern = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+    statesValue.forEach { (label, state) ->
+        when (label) {
+            "First Name", "Last Name" -> {
+                val name = state.value
+                if (name.isBlank()) {
+                    errors[label]?.value = "Cannot be empty"
+                    hasError = true
+                } else if (name.any { it.isDigit() }) {
+                    errors[label]?.value = "Cannot contain numbers"
+                    hasError = true
+                } else if (!name.first().isUpperCase()) {
+                    errors[label]?.value = "First letter uppercase"
+                    hasError = true
+                } else {
+                    errors[label]?.value = ""
+                }
+            }
 
-    return false
+            "Email" -> {
+                val email = state.value
+                if (!emailPattern.matches(email)) {
+                    errors[label]?.value = "Invalid email address"
+                    hasError = true
+                } else if (email != email.lowercase()) {
+                    errors[label]?.value = "Email must be lowercase"
+                    hasError = true
+                } else {
+                    errors[label]?.value = ""
+                }
+            }
+
+            "Address" -> {
+                val address = state.value
+                if (address.isBlank()) {
+                    errors[label]?.value = "Cannot be empty"
+                    hasError = true
+                } else if (address.length < 5) {
+                    errors[label]?.value = "Address is too short"
+                    hasError = true
+                } else if (!address.matches(Regex("^[a-zA-Z0-9,. ]+$"))) {
+                    errors[label]?.value = "Invalid address"
+                    hasError = true
+                } else {
+                    errors[label]?.value = ""
+                }
+            }
+
+            "Mobile Number" -> {
+                if (state.value.length != 11) {
+                    errors[label]?.value = "Must be 11 digits"
+                    hasError = true
+                } else if (!state.value.startsWith("09")) {
+                    errors[label]?.value = "Must start with '09'"
+                    hasError = true
+                } else {
+                    errors[label]?.value = ""
+                }
+            }
+
+            "Password" -> {
+                if (state.value.length < 6) {
+                    errors[label]?.value = "Must be at least 6 characters"
+                    hasError = true
+                } else if (state.value.contains(" ")) {
+                    errors[label]?.value = "Cannot contain spaces"
+                    hasError = true
+                } else {
+                    errors[label]?.value = ""
+                }
+            }
+
+            "Date Of Birth" -> {
+                if (state.value.isEmpty()) {
+                    errors[label]?.value = "Date of birth is required"
+                    hasError = true
+                } else {
+                    errors[label]?.value = ""
+                }
+            }
+        }
+    }
+    return hasError
 }
