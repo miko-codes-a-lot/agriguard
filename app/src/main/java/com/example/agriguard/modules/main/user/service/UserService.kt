@@ -107,14 +107,6 @@ class UserService  @Inject constructor(private val realm: Realm)  {
         }
     }
 
-    private fun fetchEmailAndToken(email: String, token: String): UserDto? {
-        val user = realm.query<User>("email == $0 AND resetPasswordToken == $1", email, token).find().firstOrNull()
-        if (user != null) {
-            return user.toDTO()
-        }
-        return null
-    }
-
     fun fetchComplaintsByUsersAddress(address: String?): List<ComplaintInsuranceDto> {
         if (address.isNullOrEmpty()) {
             return emptyList()
@@ -140,5 +132,18 @@ class UserService  @Inject constructor(private val realm: Realm)  {
         }
         val complaintList = complaintQuery.find()
         return complaintList.map { it.toDTO() }
+    }
+
+    fun fetchByEmail(email: String): UserDto? {
+        val user = realm.query<User>("email == $0", email).find().firstOrNull()
+        return user?.toDTO()
+    }
+
+    fun fetchEmailAndToken(email: String, token: String): UserDto? {
+        val user = realm.query<User>("email == $0 AND resetPasswordToken == $1", email, token).find().firstOrNull()
+        if (user != null) {
+            return user.toDTO()
+        }
+        return null
     }
 }

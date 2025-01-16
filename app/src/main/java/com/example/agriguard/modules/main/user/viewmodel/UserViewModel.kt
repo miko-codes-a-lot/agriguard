@@ -34,4 +34,12 @@ class UserViewModel @Inject constructor(
         return userService.fetchComplaintsByDate(userId = id)
     }
 
+    fun fetchUserByEmail(email: String): UserDto? {
+        return userService.fetchByEmail(email)
+    }
+
+    fun fetchUserByEmailAndToken(email: String, token: String): UserDto? {
+        return userService.fetchEmailAndToken(email, token)
+    }
+
 }
