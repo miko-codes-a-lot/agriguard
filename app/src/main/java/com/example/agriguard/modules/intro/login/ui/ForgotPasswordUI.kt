@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -68,17 +69,26 @@ fun ForgotPasswordUI (
 
         Button(
             onClick = {
-                if (email.isNotBlank()) {
-                    isLoading = true
-                    viewModel.sendPasswordResetToken(email) { success, errorMessage ->
-                        isLoading = false
-                        if (success) {
-                            navController.navigate(IntroNav.TokenVerification(email))
+                when {
+                    email.isBlank() -> {
+                        message = "Email cannot be blank."
+                    }
+                    !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
+                        message = "Please enter a valid email address."
+                    }
+                    else -> {
+                        isLoading = true
+                        message = null
+                        viewModel.request(email) { success, responseMessage ->
+                            isLoading = false
+                            message = responseMessage
+                            if (success) {
+                                navController.navigate(IntroNav.TokenVerification(email))
+                            }
                         }
                     }
-                } else {
-                    message = "Email cannot be blank."
                 }
+
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -110,7 +120,8 @@ fun ForgotPasswordUI (
                 it,
                 color = if (it.contains("success")) Color.Green else Color.Red,
                 fontSize = 15.sp,
-                modifier = Modifier.padding(top = 10.dp)
+                modifier = Modifier.padding(top = 10.dp),
+                textAlign = TextAlign.Center
             )
         }
     }
