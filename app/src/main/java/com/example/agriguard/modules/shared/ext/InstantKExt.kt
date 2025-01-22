@@ -11,3 +11,10 @@ fun Instant.toRealmInstant(): RealmInstant {
 fun RealmInstant.toKotlinInstant(): Instant {
     return Instant.fromEpochSeconds(epochSeconds, nanosecondsOfSecond.toLong())
 }
+
+fun RealmInstant.plusSeconds(secondsToAdd: Long): RealmInstant {
+    val newEpochSeconds = this.epochSeconds + secondsToAdd
+    val newNanoSeconds = this.nanosecondsOfSecond
+
+    return RealmInstant.from(newEpochSeconds, newNanoSeconds)
+}
