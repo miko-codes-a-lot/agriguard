@@ -3,7 +3,6 @@ package com.example.agriguard.modules.intro.login.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -74,18 +73,17 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun sendPasswordResetToken(email: String, callback: (Boolean, String?) -> Unit) {
+    fun request(email: String, callback: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {
-                val success = authService.requestPasswordReset(email)
+                val success = authService.requestOTP(email)
                 if (success) {
-                    callback(true, null)
+                    callback(true, "OTP successfully generated and saved to the database.")
                 } else {
-                    Log.e("ForgotPassword", "Failed to send password reset token for email: $email")
-                    callback(false, "Failed to send password reset token.")
+                    callback(false, "Failed to generate OTP.")
                 }
             } catch (e: Exception) {
-                callback(false, "Error: ${e.message}")
+                callback(false, e.message)
             }
         }
     }
@@ -95,16 +93,15 @@ class LoginViewModel @Inject constructor(
             callback(false, "Email and token cannot be blank.")
             return
         }
+
         viewModelScope.launch {
             try {
-                val success = authService.verifyToken(email, token)
-                if (success) {
+                val isTokenValid = authService.verifyResetToken(email, token)
+                if (isTokenValid) {
                     callback(true, null)
-                } else {
-                    callback(false, "Token verification failed.")
                 }
             } catch (e: Exception) {
-                callback(false, "Failed to verify token: ${e.localizedMessage}")
+                callback(false, "Invalid token. Please try again.")
             }
         }
     }
@@ -122,9 +119,5 @@ class LoginViewModel @Inject constructor(
                 callback(false, "Error resetting password: ${e.localizedMessage}")
             }
         }
-    }
-
-    fun getUserByEmail(email: String): UserDto? {
-        return userService.fetchByEmail(email)
     }
 }
