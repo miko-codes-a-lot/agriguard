@@ -39,7 +39,7 @@ fun TokenVerificationUI(
 ) {
     var token by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
-
+    var isLoading by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -47,7 +47,7 @@ fun TokenVerificationUI(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Enter the token sent to your MobileNumber", fontSize = 17.sp, fontFamily = FontFamily.SansSerif)
+        Text("Enter the token sent to your Mobile Number", fontSize = 17.sp, fontFamily = FontFamily.SansSerif)
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             value = token,
@@ -65,14 +65,19 @@ fun TokenVerificationUI(
 
         Button(
             onClick = {
-                viewModel.verifyToken(email, token) { success, errorMessage ->
-                    if (success) {
-                        Log.d("TokenVerificationUIF", "Success User Email: $email, Token: $token")
-                        navController.navigate(IntroNav.ResetPassword(email, token))
-                    } else {
-                        Log.d("TokenVerificationUIF", "Error User Email: $email, Token: $token")
-                        message = errorMessage ?: "Token verification failed"
+                if (email.isNotBlank() && token.isNotBlank()) {
+                    isLoading = true
+                    message = null
+                    viewModel.verifyToken(email, token) { success, errorMessage ->
+                        isLoading = false
+                        if (success) {
+                            navController.navigate(IntroNav.ResetPassword(email, token))
+                        } else {
+                            message = errorMessage ?: "Token verification failed. Please try again."
+                        }
                     }
+                } else {
+                    message = "Email and Token cannot be empty"
                 }
             },
             modifier = Modifier
