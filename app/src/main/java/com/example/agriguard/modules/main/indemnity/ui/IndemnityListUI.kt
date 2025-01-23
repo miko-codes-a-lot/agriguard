@@ -183,7 +183,7 @@ private fun IndemnityButton(
         ) {
             item {
                 val text = if (currentUser.isFarmers) formattedDate
-                else "${user.firstName} ${user.lastName} - $formattedDate"
+                else "\uD83D\uDCCC ${user.address},  ${user.firstName} ${user.lastName} - $formattedDate"
                 Text(
                     text = text,
                     fontSize = 17.sp,
