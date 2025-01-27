@@ -13,7 +13,7 @@ User-Friendly Design: Clean and intuitive UI powered by Jetpack Compose.
 Kotlin: Programming language for the app development.
 Jetpack Compose: Modern UI toolkit for building native Android apps.
 MVVM Architecture: Clean and scalable app architecture.
-Room Database: For offline storage of crop-related data.
+Mongodb Atlas: For data storage of crop-related data.
 Retrofit: To fetch expert recommendations and solutions from the backend.
 
 📲 Installation
@@ -44,7 +44,7 @@ Click on the ▶️ "Run" button in Android Studio or use the shortcut Shift + F
 Home Screen	Crop Details	Expert Guidance
 ![image alt](https://github.com/miko-codes-a-lot/agriguard/blob/42d9481f72d6ce3065ad0b329d312301c9baed0d/Untitled%20design.png)
 
-Database Setup
+## Database Setup
 
 🌥️ Deploy with MongoDB Atlas (Cloud
 
