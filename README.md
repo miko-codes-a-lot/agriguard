@@ -44,6 +44,23 @@ Click on the ▶️ "Run" button in Android Studio or use the shortcut Shift + F
 Home Screen	Crop Details	Expert Guidance
 ![image alt](https://github.com/miko-codes-a-lot/agriguard/blob/42d9481f72d6ce3065ad0b329d312301c9baed0d/Untitled%20design.png)
 
+Database Setup
+
+🌥️ Deploy with MongoDB Atlas (Cloud
+
+1. Create a MongoDB Atlas Account:
+
+   * Sign up at MongoDB Atlas.
+
+2. Create a Cluster:
+
+   * Create a free cluster and add a database user with appropriate access.
+
+3. Update Connection String:
+
+   * Replace and add (mongodb+srv://<username>:<password>@cluster0.mongodb.net/agriguard)
+
+
 📧 Contact
 If you have any questions, suggestions, or feedback, feel free to reach out:
 
