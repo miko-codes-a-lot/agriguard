@@ -1,7 +1,5 @@
-# AgriGuard App
+# AgriGuard Mobile Application
 
-AgriGuard is a mobile application crafted to empower farmers by simplifying the management of their agricultural activities. 
-With its intuitive design and practical features, AgriGuard seamlessly integrates traditional farming methods with modern technology, 
-enabling farmers to boost productivity, make informed decisions, and adapt to the evolving agricultural landscape with confidence.
+AgriGuard is a mobile application designed to assist farmers by providing valuable insights into managing their agricultural activities. It enables farmers to register their crops and access expert guidance on proper care. Additionally, the app delivers solutions to address crop diseases and pests effectively.
 
 ![image alt](https://github.com/miko-codes-a-lot/agriguard/blob/14ba9b39bc0c294b39b5fbea2c592b75189e68d7/home.jpg)
