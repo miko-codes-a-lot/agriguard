@@ -4,7 +4,6 @@ AgriGuard is a mobile application designed to assist farmers by providing valuab
 
 ![image alt](https://github.com/miko-codes-a-lot/agriguard/blob/14ba9b39bc0c294b39b5fbea2c592b75189e68d7/home.jpg)
 
-
 ## Installation
 1. Clone the repository:  
    ```bash
@@ -71,7 +70,7 @@ Run the app:
 Click on the ▶️ "Run" button in Android Studio or use the shortcut Shift + F10.
 📸 Screenshots
 Home Screen	Crop Details	Expert Guidance
-		
+![image alt](https://github.com/miko-codes-a-lot/agriguard/blob/42d9481f72d6ce3065ad0b329d312301c9baed0d/Untitled%20design.png)
 (More screenshots coming soon!)
 
 🌟 Contributing
