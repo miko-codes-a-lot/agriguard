@@ -19,7 +19,8 @@ Retrofit: To fetch expert recommendations and solutions from the backend.
 📲 Installation
 To set up and run the AgriGuard application on your local machine, follow these steps:
 
-![image alt]()
+![image alt](https://github.com/miko-codes-a-lot/agriguard/blob/a56f84ff8e6f1263b9fb237e29761fe0cb9bace7/Image-App1.png)
+![image alt](https://github.com/miko-codes-a-lot/agriguard/blob/a56f84ff8e6f1263b9fb237e29761fe0cb9bace7/Image-App2.png)
 
 ## Installation
 1. Clone the repository:  
